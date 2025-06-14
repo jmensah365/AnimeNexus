@@ -33,3 +33,7 @@ export const signOut = async () => {
 export const refreshTokenSession = async (refreshToken) => {
     return await supabase.auth.refreshSession({refresh_token: refreshToken});
 }
+
+export const setUserSession = async (accessToken, refreshToken) => {
+    return await supabase.auth.setSession({access_token: accessToken, refresh_token: refreshToken});
+}
