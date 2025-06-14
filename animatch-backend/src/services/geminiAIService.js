@@ -20,7 +20,6 @@ export const getAIAnimeReccommendations = async (userData) => {
         const processedResponse = response.text.replace(/^```json|```$/g, '').trim();
 
 
-        console.log(processedResponse);
 
         return JSON.parse(processedResponse);
     } catch (error) {

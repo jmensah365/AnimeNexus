@@ -13,7 +13,6 @@ export const getRecommendations = async (req, res) => {
     try {
         const recommendations = await generateAIReccommendations();
 
-        console.log(recommendations);
 
         if (!recommendations || recommendations.length === 0) {
             return res.status(404).json({

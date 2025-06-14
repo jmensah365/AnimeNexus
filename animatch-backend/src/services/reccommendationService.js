@@ -13,7 +13,9 @@ export const generateAIReccommendations = async () => {
     const userData = {preferences, watchlist, reactions};
 
     try {
-        return await getAIAnimeReccommendations(userData);
+        const recommendations = await getAIAnimeReccommendations(userData);
+        console.log(recommendations.recommendations.map(rec => rec.similarity_score));
+        return recommendations;
     } catch (error) {
         console.error('Error generating recommendations:', error);
         throw new Error('Failed to generate recommendations');

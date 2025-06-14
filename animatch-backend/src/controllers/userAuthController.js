@@ -1,6 +1,8 @@
-import { signUpUser, signInUser, signOut, updateUserEmail, updateUserPassword, refreshTokenSession } from '../services/authService.js';
+import { signUpUser, signInUser, signOut, updateUserEmail, updateUserPassword, refreshTokenSession, setUserSession } from '../services/authService.js';
+import { supabaseAuthMiddleware } from '../middlewares/supabaseMiddleware.js';
 
 export const userSignIn = async (req, res, next) => {
+
     const userEmail = req.body.email;
     const userPassword = req.body.password;
 
@@ -24,12 +26,9 @@ export const userSignIn = async (req, res, next) => {
         }
 
         //store access and refresh tokens in cookies, DO NOT expose to JS
-        res.cookie("access-token", data.session.access_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, domain: 'localhost', path: '/'  });
-        res.cookie("refresh-token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, domain: 'localhost', path: '/' });
+        res.cookie("access-token", data.session.access_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, path: '/', sameSite: 'strict', secure: false  });
+        res.cookie("refresh-token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, path: '/', sameSite: 'strict', secure: false });
 
-        console.log('Token expires in:', data.session.expires_in, 'seconds');
-        console.log('Current time:', new Date());
-        console.log('Expires at:', new Date(Date.now() + data.session.expires_in * 1000));
 
         // Successful signin
         return res.status(200).json({
@@ -102,6 +101,10 @@ export const userSignOut = async (req, res, next) => {
                 message: `There was an error when signing out: ${error.message}`
             })
         }
+
+        // Clear cookies
+        res.clearCookie("access-token", {domain: 'localhost', path: '/'});
+        res.clearCookie("refresh-token", {domain: 'localhost', path: '/'});
 
         return res.status(200).json({
             success: true,
@@ -218,6 +221,49 @@ export const refreshToken = async (req, res, next) => {
             user: data.user.email,
         });
     } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `Server Error: ${error.message}`,
+        });
+    }
+}
+
+export const validateSession = async (req, res) => {
+    const access_token = req.cookies['access-token']
+    const refresh_token = req.cookies['refresh-token']
+
+    if (!access_token || !refresh_token) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to access this resource'
+        });
+    }
+
+    try {
+        const {data: {session}, error} = await setUserSession(access_token, refresh_token);
+        if (error) {
+            return res.status(401).json({
+                error: true,
+                message: `Unauthorized: ${error.message}`
+            });
+        }
+        if (!session) {
+            return res.status(401).json({
+                error: true,
+                message: 'Unauthorized: Invalid session'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Session is valid',
+            user: {
+                email: session.user.email,
+                id: session.user.id
+            },
+            expires_at: session.expires_at
+        });
+    } catch (error) {   
         return res.status(500).json({
             error: true,
             message: `Server Error: ${error.message}`,
