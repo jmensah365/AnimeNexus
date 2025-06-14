@@ -1,0 +1,49 @@
+import React from 'react'
+import LoginButton from '../components/LoginButton'
+import AniMatchOverview from '../components/AniMatchOverview'
+import HowItWorks from '../components/HowItWorks'
+import SignUpButton from '../components/SignUpButton'
+import '../App.css'
+import HomeNavBar from '../components/HomeNavBar'
+import SplitText from '../components/SplitText'
+import backgroundMusic from '../assets/nujabes-aruarian-dance-made-with-Voicemod.mp3'
+
+function HomePage() {
+  return (
+    <>
+    <div className='animate-fade-down animate-delay-200'>
+    <HomeNavBar/>
+      <div className='flex flex-col items-center justify-center bg-cover bg-center min-h-screen bg-[url(/afro_samurai.webp)] '>
+        {/* <audio src={backgroundMusic} autoPlay loop className='hidden' controls/> */}
+          <div className='flex flex-col items-center justify-center'>
+            <SplitText
+              text="Discover Your Next Anime Adventure"
+              className="text-4xl font-semibold text-center mb-8 "
+              delay={70}
+              duration={0.3}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+            />
+          </div>
+          {/* Overview Section */}
+          <AniMatchOverview />
+          {/* Login/Signup Section */}
+          <div className='flex flex-col md:flex-row items-center justify-center gap-4 md:gap-10'>
+            <LoginButton />
+            <SignUpButton />
+          </div>
+          </div>
+
+          {/* How It Works Section */}
+          <HowItWorks />
+          </div>
+    </>
+  )
+}
+
+export default HomePage
