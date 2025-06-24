@@ -1,4 +1,4 @@
-import { saveUserPreference, deleteUserPreference, updateUserPreference, fetchUserPreferences } from "../services/preferenceService.js";
+import { saveUserPreference, deleteUserPreference, updateUserPreference, fetchUserPreferences, checkPreferenceFormCompletedService, updatePreferenceCheckService, insertPreferenceFormService } from "../services/preferenceService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const addPreference = async (req, res, next) => {
@@ -70,7 +70,7 @@ export const updatePreference = async (req, res, next) => {
     }
     const preferenceId = req.params.preferenceId;
     const updatedData = req.body;
-    console.log(preferenceId);
+    // console.log(updatedData);
     if (!preferenceId) {
         return res.status(400).json({
             error: true,
@@ -119,6 +119,60 @@ export const fetchPreferences = async (req, res, next) => {
             });
         }
         return res.status(200).json({ preference });
+    } catch (error) {
+        return res.status(500).json({
+            message: `Something went wrong: ${error.message}`
+        });
+    }
+}
+
+export const checkPreferenceFormCompletedController = async (req, res, next) => {
+    const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    if (error || !session) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to check preference form completion'
+        });
+    }
+    try {
+        const isCompleted = await checkPreferenceFormCompletedService();
+        return res.status(200).json({ isCompleted });
+    } catch (error) {
+        return res.status(500).json({
+            message: `Something went wrong: ${error.message}`
+        });
+    }
+}
+
+export const updatePreferenceCheck = async (req, res, next) => {
+    const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    if (error || !session) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to update preference check'
+        });
+    }
+    try {
+        const updatedResponse = await updatePreferenceCheckService();
+        return res.status(200).json({ updatedResponse });
+    } catch (error) {
+        return res.status(500).json({
+            message: `Something went wrong: ${error.message}`
+        });
+    }
+}
+
+export const insertPreferenceFormController = async (req, res, next) => {
+    const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    if (error || !session) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to insert preference form'
+        });
+    }
+    try {
+        const response = await insertPreferenceFormService();
+        return res.status(201).json({ response });
     } catch (error) {
         return res.status(500).json({
             message: `Something went wrong: ${error.message}`
