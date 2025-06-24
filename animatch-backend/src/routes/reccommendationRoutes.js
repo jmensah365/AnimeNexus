@@ -1,8 +1,9 @@
 import express from 'express';
-import {getRecommendations} from '../controllers/reccommendationController.js';
+import {getRecommendations, getRecommendationsWithInput} from '../controllers/reccommendationController.js';
 
 const router = express.Router();
 
-router.get('/recommendations', getRecommendations);
+router.get('/', getRecommendations);
+router.post('/userInput', getRecommendationsWithInput);
 
 export default router;

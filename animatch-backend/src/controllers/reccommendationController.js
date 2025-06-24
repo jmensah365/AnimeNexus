@@ -1,4 +1,4 @@
-import { generateAIReccommendations } from "../services/reccommendationService.js";
+import { generateAIReccommendations, generateAIReccommendationsWithInput } from "../services/reccommendationService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const getRecommendations = async (req, res) => {
@@ -12,6 +12,39 @@ export const getRecommendations = async (req, res) => {
 
     try {
         const recommendations = await generateAIReccommendations();
+
+
+        if (!recommendations || recommendations.length === 0) {
+            return res.status(404).json({
+                error: true,
+                message: 'No recommendations found'
+            });
+        }
+
+        return res.status(200).json({
+            result: recommendations
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: `Something went wrong: ${error.message}`
+        })
+    }
+
+}
+
+export const getRecommendationsWithInput = async (req, res) => {
+    const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    if (error || !session) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to add preferences'
+        });
+    }
+
+    const user_input = req.body;
+
+    try {
+        const recommendations = await generateAIReccommendationsWithInput(user_input);
 
 
         if (!recommendations || recommendations.length === 0) {
