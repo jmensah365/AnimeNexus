@@ -98,7 +98,7 @@ function SignUpPage() {
                                 </div>
                                 <div className='space-y-0.5 text-sm font-semibold'>
                                     <div className="">
-                                        <span className='inline-flex items-center'> {passwordLength ? <CheckIcon size={16} color='black' /> : <XIcon size={16} color='red' />} <p>At least 6 chars.</p></span>
+                                        <span className='inline-flex items-center'> {passwordLength ? <CheckIcon size={16} color='black' /> : <XIcon size={16} color='red' />} <p>At least 8 chars.</p></span>
                                     </div>
                                     <div className=" ">
                                         <span className='inline-flex items-center'>{hasUppercase ? <CheckIcon size={16} color='black' /> : <XIcon size={16} color='red' />}<p>At least 1 uppercase</p></span>

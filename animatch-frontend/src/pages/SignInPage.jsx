@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogoIcon, FacebookLogoIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import HomeNavbar from '../components/HomeNavBar'
-import { useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import ErrorCard from '../components/ErrorCard'
 import supabase from '../utils/supabaseClient'
 
@@ -26,26 +26,53 @@ const useSignIn = () => {
     return useMutation({mutationFn: signIn});
 }
 
+const checkifFormIsCompleted = async () => {
+    const response = await fetch('http://localhost:3000/preference/checkPreferenceFormCompleted', {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+    })
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+
+
+
+
+
 function SignInPage() {
     const [isVisible, setIsVisible] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const { mutate, isError, error, isPending, isSuccess } = useSignIn();
     const navigate = useNavigate();
     const navigateTo = (path) => {
         navigate(path);
     }
 
+    const { mutate: signInMutate, isError, isPending } = useSignIn();
+    const formCheckMutation = useMutation({
+        mutationFn: checkifFormIsCompleted, 
+        onSuccess: (data) => {
+            if (data.isCompleted) navigateTo('/welcome');
+            else navigateTo('/more-info');
+        }, 
+        onError: (error) => {console.error("Failed to check form completion status: ", error);
+    }});
+
+
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        mutate(
+        signInMutate(
             {email, password},
             {
                 onSuccess: async () => {
-                    navigateTo('/more-info');
+                    formCheckMutation.mutate(); // Check if the user has completed the preference form
                 },
 
                 onError: (error) => {
@@ -73,7 +100,7 @@ function SignInPage() {
                         <form id='form' method='POST' onSubmit={handleSubmit} className='space-y-4'>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="email">Email</label>
-                                <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                <input className="flex text-black h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 type="email" 
                                 id="email" 
                                 name='email'
@@ -85,7 +112,7 @@ function SignInPage() {
                             <div className=" relative space-y-2">
                                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="password">Password</label>
                                 <div>
-                                    <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    <input className="flex text-black h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     type={isVisible ? "text" : "password"} 
                                     id="password" 
                                     name='password' 

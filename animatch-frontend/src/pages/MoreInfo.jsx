@@ -1,6 +1,45 @@
 import React, { useState } from 'react';
 import { CheckIcon, XIcon, PlusCircleIcon } from '@phosphor-icons/react';
 import AniMatchLogo from '/AniMatchLogo.png'
+import ShinyText from '../styles/ShinyText';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import ErrorCard from '../components/ErrorCard';
+
+const insertPreferences = async ({genres,mood,anime_era, episode_count}) => {
+    const response = await fetch('http://localhost:3000/preference/insertPreference', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({genres, mood, anime_era, episode_count}),
+        credentials: 'include',
+    });
+
+
+    if (!response.ok) throw new Error(await response.text());
+
+    return response.json();
+
+}
+
+const updatePreferenceFormCompletion = async () => {
+    const response = await fetch('http://localhost:3000/preference/updatePreferenceCheck', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+
+}
+
+
+const useInsertPreferences = () => {
+    return useMutation({mutationFn: insertPreferences});
+}
+
+
+
 const genresList = [
     'Action', 'Adventure', 'Comedy', 'Sci-Fi', 'Drama', 'Romance', 'Police', 'Space',
     'Mystery', 'Magic', 'Supernatural', 'Fantasy', 'Sports', 'Cars', 'Slice of Life',
@@ -8,26 +47,63 @@ const genresList = [
 ];
 
 const animeEras = [
-    'The Foundations', 'The Classics', 'The Boom', 'The Digital Revolution',
-    'The Streaming Era', 'The Current Era'
+    'The_Foundations', 'The_Classics', 'The_Boom', 'The_Digital_Revolution',
+    'The_Streaming_Era', 'The_Current_Era'
 ];
 
 const episodeCounts = ['1-13', '13-26', '26-50+', '50+'];
 
 export default function AnimePreferencesForm() {
-    const [selectedGenres, setSelectedGenres] = useState([]);
+    const [genres, setGenres] = useState([]);
     const [mood, setMood] = useState('');
-    const [selectedEras, setSelectedEras] = useState([]);
-    const [selectedEpisodes, setSelectedEpisodes] = useState([]);
+    const [anime_era, setAnimeEras] = useState([]);
+    const [episode_count, setEpisodeCounts] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const {mutate: insertPreferenceMutate, isError, isPending} = useInsertPreferences();
+    const updatePreferenceFormCompletionMutate = useMutation({
+        mutationFn: updatePreferenceFormCompletion,
+        onSuccess: (data) => {
+            console.log("Preference form completed");
+        },
+        onError: (error) => {
+            console.error("Failed to update preference form completion status: ", error);
+            setErrorMessage("Failed to update preference form completion status.");
+        }
+        });
+
+    const navigate = useNavigate();
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        insertPreferenceMutate({genres, mood, anime_era, episode_count},
+            {
+                onSuccess: async (data) => {
+                    updatePreferenceFormCompletionMutate.mutate();
+                    navigate('/welcome');
+                },
+
+                onError: (error) => {
+                    try {
+                        const parsedError = JSON.parse(error.message);
+                        setErrorMessage(parsedError.message || "An error occurred during sign in.");
+                    } catch (e) {
+                        setErrorMessage("An error occurred during submitting preferences. Please try again.");
+                        console.error(e);
+                    }
+                }
+            })
+    }
 
     const handleAddGenre = (genre) => {
-        if (!selectedGenres.includes(genre)) {
-            setSelectedGenres([...selectedGenres, genre]);
+        if (!genres.includes(genre)) {
+            setGenres([...genres, genre]);
         }
     };
 
     const handleRemoveGenre = (genre) => {
-        setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+        setGenres(genres.filter((g) => g !== genre));
     };
 
     const handleCheckboxChange = (setter, value) => {
@@ -44,15 +120,15 @@ export default function AnimePreferencesForm() {
                     <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Anime Preferences</h1>
                 </div>
 
-                <form className="space-y-6">
+                <form className="space-y-6" id='form' method='POST' onSubmit={handleSubmit}>
                     {/* Genre Selection */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Genres</label>
                         <div className="flex flex-wrap gap-2 mt-2">
-                            {selectedGenres.map((genre) => (
+                            {genres.map((genre) => (
                                 <span
                                     key={genre}
-                                    className="flex items-center bg-purple-500 text-white text-sm rounded-full px-3 py-1"
+                                    className="flex items-center rounded-full px-3 py-1 bg-purple-500"
                                 >
                                     {genre}
                                     <XIcon
@@ -100,8 +176,8 @@ export default function AnimePreferencesForm() {
                                 <label key={era} className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
-                                        checked={selectedEras.includes(era)}
-                                        onChange={() => handleCheckboxChange(setSelectedEras, era)}
+                                        checked={anime_era.includes(era)}
+                                        onChange={() => handleCheckboxChange(setAnimeEras, era)}
                                         className="text-purple-500 focus:ring-purple-500 border-gray-300 rounded"
                                     />
                                     <span className="text-sm text-gray-700">{era}</span>
@@ -118,8 +194,8 @@ export default function AnimePreferencesForm() {
                                 <label key={count} className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
-                                        checked={selectedEpisodes.includes(count)}
-                                        onChange={() => handleCheckboxChange(setSelectedEpisodes, count)}
+                                        checked={episode_count.includes(count)}
+                                        onChange={() => handleCheckboxChange(setEpisodeCounts, count)}
                                         className="text-purple-500 focus:ring-purple-500 border-gray-300 rounded"
                                     />
                                     <span className="text-sm text-gray-700">{count}</span>
@@ -130,12 +206,14 @@ export default function AnimePreferencesForm() {
 
                     {/* Submit Button */}
                     <button
+                        id='submitBtn'
                         type="submit"
                         className="w-full py-2 px-4 bg-purple-600 text-white text-sm font-medium rounded-md shadow hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                     >
-                        Submit Preferences
+                        {isPending ? 'Submitting Preferences...' : 'Submit Preferences'}
                     </button>
                 </form>
+                {isError && <ErrorCard errorMsg={errorMessage}/>}
             </div>
         </div>
     );
