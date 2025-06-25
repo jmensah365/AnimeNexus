@@ -2,6 +2,7 @@ import {getAIAnimeReccommendations,getAIAnimeReccommendationsWInput} from '../se
 import {fetchPreferences} from '../models/preferenceModel.js';
 import {fetchUserReactionsWithAnimeTitles} from '../models/userReactionModel.js';
 import {fetchWatchlistWithAnimeTitles} from '../models/watchlistModel.js';
+import { insertAIRecs, fetchAIRecs } from '../models/reccommendationModel.js';
 
 export const generateAIReccommendations = async () => {
     const [preferences, watchlist, reactions] = await Promise.all([
@@ -37,4 +38,12 @@ export const generateAIReccommendationsWithInput = async (user_input) => {
         console.error('Error generating recommendations:', error);
         throw new Error('Failed to generate recommendations');
     }
+}
+
+export const insertAIReccommendations = async () => {
+    return await insertAIRecs();
+}
+
+export const fetchAIReccommendations = async () => {
+    return await fetchAIRecs();
 }

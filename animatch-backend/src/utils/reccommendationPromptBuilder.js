@@ -35,22 +35,20 @@ export const buildRecommendationPrompt = (userData) => {
     {
         "recommendations": [
             {
-                "title": "Anime Title",
+                "anime_title": "Anime Title",
                 "year": "Year of release",
                 "genres": [],
                 "justification": "Brief justification for the reccommendation",
                 "similarity_score": 8,
                 adventurous: false,
-                "additional_info": {
-                    "synopsis": "A brief synopsis of the anime",
-                    "rating": 8.5,
-                    "episode_count": 24,
-                    "status": "Airing/Completed",
-                    "release_date": "2023-01-01",
-                    "end_date": "2023-12-31",
-                    "age_rating": "PG-13",
-                    "show_type": "TV/OVA/Movie",
-                }
+                "synopsis": "A brief synopsis of the anime",
+                "rating": 8.5,
+                "episode_count": 24,
+                "status": "Airing/Completed",
+                "release_date": "2023-01-01",
+                "end_date": "2023-12-31",
+                "age_rating": "PG-13",
+                "show_type": "TV/OVA/Movie",
             },
         ]
     }
