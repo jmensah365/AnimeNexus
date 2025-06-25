@@ -42,7 +42,7 @@ function AniMatchHome() {
     const closeModal = () => { setModalData(null); }
 
     return (
-        <div className='flex min-h-screen bg-black text-white'>
+        <div className='flex min-h-screen bg-black text-white animate-fade-down'>
             <div className="w-50 bg-black border-r border-gray-800 p-3.5">
                 {/* Menu Section */}
                 <div className="mb-8">
