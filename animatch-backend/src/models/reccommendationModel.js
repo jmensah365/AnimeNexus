@@ -12,7 +12,7 @@ export const fetchAIRecs =  async () => {
     const {data: aiRecs, error: fetchError} = await supabase.from('ai_recommendations').select().eq('user_id', userData.user.id).order('similarity_score', { ascending: false });
 
     if (fetchError) throw fetchError;
-    if (!aiRecs || aiRecs.length === 0) {
+    if (!aiRecs) {
         throw new Error('No AI recommendations found for the user');
     }
     return aiRecs;
@@ -26,7 +26,6 @@ export const insertAIRecs = async () => {
     }
 
     const recs = await generateAIReccommendations();
-    console.log(recs);
     const recsWithuser = recs.recommendations.map(rec => ({
         ...rec,
         user_id: userData.user.id

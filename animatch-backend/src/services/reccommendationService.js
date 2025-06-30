@@ -5,16 +5,20 @@ import {fetchWatchlistWithAnimeTitles} from '../models/watchlistModel.js';
 import { insertAIRecs, fetchAIRecs } from '../models/reccommendationModel.js';
 
 export const generateAIReccommendations = async () => {
-    const [preferences, watchlist, reactions] = await Promise.all([
+    const [preferences, watchlist, reactions, previous_recommendations] = await Promise.all([
         fetchPreferences(),
         fetchWatchlistWithAnimeTitles(),
         fetchUserReactionsWithAnimeTitles(),
+        fetchAIRecs()
     ]);
 
-    const userData = {preferences, watchlist, reactions};
+    const userData = {preferences, watchlist, reactions, previous_recommendations};
+
+    console.log(preferences);
 
     try {
         const recommendations = await getAIAnimeReccommendations(userData);
+        console.log('recommendations', recommendations);
         return recommendations;
     } catch (error) {
         console.error('Error generating recommendations:', error);
@@ -23,13 +27,14 @@ export const generateAIReccommendations = async () => {
 }
 
 export const generateAIReccommendationsWithInput = async (user_input) => {
-    const [preferences, watchlist, reactions] = await Promise.all([
+    const [preferences, watchlist, reactions, previous_recommendations] = await Promise.all([
         fetchPreferences(),
         fetchWatchlistWithAnimeTitles(),
         fetchUserReactionsWithAnimeTitles(),
+        fetchAIRecs()
     ]);
 
-    const userData = {preferences, watchlist, reactions, user_input};
+    const userData = {preferences, watchlist, reactions,previous_recommendations, user_input};
 
     try {
         const recommendations = await getAIAnimeReccommendationsWInput(userData);

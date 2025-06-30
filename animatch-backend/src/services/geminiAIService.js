@@ -9,6 +9,8 @@ export const getAIAnimeReccommendations = async (userData) => {
         const model = 'gemini-2.0-flash-001';
         const prompt = buildRecommendationPrompt(userData);
 
+        // console.log(prompt);
+
         const response = await ai.models.generateContent({
             model: model,
             contents: prompt,
@@ -31,6 +33,7 @@ export const getAIAnimeReccommendationsWInput = async (userData) => {
     try {
         const model = 'gemini-2.5-flash-lite-preview-06-17';
         const prompt = buildRecommendationPromptWithInput(userData);
+
 
         const response = await ai.models.generateContent({
             model: model,
