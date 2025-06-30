@@ -96,8 +96,10 @@ export const fetchPreferences = async () => {
         .select()
         .eq('user_id', userData.user.id);
 
+       
 
-    if (!preference || preference.length === 0) {
+
+    if (!preference) {
         throw new Error('Preference does not exist')
     }
     if (fetchError) {

@@ -11,6 +11,6 @@ router.get("/seasonYear/:year", fetchAnimeListBySeasonYear);
 //current, upcoming, or finished
 router.get("/status/:status", fetchAnimeListByStatus);
 router.get("/season/:season", fetchAnimeListBySeason);
-router.post("/insertMetadata/:category", addAnimeMetadata );
+router.post("/insertMetadata", addAnimeMetadata );
 
 export default router;

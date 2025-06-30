@@ -18,9 +18,9 @@ export const fetchWatchlist = async () => {
 
     const {data: watchList, error: fetchError} = await supabase.from('watchlist').select().eq('user_id', userData.user.id);
     if (fetchError) throw fetchError;
-    if (!watchList) {
-        throw new Error('Watchlist does not exist')
-    }
+    // if (!watchList) {
+    //     throw new Error('Watchlist does not exist')
+    // }
 
     return watchList;
 }

@@ -70,9 +70,9 @@ export const addAnimeMetadata = async (req, res, next) => {
             message: 'Unauthorized: Please log in to add preferences'
         });
     }
-    const category = req.params.category; //extracts category from URL params
+    //const category = req.params.category; //extracts category from URL params
     try{
-        const dataToInsert = await insertAnimeMetadata(category);
+        const dataToInsert = await insertAnimeMetadata();
         if (!dataToInsert || dataToInsert.length === 0) {
             return res.status(404).json({
                 error: true,
