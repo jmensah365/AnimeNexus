@@ -11,6 +11,8 @@ export const getAnimeListByCategory = async (category) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -19,6 +21,7 @@ export const getAnimeListByCategory = async (category) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
 
@@ -31,6 +34,8 @@ export const getAnimeListByName = async (name) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -39,6 +44,7 @@ export const getAnimeListByName = async (name) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
 
@@ -51,6 +57,8 @@ export const getAnimeListByAgeRating = async (ageRating) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -59,6 +67,7 @@ export const getAnimeListByAgeRating = async (ageRating) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
 
@@ -71,6 +80,8 @@ export const getAnimeListBySeasonYear = async (year) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -79,6 +90,7 @@ export const getAnimeListBySeasonYear = async (year) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
 
@@ -91,6 +103,8 @@ export const getAnimeListByStatus = async (status) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -99,6 +113,7 @@ export const getAnimeListByStatus = async (status) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
 
@@ -111,6 +126,8 @@ export const getAnimeListBySeason = async (season) => {
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,
         synopsis: item.attributes.synopsis,
         image_url: item.attributes.posterImage.small,
+        original_image_url: item.attributes.posterImage.original,
+        large_image_url: item.attributes.posterImage.large,
         start_date: item.attributes.startDate,
         end_date: item.attributes.endDate,
         rating_rank: item.attributes.ratingRank,
@@ -119,5 +136,6 @@ export const getAnimeListBySeason = async (season) => {
         status: item.attributes.status,
         episode_count: item.attributes.episodeCount,
         show_type: item.attributes.showType,
+        youtube_id: item.attributes.youtubeVideoId,
     }));
 }
