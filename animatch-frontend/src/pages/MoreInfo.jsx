@@ -4,7 +4,7 @@ import AniMatchLogo from '/AniMatchLogo.png'
 import ShinyText from '../styles/ShinyText';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import ErrorCard from '../components/ErrorCard';
+import ErrorCard from '../components/Cards/ErrorCard';
 
 const insertPreferences = async ({genres,mood,anime_era, episode_count}) => {
     const response = await fetch('http://localhost:3000/preference/insertPreference', {
@@ -42,8 +42,8 @@ const useInsertPreferences = () => {
 
 const genresList = [
     'Action', 'Adventure', 'Comedy', 'Sci-Fi', 'Drama', 'Romance', 'Police', 'Space',
-    'Mystery', 'Magic', 'Supernatural', 'Fantasy', 'Sports', 'Cars', 'Slice of Life',
-    'Racing', 'Horror', 'Psychological', 'Thriller'
+    'Mystery', 'Magic', 'Supernatural', 'Fantasy', 'Sports', 'Cars',
+    'Racing', 'Horror', 'Psychological', 'Thriller', 'Assassin', 'Ninja,', 'Ghost', 'Mecha', 'Space', 'Historical', 'Past', 'Present',
 ];
 
 const animeEras = [

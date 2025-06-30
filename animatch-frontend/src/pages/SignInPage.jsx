@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleLogoIcon, FacebookLogoIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import HomeNavbar from '../components/HomeNavBar'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import ErrorCard from '../components/ErrorCard'
-import supabase from '../utils/supabaseClient'
+import ErrorCard from '../components/Cards/ErrorCard'
 
 const signIn = async ({email, password}) => {
     const response = await fetch('http://localhost:3000/auth/signIn', {
@@ -56,7 +55,7 @@ function SignInPage() {
     const formCheckMutation = useMutation({
         mutationFn: checkifFormIsCompleted, 
         onSuccess: (data) => {
-            if (data.isCompleted) navigateTo('/welcome');
+            if (data.isCompleted) navigateTo('/home');
             else navigateTo('/more-info');
         }, 
         onError: (error) => {console.error("Failed to check form completion status: ", error);

@@ -1,11 +1,11 @@
 import React from 'react'
-import LoginButton from '../components/LoginButton'
+import LoginButton from '../components/Buttons/LoginButton'
 import AniMatchOverview from '../components/AniMatchOverview'
 import HowItWorks from '../components/HowItWorks'
-import SignUpButton from '../components/SignUpButton'
+import SignUpButton from '../components/Buttons/SignUpButton'
 import '../App.css'
 import HomeNavBar from '../components/HomeNavBar'
-import SplitText from '../components/SplitText'
+import SplitText from '../styles/SplitText'
 import backgroundMusic from '../assets/nujabes-aruarian-dance-made-with-Voicemod.mp3'
 
 function HomePage() {
@@ -33,7 +33,7 @@ function HomePage() {
           {/* Overview Section */}
           <AniMatchOverview />
           {/* Login/Signup Section */}
-          <div className='flex flex-col md:flex-row items-center justify-center gap-4 md:gap-10'>
+          <div className='flex flex-row items-center justify-center gap-4 md:gap-10'>
             <LoginButton />
             <SignUpButton />
           </div>
