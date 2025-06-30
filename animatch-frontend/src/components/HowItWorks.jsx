@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import StyledButton from "./StyledButton";
+import StyledButton from "./Buttons/StyledButton";
 import {MonitorPlayIcon, PuzzlePieceIcon, MagicWandIcon} from '@phosphor-icons/react'
 
 

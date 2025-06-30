@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { data, useNavigate } from 'react-router-dom';
 import { GoogleLogoIcon, FacebookLogoIcon, XIcon, EyeClosedIcon, EyeIcon, CheckIcon } from '@phosphor-icons/react'
 import HomeNavBar from '../components/HomeNavBar.jsx';
-import SuccessCard from '../components/SuccessCard.jsx';
-import ErrorCard from '../components/ErrorCard.jsx';
+import SuccessCard from '../components/Cards/SuccessCard.jsx';
+import ErrorCard from '../components/Cards/ErrorCard.jsx';
 
 const signUp = async ({ email, password }) => {
     const response = await fetch('http://localhost:3000/auth/signUp', {

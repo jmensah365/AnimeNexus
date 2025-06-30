@@ -1,5 +1,5 @@
 import React from 'react'
-import StyledButton from './StyledButton'
+import StyledButton from './Buttons/StyledButton'
 
 function HomeNavBar() {
     return (
@@ -25,7 +25,7 @@ function HomeNavBar() {
                                 <a href="http://localhost:5173/" class="block py-2 px-3 text-black rounded-sm md:bg-transparent md:p-0 md:hover:bg-transparent md:hover:underline cursor-pointer" aria-current="page">Home</a>
                             </li>
                             <li>
-                                <a href="#" class="block py-2 px-3 text-black rounded-sm md:hover:bg-transparen md:p-0 md:hover:underline cursor-pointer ">About</a>
+                                <a href="/about" class="block py-2 px-3 text-black rounded-sm md:hover:bg-transparen md:p-0 md:hover:underline cursor-pointer ">About</a>
                             </li>                      
                         </ul>
                     </div>
