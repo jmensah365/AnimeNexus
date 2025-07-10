@@ -1,6 +1,10 @@
-import { insertAnimeMetadata } from "../models/animeModel.js";
+import { insertAnimeMetadata, fetchAnimeData } from "../models/animeModel.js";
 import { getAnimeListByCategory, getAnimeListByName, getAnimeListByAgeRating, getAnimeListBySeasonYear, getAnimeListByStatus, getAnimeListBySeason } from "../services/animeService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
+
+/*
+    The supabase auth middleware is used to ensure a user is authenticated before each request in protected routes.
+ */
 
 export const fetchAnimeListByCategory = async (req, res, next) => {
     try {
@@ -70,7 +74,6 @@ export const addAnimeMetadata = async (req, res, next) => {
             message: 'Unauthorized: Please log in to add preferences'
         });
     }
-    //const category = req.params.category; //extracts category from URL params
     try{
         const dataToInsert = await insertAnimeMetadata();
         if (!dataToInsert || dataToInsert.length === 0) {
@@ -94,3 +97,32 @@ export const addAnimeMetadata = async (req, res, next) => {
     }
 }
 
+
+export const getAnimeData = async(req, res) => {
+    const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    if (error || !session) {
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized: Please log in to add preferences'
+        });
+    }
+
+    try {
+        const animeData = await fetchAnimeData();
+        if (!animeData || animeData.length === 0) {
+            return res.status(404).json({
+                error: true,
+                message: 'No anime data found for this user'
+            });
+        }
+        return res.status(200).json({
+            anime_data: animeData,
+            message: 'Anime data fetched successfully'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `Failed to fetch anime data: ${error.message}`
+        });
+    }
+}

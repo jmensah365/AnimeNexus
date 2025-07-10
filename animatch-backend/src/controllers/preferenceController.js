@@ -1,7 +1,11 @@
-import { saveUserPreference, deleteUserPreference, updateUserPreference, fetchUserPreferences, checkPreferenceFormCompletedService, updatePreferenceCheckService, insertPreferenceFormService } from "../services/preferenceService.js";
+import { saveUserPreference, deleteUserPreference, updateUserPreference, fetchUserPreferences, checkPreferenceFormCompletedService, updatePreferenceCheckService } from "../services/preferenceService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
-export const addPreference = async (req, res, next) => {
+/*
+    The supabase auth middleware is used to ensure a user is authenticated before each request in protected routes.
+ */
+
+export const addPreference = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -9,7 +13,7 @@ export const addPreference = async (req, res, next) => {
             message: 'Unauthorized: Please log in to add preferences'
         });
     }
-    const preferenceData = req.body;
+    const preferenceData = req.body; // Extract preference data from the request body
     if (!preferenceData) {
         return res.status(400).json({
             error: true,
@@ -32,7 +36,7 @@ export const addPreference = async (req, res, next) => {
     }
 }
 
-export const delPreference = async (req, res, next) => {
+export const delPreference = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -40,7 +44,7 @@ export const delPreference = async (req, res, next) => {
             message: 'Unauthorized: Please log in to add preferences'
         });
     }
-    const preferenceId = req.params.preferenceId;
+    const preferenceId = req.params.preferenceId; // Extract preference ID from the request parameters
     if (!preferenceId) {
         return res.status(400).json({
             error: true,
@@ -60,7 +64,7 @@ export const delPreference = async (req, res, next) => {
     }
 }
 
-export const updatePreference = async (req, res, next) => {
+export const updatePreference = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -68,8 +72,8 @@ export const updatePreference = async (req, res, next) => {
             message: 'Unauthorized: Please log in to add preferences'
         });
     }
-    const preferenceId = req.params.preferenceId;
-    const updatedData = req.body;
+    const preferenceId = req.params.preferenceId; // Extract preference ID from the request parameters
+    const updatedData = req.body; // Extract updated data from the request body
     // console.log(updatedData);
     if (!preferenceId) {
         return res.status(400).json({
@@ -103,7 +107,7 @@ export const updatePreference = async (req, res, next) => {
     }
 }
 
-export const fetchPreferences = async (req, res, next) => {
+export const fetchPreferences = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -126,7 +130,7 @@ export const fetchPreferences = async (req, res, next) => {
     }
 }
 
-export const checkPreferenceFormCompletedController = async (req, res, next) => {
+export const checkPreferenceFormCompletedController = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -144,7 +148,7 @@ export const checkPreferenceFormCompletedController = async (req, res, next) => 
     }
 }
 
-export const updatePreferenceCheck = async (req, res, next) => {
+export const updatePreferenceCheck = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
         return res.status(401).json({
@@ -162,20 +166,3 @@ export const updatePreferenceCheck = async (req, res, next) => {
     }
 }
 
-export const insertPreferenceFormController = async (req, res, next) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to insert preference form'
-        });
-    }
-    try {
-        const response = await insertPreferenceFormService();
-        return res.status(201).json({ response });
-    } catch (error) {
-        return res.status(500).json({
-            message: `Something went wrong: ${error.message}`
-        });
-    }
-}

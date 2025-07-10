@@ -1,6 +1,10 @@
 import { generateAIReccommendations, generateAIReccommendationsWithInput, insertAIReccommendations, fetchAIReccommendations } from "../services/reccommendationService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
+/*
+    The supabase auth middleware is used to ensure a user is authenticated before each request in protected routes.
+ */
+
 export const getRecommendations = async (req, res) => {
     const {data: {session}, error} = await supabaseAuthMiddleware(req);
     if (error || !session) {
@@ -41,7 +45,8 @@ export const getRecommendationsWithInput = async (req, res) => {
         });
     }
 
-    const user_input = req.body;
+    //User input is sent in the request body. Not sure if this is the best way to do it, but it works for now.
+    const user_input = req.body; 
 
     try {
         const recommendations = await generateAIReccommendationsWithInput(user_input);

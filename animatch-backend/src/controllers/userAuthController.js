@@ -1,7 +1,7 @@
 import { signUpUser, signInUser, signOut, updateUserEmail, updateUserPassword, refreshTokenSession, setUserSession } from '../services/authService.js';
 import { supabaseAuthMiddleware } from '../middlewares/supabaseMiddleware.js';
 
-export const userSignIn = async (req, res, next) => {
+export const userSignIn = async (req, res) => {
 
     const userEmail = req.body.email;
     const userPassword = req.body.password;
@@ -17,7 +17,6 @@ export const userSignIn = async (req, res, next) => {
 
     try {
         const { data, error } = await signInUser(userEmail, userPassword);
-        // Handle Supabase error
         if (error) {
             return res.status(401).json({
                 error: true,
@@ -26,8 +25,9 @@ export const userSignIn = async (req, res, next) => {
         }
 
         //store access and refresh tokens in cookies, DO NOT expose to JS
+        // Note: maxAge for refresh token will be 15 days or * 60 * 60 * 24 * 15
         res.cookie("access-token", data.session.access_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, path: '/', sameSite: 'strict', secure: false  });
-        res.cookie("refresh-token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, path: '/', sameSite: 'strict', secure: false });
+        res.cookie("refresh-token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 1000 * 60 * 60 * 24 * 15, path: '/', sameSite: 'strict', secure: false });
 
 
         // Successful signin
@@ -50,7 +50,7 @@ export const userSignIn = async (req, res, next) => {
 
 }
 
-export const userSignUp = async (req, res, next) => {
+export const userSignUp = async (req, res) => {
     const userEmail = req.body.email;
     const userPassword = req.body.password;
 
@@ -92,7 +92,7 @@ export const userSignUp = async (req, res, next) => {
     }
 }
 
-export const userSignOut = async (req, res, next) => {
+export const userSignOut = async (req,res) => {
     try {
         const { error } = await signOut();
         if (error) {
@@ -120,7 +120,7 @@ export const userSignOut = async (req, res, next) => {
 
 }
 
-export const changeEmail = async (req, res, next) => {
+export const changeEmail = async (req, res) => {
     const email = req.body.email;
 
     //validate input
@@ -154,7 +154,7 @@ export const changeEmail = async (req, res, next) => {
     }
 }
 
-export const changePassword = async (req, res, next) => {
+export const changePassword = async (req, res) => {
     const password = req.body.password;
 
     //validate input
@@ -186,10 +186,10 @@ export const changePassword = async (req, res, next) => {
     }
 }
 
-export const refreshToken = async (req, res, next) => {
-    const refreshToken = req.cookies.refresh_token;
-
-    if (!refreshToken) {
+export const refreshToken = async (req, res) => {
+    const refresh_token = req.cookies['refresh-token']
+    console.log(`${refresh_token}`);
+    if (!refresh_token) {
         return res.status(401).json({
             error: true,
             message: 'Refresh token is missing'
@@ -197,7 +197,7 @@ export const refreshToken = async (req, res, next) => {
     }
 
     try {
-        const {data, error} = await refreshTokenSession(refreshToken);
+        const {data, error} = await refreshTokenSession(refresh_token);
 
 
         if (error) {
@@ -206,9 +206,11 @@ export const refreshToken = async (req, res, next) => {
                 message: `Failed to refresh token: ${error.message}`
             });
         }
+
         //store access and refresh tokens in cookies, DO NOT expose to JS
-        res.cookie("access_token", data.session.access_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, domain: 'localhost' });
-        res.cookie("refresh_token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 7 * 24 * 60 * 60 * 1000, domain: 'localhost' });
+        // Note: maxAge for refresh token will be 15 days or * 60 * 60 * 24 * 15
+        res.cookie("access-token", data.session.access_token, { httpOnly: true, maxAge: data.session.expires_in * 1000, path: '/', sameSite: 'strict', secure: false  });
+        res.cookie("refresh-token", data.session.refresh_token, { httpOnly: true, maxAge: data.session.expires_in * 1000 * 60 * 60 * 24 * 15, path: '/', sameSite: 'strict', secure: false });
 
         return res.status(200).json({
             success: true,
@@ -231,6 +233,7 @@ export const refreshToken = async (req, res, next) => {
 export const validateSession = async (req, res) => {
     const access_token = req.cookies['access-token']
     const refresh_token = req.cookies['refresh-token']
+    console.log(`Access Token: ${access_token}, Refresh Token: ${refresh_token}`);
 
     if (!access_token || !refresh_token) {
         return res.status(401).json({
