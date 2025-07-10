@@ -4,6 +4,10 @@ import {fetchUserReactionsWithAnimeTitles} from '../models/userReactionModel.js'
 import {fetchWatchlistWithAnimeTitles} from '../models/watchlistModel.js';
 import { insertAIRecs, fetchAIRecs } from '../models/reccommendationModel.js';
 
+/* This service allows me to generate AI reccommendations with and without user input
+    It also fetches AI Recs from the DB and inserts them into the DB
+     */
+
 export const generateAIReccommendations = async () => {
     const [preferences, watchlist, reactions, previous_recommendations] = await Promise.all([
         fetchPreferences(),
@@ -14,11 +18,9 @@ export const generateAIReccommendations = async () => {
 
     const userData = {preferences, watchlist, reactions, previous_recommendations};
 
-    console.log(preferences);
 
     try {
         const recommendations = await getAIAnimeReccommendations(userData);
-        console.log('recommendations', recommendations);
         return recommendations;
     } catch (error) {
         console.error('Error generating recommendations:', error);

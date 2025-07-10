@@ -1,5 +1,7 @@
 import {createWatchlist, updateExistingWatchlist, fetchWatchlist, deleteWatchlist,fetchWatchlistWithAnimeTitles} from '../models/watchlistModel.js';
 
+// This service handles user watchlists, allowing users to save, delete, update, and fetch their watchlists.
+
 export const getWatchlist = async () => {
     return await fetchWatchlist();
 }

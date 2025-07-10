@@ -9,7 +9,6 @@ export const getAIAnimeReccommendations = async (userData) => {
         const model = 'gemini-2.0-flash-001';
         const prompt = buildRecommendationPrompt(userData);
 
-        // console.log(prompt);
 
         const response = await ai.models.generateContent({
             model: model,
@@ -18,7 +17,7 @@ export const getAIAnimeReccommendations = async (userData) => {
 
         if (!response || !response.text) throw new Error('No response from AI model');
 
-        //trim the response to ensure it is valid JSON
+        //trim the response to ensure that this function returns valid JSON
         const processedResponse = response.text.replace(/^```json|```$/g, '').trim();
 
 
@@ -35,6 +34,8 @@ export const getAIAnimeReccommendationsWInput = async (userData) => {
         const prompt = buildRecommendationPromptWithInput(userData);
 
 
+        // experimenting with a newer gemini model that allows for thinking before responding
+        // the thinking budget set to -1 means its dynamically allocates thinking budget based on the complexity of the prompt
         const response = await ai.models.generateContent({
             model: model,
             contents: prompt,
@@ -47,7 +48,7 @@ export const getAIAnimeReccommendationsWInput = async (userData) => {
 
         if (!response || !response.text) throw new Error('No response from AI model');
 
-        //trim the response to ensure it is valid JSON
+        //trim the response to ensure that this function returns valid JSON
         const processedResponse = response.text.replace(/^```json|```$/g, '').trim();
 
 

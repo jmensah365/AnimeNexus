@@ -1,6 +1,9 @@
 import {fetchAnime } from "../utils/fetchKitsuApi.js";
 import { KITSU_API_URL } from "../config/apiConfig.js";
-import { insertAnimeMetadata } from "../models/animeModel.js";
+
+//this file contains the functions that interact with the Kitsu API to fetch anime data
+
+//TODO: add the ability to paginate the results
 
 export const getAnimeListByCategory = async (category) => {
     //&page[limit]=${limit}&page[offset]=${offset}
@@ -98,6 +101,7 @@ export const getAnimeListByStatus = async (status) => {
     //&page[limit]=${limit}&page[offset]=${offset}
     const url = `${KITSU_API_URL}?filter[status]=${status}`;
     const apiResponse = await fetchAnime(url);
+
     return apiResponse.data.map(item => ({
         kitsu_id: item.id,
         title: item.attributes.titles.en || item.attributes.titles.en_us || item.attributes.titles.en_jp || item.attributes.canonicalTitle,

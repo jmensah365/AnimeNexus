@@ -1,4 +1,6 @@
-import { deletePreference, fetchPreferences, insertPreference, updatePreference,checkPreferenceFormCompleted,updatePreferenceCheck, insertPreferenceForm} from "../models/preferenceModel.js";
+import { deletePreference, fetchPreferences, insertPreference, updatePreference,checkPreferenceFormCompleted,updatePreferenceCheck} from "../models/preferenceModel.js";
+
+// This service handles user preferences, allowing users to save, delete, update, and fetch their preferences.
 
 export const saveUserPreference = async (preferenceData) => {
     return await insertPreference(preferenceData);
@@ -24,9 +26,6 @@ export const updatePreferenceCheckService = async () => {
     return await updatePreferenceCheck();
 }
 
-export const insertPreferenceFormService = async () => {
-    return await insertPreferenceForm();
-}
 
 
 
