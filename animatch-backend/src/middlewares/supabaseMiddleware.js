@@ -15,7 +15,7 @@ export const supabaseAuthMiddleware = async (req) => {
     }
 
     try {
-        //sets the session using the access and refresh tokens
+        //set the session using the access and refresh tokens
         const {data: { session }, error} = await supabase.auth.setSession({access_token, refresh_token});
         if (error) throw error;
 
