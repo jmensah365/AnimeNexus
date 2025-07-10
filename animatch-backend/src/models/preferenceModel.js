@@ -1,5 +1,17 @@
 import supabase from "../config/databaseConfig.js";
 
+/* This model handles collecting and storing a user anime preferences.
+    They are able to insert, update, delete, and fetch their preferences.
+
+    In addition this model handles checking if the user has completed the preference collection form
+    and updating the preference_survey_completed field in the preference_users table accordingly.
+ */
+
+/*
+    Get User is in each function to ensure the user is valid and authenticated before performing any operations.
+*/
+
+// Define the anime eras and episode counts so it can map correctly to the ENUM in Supabase
 const Anime_Eras = Object.freeze({
     THE_FOUNDATIONS: 'Pre-1960s',
     THE_CLASSICS: '1960s-1980s',
@@ -42,6 +54,11 @@ export const insertPreference = async ({ genres, mood, episode_count, anime_era 
 }
 
 export const deletePreference = async (preferenceId) => {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!userData || !userData.user) {
+        throw new Error('User not authenticated');
+    }
     const response = await supabase.from('preferences').delete().eq('id', preferenceId);
     return response;
 }
@@ -53,11 +70,11 @@ export const updatePreference = async (preferenceId, updatedData) => {
         throw new Error('User not authenticated');
     }
 
-    //check if the record exists
+    //check if the preference already exists 
     const { data: preference, error: fetchError } = await supabase
         .from('preferences')
         .select()
-        .eq('user_id', userData.user.id);
+        .eq('id', preferenceId);
 
 
     if (!preference || preference.length === 0) {
@@ -66,6 +83,8 @@ export const updatePreference = async (preferenceId, updatedData) => {
     if (fetchError) {
         throw fetchError;
     }
+
+    //TODO: Update genres and mood
 
     updatedData.anime_eras = updatedData.anime_eras.map(era => {
         if (!Object.keys(Anime_Eras).includes(era.toUpperCase())) throw new Error('Invalid anime era');
@@ -95,9 +114,7 @@ export const fetchPreferences = async () => {
         .from('preferences')
         .select()
         .eq('user_id', userData.user.id);
-
-       
-
+    
 
     if (!preference) {
         throw new Error('Preference does not exist')
@@ -108,18 +125,11 @@ export const fetchPreferences = async () => {
     return preference;
 }
 
-export const insertPreferenceForm = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase.from('preference_users').insert({ id: userData.user.id, preference_survey_completed: false }).select();
-    if (error) throw error;
-    return data;
-}
-
+/* 
+    This function checks if the preference collection form is completed.
+    If it is return True, otherwise False
+    This helps for the frontend to determine where to redirect the user after login
+*/
 export const checkPreferenceFormCompleted = async () => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError) throw userError;
@@ -129,8 +139,6 @@ export const checkPreferenceFormCompleted = async () => {
 
     const response = await supabase.from('preference_users').select('preference_survey_completed').eq('id', userData.user.id).single();
 
-
-
     if (response.data.preference_survey_completed === true) {
         return true;
     } else {
@@ -138,6 +146,10 @@ export const checkPreferenceFormCompleted = async () => {
     }
 }
 
+/* 
+    This function updates the preference_survey_completed field in the preference_users table.
+    Once the user completes the form on the frontend this function updates the field to true.
+*/
 export const updatePreferenceCheck = async () => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError) throw userError;
@@ -145,6 +157,7 @@ export const updatePreferenceCheck = async () => {
         throw new Error('User not authenticated');
     }
 
+    // Confirm if the user has an existing preference entry
     const response = await supabase.from('preference_users').select('preference_survey_completed').eq('id', userData.user.id).single();
     if (!response) {
         throw new Error('Preference for user not found');
