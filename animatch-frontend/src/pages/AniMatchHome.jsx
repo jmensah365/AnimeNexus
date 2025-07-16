@@ -5,13 +5,37 @@ import { useNavigate } from 'react-router-dom'
 import Carousel from '../components/AniMatchHome/Carousel'
 import AIRecCards from '../components/Cards/AIRecCards'
 import MainContentArea from '../components/AniMatchHome/MainContentArea'
+import Search from '../components/AniMatchHome/Search'
 
 const fetchKitsuApi = async () => {
-    const response = await fetch('http://localhost:3000/api/anime/category/action', {
+    const response = await fetch('http://localhost:3000/api/anime/status/upcoming', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
 
+    const data = await response.json();
+
+    const formattedData = data.map(anime => ({
+        id: anime.kitsu_id,
+        title: anime.title,
+        synopsis: anime.synopsis,
+        age_rating: anime.age_rating,
+        poster_image:  anime.original_image_url,
+        youtube_id: anime.youtube_id,
+    }))
+
+    console.log("Formatted Data: ", formattedData);
+
+    if (!response.ok) throw new Error(await response.text());
+    return formattedData;
+}
+
+const fetchAnimeFromDB = async () => {
+    const response = await fetch('http://localhost:3000/api/anime/getAnime', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    });
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
@@ -22,7 +46,6 @@ const fetchAiRecs = async () => {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
     });
-    console.log(response);
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
@@ -32,7 +55,6 @@ const signOut = async () => {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
     })
-    console.log(response);
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
@@ -41,6 +63,15 @@ const useFetchKitsuApi = () => {
     return useQuery({
         queryKey: ['kitsuApi'],
         queryFn: fetchKitsuApi,
+        refetchOnWindowFocus: false,
+        retry: 3,
+    })
+}
+
+const useFetchAnimeFromDB = () => {
+    return useQuery({
+        queryKey: ['animeFromDB'],
+        queryFn: fetchAnimeFromDB,
         refetchOnWindowFocus: false,
         retry: 3,
     })
@@ -63,6 +94,7 @@ function AniMatchHome() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const { data: kitsuAPIData, isLoading, error: kitsuAPIError, isSuccess: kitsuAPISuccess } = useFetchKitsuApi();
+    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB();
     const { data: aiRecsData, isLoading: aiRecsLoading, error: aiRecsError, isSuccess: aiRecsSuccess } = useFetchAiRecs();
     const { mutate: signOutMutation, isPending, isSuccess: signOutSuccess, isError: signOutError } = useSignOut();
 
@@ -77,14 +109,24 @@ function AniMatchHome() {
     }, [kitsuAPISuccess, kitsuAPIError]);
 
     useEffect(() => {
+        if (animeFromDBSuccess) {
+            // console.log(animeFromDBData);
+        }
+        if (animeFromDBError) {
+            setErrorMessage(animeFromDBError);
+            console.error(animeFromDBError);
+        }
+    }, [animeFromDBSuccess, animeFromDBError]);
+
+    useEffect(() => {
         if (aiRecsSuccess) {
-            console.log(aiRecsData);
+            // console.log(aiRecsData);
         }
         if (aiRecsError) {
             setErrorMessage(aiRecsError);
             console.error(aiRecsError);
         }
-    })
+    }, [aiRecsSuccess, aiRecsError, aiRecsData]);
 
     useEffect(() => {
         if (signOutSuccess) {
@@ -98,7 +140,7 @@ function AniMatchHome() {
             setErrorMessage(signOutError);
             console.error("Failed to sign out: ", signOutError);
         }
-    })
+    }, [signOutSuccess, isPending, signOutError, navigate]);
 
     const handleSignOut = () => {
         signOutMutation({
@@ -113,7 +155,6 @@ function AniMatchHome() {
         });
     }
 
-    const images = kitsuAPIData ? kitsuAPIData.map(anime => anime.original_image_url) : [];
 
 
 
@@ -132,7 +173,7 @@ function AniMatchHome() {
                             <HouseIcon size={18} />
                             <span className="font-medium">Home</span>
                         </a>
-                        <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors">
+                        <a href="/anime-recs" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors">
                             <SparkleIcon size={18} />
                             <span>Recs</span>
                         </a>
@@ -145,11 +186,11 @@ function AniMatchHome() {
                 <div className="mb-8">
                     <h3 className="text-sm font-medium text-gray-400 mb-4">Library</h3>
                     <nav className="space-y-2">
-                        <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-800/50 px-3 py-2.5 rounded-lg transition-colors">
+                        <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors">
                             <ClockIcon size={18} />
                             <span>Watchlist</span>
                         </a>
-                        <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-800/50 px-3 py-2.5 rounded-lg transition-colors">
+                        <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors">
                             <CheckSquareOffsetIcon size={18} />
                             <span>Reactions</span>
                         </a>
@@ -162,10 +203,10 @@ function AniMatchHome() {
                             <UserCircleGearIcon size={18} />
                             <span>Settings</span>
                         </a>
-                        <button onClick={handleSignOut} className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors cursor-pointer">
+                        <a onClick={handleSignOut} className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors cursor-pointer">
                             <SignOutIcon size={18} />
                             <span>Sign Out</span>
-                        </button>
+                        </a>
                     </nav>
                 </div>
             </div>
@@ -179,22 +220,21 @@ function AniMatchHome() {
                         <p className="text-gray-300">Discover new anime, get personalized recommendations, and track your watchlist.</p>
                     </div> */}
                     {/* Carousel Section */}
+                    <div className=''>
+                        <Carousel data={kitsuAPIData} autoSlide={false} autoSlideInterval={6000} />
+                    </div>
                     
-                        <Carousel autoSlide={false}>
-                            {images.map((image, index) => (
-                                <img key={index} src={image} alt={`Anime ${index + 1}`} className='h-[600px] w-full aspect-square object-fit'/>
-                            ))}
-                        </Carousel>
-                    
-                    {/* Ai Recs Cards Section */} {/* TODO: Paginate the data */}
+                    {/* Ai Recs Cards Section */}
                     <AIRecCards data={aiRecsData} error={aiRecsError} success={aiRecsSuccess}/> 
+
                     {/* Anime Cards based on preferences */}
-                    <MainContentArea data={kitsuAPIData} error={kitsuAPIError} success={kitsuAPISuccess}/>
+                    <MainContentArea data={animeFromDBData} error={animeFromDBError} success={animeFromDBSuccess}/>
                 </div>
             </div>
 
             {/* Right sidebar */}
             <div className="w-60 bg-black border-l border-gray-800 text-white p-6">
+                <Search/>
                 {/* Going to contain watchlist anime and popular anime (rotating) */}
                 <div className="mb-4">
                     <h3 className="text-xl font-medium mb-2">Trending Anime</h3>
