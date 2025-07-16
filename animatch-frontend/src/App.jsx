@@ -9,6 +9,7 @@ import ProtectedRoute from "./utils/Wrapper.jsx";
 import MoreInfo from "./pages/MoreInfo.jsx";
 import AniMatchHome from "./pages/AniMatchHome.jsx";
 import About from "./pages/About.jsx";
+import AnimeRecs from "./pages/AnimeRecs.jsx";
 
 export const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ function App() {
           <Route path='/welcome' element={<ProtectedRoute> <WelcomePage/> </ProtectedRoute>} />
           <Route path='/home' element={<ProtectedRoute> <AniMatchHome/> </ProtectedRoute>} />
           <Route path='/more-info' element={<ProtectedRoute> <MoreInfo/> </ProtectedRoute>} />
+          <Route path='/anime-recs' element={<ProtectedRoute> <AnimeRecs/> </ProtectedRoute>} />
         </Routes>
       </Router>
     </QueryClientProvider>
