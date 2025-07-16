@@ -16,7 +16,7 @@ function HowItWorks() {
             icon: PuzzlePieceIcon,
             alt: "Receive Tailored Recommendations Icon",
             title: "Receive Tailored Recommendations",
-            description: "The algorithm and AI finds perfect matches based on your taste",
+            description: "Recieve perfect matches based on your taste",
         },
         {
             icon: MonitorPlayIcon,
