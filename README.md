@@ -1,7 +1,7 @@
-📺 AniMatch
+## 📺 AniMatch
 - AniMatch is a personalized anime recommendation platform built to help users discover new shows based on their preferences, moods, and watch history. Powered by Generative AI, AniMatch makes anime discovery delightful, interactive, and highly tailored.
 
-🌟 Features
+## 🌟 Features
 - 🎯 Personalized Recommendations – Powered by Gemini AI for contextual and dynamic suggestions.
 
 - 👤 User Authentication – Seamless login/signup using Supabase Auth.
@@ -22,6 +22,10 @@
 | Auth     | Supabase Authentication              |
 | AI/ML    | Gemini Generative AI                 |
 | Hosting  | TBD                                  |
+| Frontend Testing | Jest                         |
+| Backend Testing  | Jest                         |
+| E2E  | Playwright                               |
+
 
 
 ## 🚀 Roadmap
