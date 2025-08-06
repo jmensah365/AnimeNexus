@@ -13,3 +13,13 @@
 - 🧪 Modern UI/UX – Built with React.js + TailwindCSS for a clean, responsive experience.
 
 - 🌐 Full-stack App – Backend handled by Node.js + Express, connected to Supabase.
+
+| Layer    | Technology                           |
+| -------- | ------------------------------------ |
+| Frontend | React.js, TailwindCSS, Flowbite      |
+| Backend  | Node.js, Express.js                  |
+| Database | Supabase (PostgreSQL)                |
+| Auth     | Supabase Authentication              |
+| AI/ML    | Gemini Generative AI                 |
+| Hosting  | TBD                                  |
+
