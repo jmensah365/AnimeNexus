@@ -23,3 +23,15 @@
 | AI/ML    | Gemini Generative AI                 |
 | Hosting  | TBD                                  |
 
+
+## 🚀 Roadmap
+
+- [x] User authentication  
+- [x] Preference form UI  
+- [x] AI-powered recommendation  
+- [ ] Add anime trailers/previews  
+- [ ] Recommendation history & likes  
+- [ ] Mobile optimization  
+- [ ] Advanced filtering by year/genre/studio  
+- [ ] Community reviews/comments  
+
