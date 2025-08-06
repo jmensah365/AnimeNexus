@@ -14,6 +14,8 @@
 
 - 🌐 Full-stack App – Backend handled by Node.js + Express, connected to Supabase.
 
+
+
 | Layer    | Technology                           |
 | -------- | ------------------------------------ |
 | Frontend | React.js, TailwindCSS, Flowbite      |
@@ -32,10 +34,12 @@
 
 - [x] User authentication  
 - [x] Preference form UI  
-- [x] AI-powered recommendation  
-- [ ] Add anime trailers/previews  
-- [ ] Recommendation history & likes  
+- [x] AI-powered recommendation
+- [x] Get anime from Kitsu API  
+- [x] Add anime trailers/previews
+- [ ] Add streaming links (Crunchyroll, Hulu, Netlix, etc.)  
+- [ ] Recommendation history, likes, watchlist  
 - [ ] Mobile optimization  
-- [ ] Advanced filtering by year/genre/studio  
-- [ ] Community reviews/comments  
+- [ ] Advanced search & filtering by year/genre/season/status  
+ 
 
