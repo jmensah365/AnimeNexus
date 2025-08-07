@@ -16,7 +16,7 @@
 
 
 
-## | Layer    | Technology                           |
+| Layer    | Technology                           |
 | -------- | ------------------------------------ |
 | Frontend | React.js, TailwindCSS, Flowbite      |
 | Backend  | Node.js, Express.js                  |
