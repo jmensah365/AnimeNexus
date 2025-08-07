@@ -14,8 +14,10 @@
 
 - 🌐 Full-stack App – Backend handled by Node.js + Express, connected to Supabase.
 
+---
 
 
+## Tech Stack
 | Layer    | Technology                           |
 | -------- | ------------------------------------ |
 | Frontend | React.js, TailwindCSS, Flowbite      |
@@ -28,7 +30,7 @@
 | Backend Testing  | Jest                         |
 | E2E  | Playwright                               |
 
-
+---
 
 ## 🚀 Roadmap
 
