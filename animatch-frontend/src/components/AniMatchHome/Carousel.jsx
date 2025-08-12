@@ -1,29 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { CaretCircleLeftIcon, CaretCircleRightIcon, PlayCircleIcon, ProhibitIcon, SmileySadIcon } from '@phosphor-icons/react';
+import { CaretCircleLeftIcon, CaretCircleRightIcon, PauseIcon, PlayCircleIcon, PlayIcon, ProhibitIcon, SmileySadIcon, XIcon } from '@phosphor-icons/react';
 import StyledButton from '../Buttons/StyledButton';
 
 function Carousel({ data, autoSlide = true, autoSlideInterval = 6000 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [activeYoutubeId, setActiveYoutubeId] = useState(null);
+    const [autoSliding, setAutoSliding] = useState(autoSlide)
 
     const prev = () => setCurrentIndex((currentIndex) => (currentIndex === 0 ? data?.length - 1 : currentIndex - 1));
     const next = () => setCurrentIndex((currentIndex) => (currentIndex === data?.length - 1 ? 0 : currentIndex + 1));
 
     useEffect(() => {
-        if (!autoSlide) return;
+        if (!autoSliding) return;
         const slideInterval = setInterval(next, autoSlideInterval);
         return () => clearInterval(slideInterval);
-    }, [autoSlide, autoSlideInterval, next]);
+    }, [autoSliding, autoSlideInterval, next]);
 
     const openModal = (youtubeId) => {
         setActiveYoutubeId(youtubeId);
         setShowModal(true);
+        setAutoSliding(false)
     }
 
     const closeModal = () => {
         setActiveYoutubeId(null);
         setShowModal(false);
+        setAutoSliding(true);
+    }
+
+    const pauseCarousel = () => {
+        setAutoSliding(false)
+    }
+    const resumeCarousel = () => {
+        setAutoSliding(true)
     }
 
 
@@ -33,18 +43,25 @@ function Carousel({ data, autoSlide = true, autoSlideInterval = 6000 }) {
 
     return (
         <>
-            <div className="relative w-full h-[800px] overflow-hidden shadow-2xl aspect-auto">
+            <div className="relative w-full h-dvh overflow-hidden shadow-2xl aspect-auto">
                 {/* Slides */}
                 <div
                     className="flex transition-transform ease-out duration-700 h-full"
                     style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                     {data.map((item, index) => (
-                        <div key={index} className={`w-full flex-shrink-0 relative h-full bg-cover bg-center`}>
+                        <div key={index} className={`w-full flex-shrink-0 relative h-full`}>
+                                <button
+                                    onClick={autoSliding ? pauseCarousel : resumeCarousel}
+                                    className="absolute top-4 right-4 z-80 text-gray-400 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2 backdrop-blur-sm cursor-pointer"
+                                    aria-label="Close modal"
+                                >
+                                    {autoSliding ? <PauseIcon size={20} weight="bold" />  : <PlayIcon size={20} weight="bold" />}
+                                </button>  
                             <img
                                 src={item.poster_image}
                                 alt={item.title}
-                                className="w-full h-full object-fit object-center"
+                                className="w-full h-full object-fit object-center aspect-auto"
                             />
                             <div className="absolute inset-0 z-50 pointer-events-auto bg-gradient-to-r from-black/50 via-black/20 to-transparent p-10 flex flex-col justify-end">
                                 <h2 className="text-3xl font-extrabold text-white mb-2 max-w-md">{item.title}</h2>
@@ -56,7 +73,7 @@ function Carousel({ data, autoSlide = true, autoSlideInterval = 6000 }) {
                                     <button
                                         className="mt-6 relative z-50 bg-red-600 hover:bg-red-800 text-white font-semibold py-2 px-6 rounded w-fit cursor-pointer flex items-center gap-2"
                                     >
-                                        <SmileySadIcon size={32}/>Trailer Not Available
+                                        <SmileySadIcon size={32} />Trailer Not Available
                                     </button>
                                 ) : (
                                     <button
@@ -110,7 +127,7 @@ function Carousel({ data, autoSlide = true, autoSlideInterval = 6000 }) {
                         <CaretCircleRightIcon size={48} weight="fill" />
                     </button>
                 </div>
-                
+
                 {/* Pagination Dots */}
                 <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex gap-2 cursor-pointer pointer-events-auto">
                     {data.map((_, index) => (

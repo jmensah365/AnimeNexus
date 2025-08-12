@@ -91,8 +91,6 @@ function AIRecCards({ data, error, success }) {
                             <div className='flex items-center gap-2 mb-2'>
                                 <TagIcon size={16} className='text-gray-400' />
                                 <span className="text-sm text-gray-400 font-medium">Genres:</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
                                 {rec.genres.map((genre, index) => (
                                     <span key={index} className="bg-gray-700/60 text-gray-200 px-2.5 py-1 rounded-full text-xs hover:scale-105 hover:bg-gray-700/80 transition-colors cursor-default">
                                         {genre}
@@ -108,7 +106,7 @@ function AIRecCards({ data, error, success }) {
                 {error && <p className="text-red-500">{error.message}</p>}
                 {modalData && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black/75 bg-opacity-75 z-50 p-4">
-                        <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-lg shadow-lg w-full">
+                        <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-lg shadow-lg w-3xl">
                             <div className="flex items-start justify-between mb-4">
                                 <div className='flex-1'>
                                     <h3 className="text-2xl font-semibold mb-2">{modalData.anime_title}</h3>
@@ -145,8 +143,6 @@ function AIRecCards({ data, error, success }) {
                             <div className='flex items-center gap-2 mb-2 mt-2'>
                                 <TagIcon size={16} className='text-gray-400' />
                                 <span className="text-sm text-gray-400 font-medium">Genres:</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
                                 {modalData.genres.map((genre, index) => (
                                     <span key={index} className="bg-gray-700/60 text-gray-200 px-2.5 py-1 rounded-full text-xs hover:scale-105 hover:bg-gray-700/80 transition-colors cursor-default">
                                         {genre}
