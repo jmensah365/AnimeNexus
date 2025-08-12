@@ -10,6 +10,9 @@ import MoreInfo from "./pages/MoreInfo.jsx";
 import AniMatchHome from "./pages/AniMatchHome.jsx";
 import About from "./pages/About.jsx";
 import AnimeRecs from "./pages/AnimeRecs.jsx";
+import Watchlist from "./pages/Watchlist.jsx";
+import Search from "./pages/Search.jsx";
+import SettingsPage from "./pages/Settings.jsx";
 
 export const queryClient = new QueryClient();
 
@@ -27,6 +30,9 @@ function App() {
           <Route path='/home' element={<ProtectedRoute> <AniMatchHome/> </ProtectedRoute>} />
           <Route path='/more-info' element={<ProtectedRoute> <MoreInfo/> </ProtectedRoute>} />
           <Route path='/anime-recs' element={<ProtectedRoute> <AnimeRecs/> </ProtectedRoute>} />
+          <Route path='/watchlist' element={<ProtectedRoute> <Watchlist/> </ProtectedRoute>} />
+          <Route path='/search' element={<ProtectedRoute> <Search/> </ProtectedRoute>} />
+          <Route path='/settings' element={<ProtectedRoute> <SettingsPage/> </ProtectedRoute>} />
         </Routes>
       </Router>
     </QueryClientProvider>
