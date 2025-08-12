@@ -18,13 +18,36 @@ const useGenerateAndInsertAiRecs = () => {
   return useMutation({ mutationFn: generateAndInsertAiRecs });
 }
 
+const generateAndInsertAnimeMetadata = async () => {
+  const response = await fetch('http://localhost:3000/api/anime/insertMetadata', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  })
+
+  if (!response.ok) throw new Error(await response.text())
+  return response.json();
+}
+
+const useGenerateAndInsertAnimeMetadata = () => {
+  return useMutation({ mutationFn: generateAndInsertAnimeMetadata });
+}
 
 
 function WelcomePage() {
   const navigate = useNavigate();
 
   const { mutate: useGenerateAndInsertAiRecsMutate, isError, error, isSuccess, isPending } = useGenerateAndInsertAiRecs();
+  const { mutate: useGenerateAndInsertAnimeMutate } = useGenerateAndInsertAnimeMetadata();
   const handleClick = () => {
+    useGenerateAndInsertAnimeMutate({}, {
+      onSuccess: () => {
+        console.log('Inserted anime metadata into DB');
+      },
+      onError: (error) => {
+        console.error('Error inserting anime metadata into DB: ', error);
+      }
+    })
     useGenerateAndInsertAiRecsMutate({},
       {
         onSuccess: () => {
@@ -35,42 +58,26 @@ function WelcomePage() {
         }
       }
     );
+
   }
 
 
   return (
     <>
-      {/* <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50 z-10 animate-bounce animate-twice">Please click below</div> */}
 
-      <div
-        className="flex items-center justify-center min-h-screen bg-cover bg-center relative animate-fade-right"
-        style={{ backgroundImage: `url('/1311994.jpeg')` }}
-        aria-label="Welcome Page Background"
-      >
-        <div className="absolute w-72 h-24 top-40 left-[540px] animate-bounce animate-thrice">
-          <div className="relative group">
-            <div className="relative w-96 h-14 opacity-90 overflow-hidden rounded-xl bg-black z-10">
-              <div className="absolute z-10 -translate-x-44 group-hover:translate-x-[30rem] ease-in transistion-all duration-700 h-full w-44 bg-gradient-to-r from-gray-500 to-white/10 opacity-30 -skew-x-12" />
-              <div className="absolute flex items-center justify-center text-white z-[1] opacity-90 rounded-2xl inset-0.5 bg-black">
-                <button name="text" className="input font-semibold text-lg h-full opacity-90 w-full px-16 py-3 rounded-xl bg-black" disabled={true}>
-                  {isPending ? 'Loading...' : 'Please click below to enter 👇🏿'}
-                </button>
-              </div>
-              <div className="absolute duration-1000 group-hover:animate-spin w-full h-[100px] bg-gradient-to-r from-red-500 to-yellow-500 blur-[30px]" />
-            </div>
-          </div>
-        </div>
-        <button
-          onClick={() => handleClick()}
-          className="absolute cursor-pointer w-[175px] h-[300px] left-[720px] top-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none focus:ring-4 focus:ring-blue-500 "
-          aria-label="Enter through the door to access the home page"
-          disabled={isPending}
-        >
-          {isPending && <div>
-            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-500 mx-auto mt-20"></div>
-            </div>}
+      <div className='bg-black min-h-screen flex flex-col items-center justify-center text-white animate-fade-down'>
+        <img src={'/AniMatchLogo.png'} className='w-[700px] h-[700px]' />
+        <p>Your adventure awaits...</p>
+        <button onClick={() => handleClick()} class={`relative border hover:border-red-600 duration-500 group cursor-pointer text-sky-50  overflow-hidden h-14 w-56 rounded-md bg-red-800 p-2 flex justify-center items-center font-extrabold mt-3 ${isPending ? 'animate-pulse' : 'animate-none'}`}>
+          <div class="absolute z-10 w-48 h-48 rounded-full group-hover:scale-150 transition-all  duration-500 ease-in-out bg-red-900 delay-150 group-hover:delay-75"></div>
+          <div class="absolute z-10 w-40 h-40 rounded-full group-hover:scale-150 transition-all  duration-500 ease-in-out bg-red-800 delay-150 group-hover:delay-100"></div>
+          <div class="absolute z-10 w-32 h-32 rounded-full group-hover:scale-150 transition-all  duration-500 ease-in-out bg-red-700 delay-150 group-hover:delay-150"></div>
+          <div class="absolute z-10 w-24 h-24 rounded-full group-hover:scale-150 transition-all  duration-500 ease-in-out bg-red-600 delay-150 group-hover:delay-200"></div>
+          <div class="absolute z-10 w-16 h-16 rounded-full group-hover:scale-150 transition-all  duration-500 ease-in-out bg-red-500 delay-150 group-hover:delay-300"></div>
+          <p class="z-10">{isPending ? 'Loading...' : 'Get Started'}</p>
         </button>
       </div>
+
     </>
   );
 }
