@@ -5,12 +5,13 @@ import ShinyText from '../styles/ShinyText';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import ErrorCard from '../components/Cards/ErrorCard';
+import { Alert } from 'flowbite-react';
 
-const insertPreferences = async ({genres,mood,anime_era, episode_count}) => {
+const insertPreferences = async ({ genres, mood, anime_era, episode_count }) => {
     const response = await fetch('http://localhost:3000/preference/insertPreference', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({genres, mood, anime_era, episode_count}),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ genres, mood, anime_era, episode_count }),
         credentials: 'include',
     });
 
@@ -24,7 +25,7 @@ const insertPreferences = async ({genres,mood,anime_era, episode_count}) => {
 const updatePreferenceFormCompletion = async () => {
     const response = await fetch('http://localhost:3000/preference/updatePreferenceCheck', {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
     });
 
@@ -35,7 +36,7 @@ const updatePreferenceFormCompletion = async () => {
 
 
 const useInsertPreferences = () => {
-    return useMutation({mutationFn: insertPreferences});
+    return useMutation({ mutationFn: insertPreferences });
 }
 
 
@@ -43,8 +44,17 @@ const useInsertPreferences = () => {
 const genresList = [
     'Action', 'Adventure', 'Comedy', 'Sci-Fi', 'Drama', 'Romance', 'Police', 'Space',
     'Mystery', 'Magic', 'Supernatural', 'Fantasy', 'Sports', 'Cars',
-    'Racing', 'Horror', 'Psychological', 'Thriller', 'Assassin', 'Ninja,', 'Ghost', 'Mecha', 'Space', 'Historical', 'Past', 'Present',
+    'Racing', 'Horror', 'Psychological', 'Thriller', 'Assassin', 'Ninja', 'Ghost', 'Mecha', 'Space', 'Historical', 'Past', 'Present',
 ];
+
+const animeErasMapping = {
+    'The Foundations (Pre-1960s)': 'The_Foundations',
+    'The Classics (1960s-1980s)': 'The_Classics',
+    'The Boom (1990s)': 'The_Boom',
+    'The Digital Revolution (2000s-2010s)': 'The_Digital_Revolution',
+    'The Streaming Era (2010s-2020s)': 'The_Streaming_Era',
+    'The Current Era (2020s-Current)': 'The_Current_Era'
+}
 
 const animeEras = [
     'The_Foundations', 'The_Classics', 'The_Boom', 'The_Digital_Revolution',
@@ -60,7 +70,9 @@ export default function AnimePreferencesForm() {
     const [episode_count, setEpisodeCounts] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const {mutate: insertPreferenceMutate, isError, isPending} = useInsertPreferences();
+    console.log(anime_era);
+
+    const { mutate: insertPreferenceMutate, isError, isPending } = useInsertPreferences();
     const updatePreferenceFormCompletionMutate = useMutation({
         mutationFn: updatePreferenceFormCompletion,
         onSuccess: (data) => {
@@ -70,14 +82,14 @@ export default function AnimePreferencesForm() {
             console.error("Failed to update preference form completion status: ", error);
             setErrorMessage("Failed to update preference form completion status.");
         }
-        });
+    });
 
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        insertPreferenceMutate({genres, mood, anime_era, episode_count},
+        insertPreferenceMutate({ genres, mood, anime_era, episode_count },
             {
                 onSuccess: async (data) => {
                     updatePreferenceFormCompletionMutate.mutate();
@@ -128,7 +140,7 @@ export default function AnimePreferencesForm() {
                             {genres.map((genre) => (
                                 <span
                                     key={genre}
-                                    className="flex items-center rounded-full px-3 py-1 bg-purple-500"
+                                    className="flex items-center rounded-full px-3 py-1 bg-red-500"
                                 >
                                     {genre}
                                     <XIcon
@@ -140,7 +152,7 @@ export default function AnimePreferencesForm() {
                         </div>
                         <div className="relative mt-2">
                             <select
-                                className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm"
+                                className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm"
                                 onChange={(e) => {
                                     handleAddGenre(e.target.value);
                                     e.target.value = '';
@@ -163,7 +175,7 @@ export default function AnimePreferencesForm() {
                             type="text"
                             value={mood}
                             onChange={(e) => setMood(e.target.value)}
-                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm px-3 py-2"
+                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm px-3 py-2"
                             placeholder="Describe your mood..."
                         />
                     </div>
@@ -172,15 +184,15 @@ export default function AnimePreferencesForm() {
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Anime Era</label>
                         <div className="grid grid-cols-2 gap-2 mt-2">
-                            {animeEras.map((era) => (
+                            {Object.entries(animeErasMapping).map(([label, era]) => (
                                 <label key={era} className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
                                         checked={anime_era.includes(era)}
                                         onChange={() => handleCheckboxChange(setAnimeEras, era)}
-                                        className="text-purple-500 focus:ring-purple-500 border-gray-300 rounded"
+                                        className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
                                     />
-                                    <span className="text-sm text-gray-700">{era}</span>
+                                    <span className="text-sm text-gray-700">{label}</span>
                                 </label>
                             ))}
                         </div>
@@ -196,7 +208,7 @@ export default function AnimePreferencesForm() {
                                         type="checkbox"
                                         checked={episode_count.includes(count)}
                                         onChange={() => handleCheckboxChange(setEpisodeCounts, count)}
-                                        className="text-purple-500 focus:ring-purple-500 border-gray-300 rounded"
+                                        className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
                                     />
                                     <span className="text-sm text-gray-700">{count}</span>
                                 </label>
@@ -208,12 +220,15 @@ export default function AnimePreferencesForm() {
                     <button
                         id='submitBtn'
                         type="submit"
-                        className="w-full py-2 px-4 bg-purple-600 text-white text-sm font-medium rounded-md shadow hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        className="w-full py-2 px-4 bg-gradient-to-br from-red-500 to-red-700 cursor-pointer hover:scale-102 transtion-all duration-500 text-white text-sm font-medium rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                         {isPending ? 'Submitting Preferences...' : 'Submit Preferences'}
                     </button>
                 </form>
-                {isError && <ErrorCard errorMsg={errorMessage}/>}
+                {isError &&
+                    <Alert color='failure'>
+                        {errorMessage}
+                    </Alert>}
             </div>
         </div>
     );
