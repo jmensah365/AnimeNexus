@@ -7,7 +7,7 @@ import SuccessCard from '../components/Cards/SuccessCard.jsx';
 import ErrorCard from '../components/Cards/ErrorCard.jsx';
 
 const signUp = async ({ email, password }) => {
-    const response = await fetch('http://localhost:3000/auth/signUp', {
+    const response = await fetch('http://localhost:3000/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

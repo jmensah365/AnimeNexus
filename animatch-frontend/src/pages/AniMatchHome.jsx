@@ -30,7 +30,7 @@ const fetchKitsuApi = async () => {
 }
 
 const fetchAnimeFromDB = async () => {
-    const response = await fetch('http://localhost:3000/api/anime/getAnime', {
+    const response = await fetch('http://localhost:3000/api/anime/get-anime', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
@@ -40,7 +40,7 @@ const fetchAnimeFromDB = async () => {
 }
 
 const fetchAiRecs = async () => {
-    const response = await fetch('http://localhost:3000/ai/fetch', {
+    const response = await fetch('http://localhost:3000/ai/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
@@ -49,7 +49,7 @@ const fetchAiRecs = async () => {
     return response.json();
 }
 const signOut = async () => {
-    const response = await fetch('http://localhost:3000/auth/signOut', {
+    const response = await fetch('http://localhost:3000/auth/sign-out', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'

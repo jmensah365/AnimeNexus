@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 const signOut = async () => {
-    const response = await fetch('http://localhost:3000/auth/signOut', {
+    const response = await fetch('http://localhost:3000/auth/sign-out', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'

@@ -6,7 +6,7 @@ import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
 
 const fetchAnimeFromDB = async () => {
-    const response = await fetch('http://localhost:3000/api/anime/getAnime', {
+    const response = await fetch('http://localhost:3000/api/anime/get-anime', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'

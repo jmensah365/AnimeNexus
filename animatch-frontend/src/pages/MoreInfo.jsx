@@ -8,7 +8,7 @@ import ErrorCard from '../components/Cards/ErrorCard';
 import { Alert } from 'flowbite-react';
 
 const insertPreferences = async ({ genres, mood, anime_era, episode_count }) => {
-    const response = await fetch('http://localhost:3000/preference/insertPreference', {
+    const response = await fetch('http://localhost:3000/preferences/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ genres, mood, anime_era, episode_count }),
@@ -23,7 +23,7 @@ const insertPreferences = async ({ genres, mood, anime_era, episode_count }) => 
 }
 
 const updatePreferenceFormCompletion = async () => {
-    const response = await fetch('http://localhost:3000/preference/updatePreferenceCheck', {
+    const response = await fetch('http://localhost:3000/preferences/', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'

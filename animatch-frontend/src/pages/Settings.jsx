@@ -7,7 +7,7 @@ import { Alert } from 'flowbite-react'
 
 // API functions
 const updateEmail = async (newEmail) => {
-    const response = await fetch('http://localhost:3000/auth/updateEmail', {
+    const response = await fetch('http://localhost:3000/auth/update-email', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newEmail }),
@@ -20,7 +20,7 @@ const updateEmail = async (newEmail) => {
 };
 
 const updatePassword = async ({ newPassword }) => {
-    const response = await fetch('http://localhost:3000/auth/updatePassword', {
+    const response = await fetch('http://localhost:3000/auth/update-password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPassword }),
@@ -32,7 +32,7 @@ const updatePassword = async ({ newPassword }) => {
 };
 
 const fetchPreferences = async () => {
-    const response = await fetch('http://localhost:3000/preference', {
+    const response = await fetch('http://localhost:3000/preferences/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -44,7 +44,7 @@ const fetchPreferences = async () => {
 
 const updatePreferences = async ({ genres, mood, moods ,anime_eras, episode_counts, preferenceId }) => {
     if (mood !==  '') moods.push(mood);
-    const response = await fetch(`http://localhost:3000/preference/updatePreference/${preferenceId}`, {
+    const response = await fetch(`http://localhost:3000/preferences/${preferenceId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ genres, moods, anime_eras, episode_counts }),

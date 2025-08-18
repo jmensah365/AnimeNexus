@@ -6,11 +6,11 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import ErrorCard from '../components/Cards/ErrorCard'
 
 const signIn = async ({email, password}) => {
-    const response = await fetch('http://localhost:3000/auth/signIn', {
+    const response = await fetch('http://localhost:3000/auth/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // Include cookies in the request
+        credentials: 'include',
     })
 
     if (!response.ok) {
@@ -26,7 +26,7 @@ const useSignIn = () => {
 }
 
 const checkifFormIsCompleted = async () => {
-    const response = await fetch('http://localhost:3000/preference/checkPreferenceFormCompleted', {
+    const response = await fetch('http://localhost:3000/preferences/completed', {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',

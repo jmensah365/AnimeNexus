@@ -4,7 +4,7 @@ import { HandPointingIcon } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 const generateAndInsertAiRecs = async () => {
-  const response = await fetch('http://localhost:3000/ai/insert', {
+  const response = await fetch('http://localhost:3000/recommendations/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -19,7 +19,7 @@ const useGenerateAndInsertAiRecs = () => {
 }
 
 const generateAndInsertAnimeMetadata = async () => {
-  const response = await fetch('http://localhost:3000/api/anime/insertMetadata', {
+  const response = await fetch('http://localhost:3000/api/anime/insert-metadata', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

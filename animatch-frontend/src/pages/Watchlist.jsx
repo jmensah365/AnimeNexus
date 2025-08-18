@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar'
 import { useQuery } from '@tanstack/react-query'
 
 const fetchWatchlistWithInfo = async () => {
-    const response = await fetch('http://localhost:3000/watchlist/withTitles', {
+    const response = await fetch('http://localhost:3000/watchlists/with-titles', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
