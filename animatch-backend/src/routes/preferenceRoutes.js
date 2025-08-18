@@ -3,12 +3,12 @@ import { addPreference, delPreference, fetchPreferences, updatePreference, check
 
 const router = express.Router();
 
-router.get('/', fetchPreferences);
+router.get('/preferences', fetchPreferences);
 router.get('/checkPreferenceFormCompleted', checkPreferenceFormCompletedController);
-router.post('/insertPreference', addPreference);
-router.delete('/deletePreference/:preferenceId', delPreference);
-router.put('/updatePreference/:preferenceId', updatePreference);
-router.put('/updatePreferenceCheck', updatePreferenceCheck);
+router.post('/preferences', addPreference);
+router.delete('/preferences/:preferenceId', delPreference);
+router.put('/preferences/:preferenceId', updatePreference);
+router.put('/preferences', updatePreferenceCheck);
 
 
 export default router;

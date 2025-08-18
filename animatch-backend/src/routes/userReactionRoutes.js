@@ -3,10 +3,10 @@ import {fetchUserReactionController, deleteUserReactionController, insertUserRea
 
 const router = express.Router();
 
-router.get('/', fetchUserReactionController);
-router.get('/with-titles', fetchUserReactionControllerWithAnimeTitles);
-router.post('/', insertUserReactionController);
-router.put('/:reactionId', updateUserReactionController);
-router.delete('/:reactionId', deleteUserReactionController);
+router.get('/user-reactions', fetchUserReactionController);
+router.get('/user-reactions/with-titles', fetchUserReactionControllerWithAnimeTitles);
+router.post('/user-reactions', insertUserReactionController);
+router.put('/user-reactions/:reactionId', updateUserReactionController);
+router.delete('/user-reactions/:reactionId', deleteUserReactionController);
 
 export default router;

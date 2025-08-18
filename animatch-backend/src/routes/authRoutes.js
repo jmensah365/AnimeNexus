@@ -4,12 +4,12 @@ import { changeEmail, changePassword, refreshToken, userSignIn, userSignOut, use
 
 const router = express.Router();
 
-router.get("/validateSession", validateSession);
-router.post("/signUp", userSignUp);
-router.post("/signIn", userSignIn);
-router.post("/signOut", userSignOut);
-router.put("/updateEmail", changeEmail);
-router.put("/updatePassword", changePassword);
-router.post("/refreshToken", refreshToken);
+router.get("/validate-session", validateSession);
+router.post("/signup", userSignUp);
+router.post("/sign-in", userSignIn);
+router.post("/sign-out", userSignOut);
+router.put("/update-email", changeEmail);
+router.put("/update-password", changePassword);
+router.post("/refresh-token", refreshToken);
 
 export default router;
