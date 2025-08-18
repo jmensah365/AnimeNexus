@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { XIcon, EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
+import { XIcon, EyeIcon, EyeSlashIcon, CheckIcon } from '@phosphor-icons/react';
 import Sidebar from '../components/Sidebar';
 import ErrorCard from '../components/Cards/ErrorCard';
-import { useMutation } from '@tanstack/react-query';
-import {Alert} from 'flowbite-react'
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Alert } from 'flowbite-react'
 
 // API functions
 const updateEmail = async (newEmail) => {
@@ -31,11 +31,23 @@ const updatePassword = async ({ newPassword }) => {
     return response.json();
 };
 
-const updatePreferences = async ({ genres, mood, anime_eras, episode_counts }) => {
-    const response = await fetch('http://localhost:3000/preference/updatePreference', {
+const fetchPreferences = async () => {
+    const response = await fetch('http://localhost:3000/preference', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+const updatePreferences = async ({ genres, mood, moods ,anime_eras, episode_counts, preferenceId }) => {
+    if (mood !==  '') moods.push(mood);
+    const response = await fetch(`http://localhost:3000/preference/updatePreference/${preferenceId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ genres, mood, anime_eras, episode_counts }),
+        body: JSON.stringify({ genres, moods, anime_eras, episode_counts }),
         credentials: 'include',
     });
 
@@ -59,14 +71,15 @@ const animeErasMapping = {
     'The Current Era (2020s-Current)': 'The_Current_Era'
 }
 
-const moods = {
+const moodMappings = {
     "😊 Happy": "happy",
     "😢 Sad": "sad",
     "😐 Neutral": "neutral",
     "😴 Tired": "tired",
     "🤔 Thoughtful": "thoughtful",
     "🔥 Excited": "excited",
-    "😌 Relaxed": "relaxed"
+    "😌 Relaxed": "relaxed",
+    "😡 Mad": "mad"
 }
 
 const animeEras = [
@@ -83,8 +96,11 @@ function Settings() {
 
     // Password state
     const [newPassword, setNewPassword] = useState('');
-    const [showNewPassword, setShowNewPassword] = useState(false);
     const [passwordSuccess, setPasswordSuccess] = useState('');
+    const passwordLength = newPassword.length >= 8;
+    const hasUppercase = /[A-Z]/.test(newPassword);
+    const hasLowercase = /[a-z]/.test(newPassword);
+    const hasDigitAndSymbol = /^(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>~`_\-+=\[\]\\\/])/.test(newPassword);
 
     // Preferences state
     const [genres, setGenres] = useState([]);
@@ -92,8 +108,8 @@ function Settings() {
     const [anime_eras, setAnimeEras] = useState([]);
     const [episode_counts, setEpisodeCounts] = useState([]);
     const [preferencesSuccess, setPreferencesSuccess] = useState('');
+    const [moods, setMoods] = useState([]);
 
-    console.log(emailSuccess);
 
     // Error states
     const [emailError, setEmailError] = useState('');
@@ -142,6 +158,11 @@ function Settings() {
         onSuccess: () => {
             setPreferencesSuccess('Preferences updated successfully!');
             setPreferencesError('');
+            setGenres([]);
+            setMood('');
+            setMoods([]);
+            setAnimeEras([]);
+            setEpisodeCounts([]);
         },
         onError: (error) => {
             try {
@@ -153,6 +174,17 @@ function Settings() {
             setPreferencesSuccess('');
         }
     });
+
+    //Queries
+    const {data: preferences, isLoading: loadingPreferences, error: fetchPreferencesError} = useQuery({
+        queryKey: ['fetchPreferences'],
+        queryFn: fetchPreferences,
+        retry: false,
+        refetchOnWindowFocus: false,
+    });
+    const preferenceId = preferences?.preference?.[0].id;
+
+
 
     // Handlers
     const handleEmailSubmit = (e) => {
@@ -167,16 +199,15 @@ function Settings() {
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
 
-        if (newPassword.length < 6) {
-            setPasswordError('New password must be at least 6 characters long.');
+        if (!passwordLength || !hasUppercase || !hasLowercase || !hasDigitAndSymbol) {
+            setPasswordError('New password must be at least 8 characters long, have at least 1 uppercase and lowercase letter, and a symbol.');
             return;
-        }
-        passwordMutation.mutate({ newPassword });
+        } 
     };
 
     const handlePreferencesSubmit = (e) => {
         e.preventDefault();
-        preferencesMutation.mutate({ genres, mood, anime_eras, episode_counts });
+        preferencesMutation.mutate({ genres, moods, mood, anime_eras, episode_counts, preferenceId });
     };
 
     const handleAddGenre = (genre) => {
@@ -230,10 +261,10 @@ function Settings() {
                             </button>
                             {emailSuccess && <Alert color='success'>
                                 Success! {emailSuccess}
-                            </Alert> }
+                            </Alert>}
                             {emailError && <Alert color='failure'>
                                 {emailError}
-                            </Alert> }
+                            </Alert>}
                         </form>
                     </div>
 
@@ -260,22 +291,37 @@ function Settings() {
                             >
                                 {passwordMutation.isPending ? "Updating..." : "Update Password"}
                             </button>
+                            {/* <div className='space-y-0.5 text-sm font-semibold'>
+                                <h3 className='text-white font-semibold text-lg'>Password Requirements</h3>
+                                <div className="">
+                                    <span className='inline-flex items-center'> {passwordLength ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />} <p>At least 8 chars.</p></span>
+                                </div>
+                                <div className=" ">
+                                    <span className='inline-flex items-center'>{hasUppercase ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 uppercase</p></span>
+                                </div>
+                                <div className=" ">
+                                    <span className='inline-flex items-center'>{hasLowercase ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 lowercase</p></span>
+                                </div>
+                                <div className="">
+                                    <span className='inline-flex items-center'>{hasDigitAndSymbol ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 digit & symbol</p></span>
+                                </div>
+                            </div> */}
                             {passwordSuccess && <Alert color='success'>
                                 {passwordSuccess}
-                            </Alert> }
+                            </Alert>}
                             {passwordError && <Alert color='failure'>
                                 {passwordError}
-                            </Alert> }
+                            </Alert>}
                         </form>
                     </div>
                 </div>
 
                 {/* Preference section */}
                 <div className='bg-gray-900 h-screen p-6 rounded-lg'>
-                    <form className="space-y-6" id='form' method='POST' >
+                    <form className="space-y-6" id='form' method='POST' onSubmit={handlePreferencesSubmit} >
                         {/* Genre Selection */}
                         <div>
-                            <label className="block text-lg font-medium text-white">Genres</label>
+                            <label className="block text-lg font-medium text-white">Genres<span className='text-red-500'>*</span> </label>
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {genres.map((genre) => (
                                     <span
@@ -308,21 +354,38 @@ function Settings() {
                             </div>
                         </div>
 
+                        {/* Mood Checkboxes */}
+                        <div>
+                        <label className="block text-lg font-medium text-white">Mood<span className='text-red-500'>*</span></label>
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                {Object.entries(moodMappings).map(([label, mood]) => (
+                                    <label key={mood} className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={moods.includes(mood)}
+                                            onChange={() => handleCheckboxChange(setMoods, mood)}
+                                            className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
+                                        />
+                                        <span className="text-sm text-white">{label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Mood Input */}
                         <div>
-                            <label className="block text-lg font-medium text-white">Mood</label>
                             <input
                                 type="text"
                                 value={mood}
                                 onChange={(e) => setMood(e.target.value)}
-                                className="mt-2 block w-full rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm px-3 py-2"
-                                placeholder="Describe your mood..."
+                                className="mt-2 block w-full rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm px-3 py-2 bg-gray-900 border-white"
+                                placeholder="Describe your mood... (optional)"
                             />
                         </div>
 
                         {/* Anime Era Selection */}
                         <div>
-                            <label className="block text-lg font-medium text-white">Anime Era</label>
+                            <label className="block text-lg font-medium text-white">Anime Era<span className='text-red-500'>*</span></label>
                             <div className="grid grid-cols-2 gap-2 mt-2">
                                 {Object.entries(animeErasMapping).map(([label, era]) => (
                                     <label key={era} className="flex items-center space-x-2">
@@ -340,7 +403,7 @@ function Settings() {
 
                         {/* Episode Count Selection */}
                         <div>
-                            <label className="block text-lg font-medium text-white">Episode Count</label>
+                            <label className="block text-lg font-medium text-white">Episode Count<span className='text-red-500'>*</span></label>
                             <div className="grid grid-cols-2 gap-2 mt-2">
                                 {episodeCounts.map((count) => (
                                     <label key={count} className="flex items-center space-x-2">
@@ -360,11 +423,13 @@ function Settings() {
                         <button
                             id='submitBtn'
                             type="submit"
-                            className="w-full py-2 px-4 bg-gradient-to-r from-red-500 to-red-700 text-white text-sm font-medium rounded-md shadow focus:outline-none cursor-pointer hover:scale-102 transition-all duration-500"
+                            className="w-full mb-4 py-2 px-4 bg-gradient-to-r from-red-500 to-red-700 text-white text-sm font-medium rounded-md shadow focus:outline-none cursor-pointer hover:scale-102 transition-all duration-500"
                         >
-                            Update Preferences
+                            {preferencesMutation.isPending ? 'Updating Preferences...' : 'Update Preferences'}
                         </button>
                     </form>
+                    {preferencesSuccess && (<Alert color='success' onDismiss={() => setPreferencesSuccess('')}>{preferencesSuccess}</Alert>)}
+                    {preferencesError && (<Alert color='failure'onDismiss={() => setPreferencesError('')} >{preferencesError}</Alert>)}
                 </div>
             </div>
         </div>
