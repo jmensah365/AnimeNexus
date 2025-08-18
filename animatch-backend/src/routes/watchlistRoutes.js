@@ -3,10 +3,10 @@ import {getWatchlistController, insertWatchlistController, removeWatchlistContro
 
 const router = express.Router();
 
-router.get('/watchlists', getWatchlistController);
-router.get('/watchlists/with-titles', getWatchlistControllerWithAnimeTitles);
-router.post('/watchlists', insertWatchlistController);
-router.delete('/watchlists/:watchListId', removeWatchlistController);
-router.put('/watchlists/:watchListId', updateWatchlistController);
+router.get('/', getWatchlistController);
+router.get('/with-titles', getWatchlistControllerWithAnimeTitles);
+router.post('/', insertWatchlistController);
+router.delete('/:watchListId', removeWatchlistController);
+router.put('/:watchListId', updateWatchlistController);
 
 export default router;

@@ -3,11 +3,11 @@ import {getRecommendations, getRecommendationsWithInput, insertRecommendations, 
 
 const router = express.Router();
 
-router.get('/fetch-recommendations', fetchRecommendations);
-router.post('/recommendations/ai', getRecommendations);
-router.post('/recommendations/input-ai', getRecommendationsWithInput);
-router.post('/recommendations', insertRecommendations);
-router.post('/recommendations/daily-spin', getDailySpinReccommendation);
+router.get('/', fetchRecommendations);
+router.post('/ai', getRecommendations);
+router.post('/input-ai', getRecommendationsWithInput);
+router.post('/', insertRecommendations);
+router.post('/daily-spin', getDailySpinReccommendation);
 
 
 export default router;
