@@ -4,23 +4,27 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
+import {useAuth} from '../utils/Auth'
 
-const fetchAnimeFromDB = async () => {
+const fetchAnimeFromDB = async (token) => {
     const response = await fetch('http://localhost:3000/api/anime/get-anime', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
     });
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
 
-const useFetchAnimeFromDB = () => {
+const useFetchAnimeFromDB = (token) => {
     return useQuery({
         queryKey: ['animeFromDB'],
-        queryFn: fetchAnimeFromDB,
+        queryFn: () => fetchAnimeFromDB(token),
         refetchOnWindowFocus: false,
         retry: 3,
+        enabled: !!token
     })
 }
 
@@ -63,23 +67,22 @@ const AnimeCard = ({ anime, onClick }) => {
 
 
 function AnimeRecs() {
+    const {session} = useAuth();
     const navigate = useNavigate();
     const [modalData, setModalData] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB();
+    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB(session?.access_token);
 
+    //Pagination
     const animePerPage = 24;
     const [currentPage, setCurrentPage] = useState(1);
-
     const totalPages = Math.ceil(animeFromDBData?.anime_data.length / animePerPage);
     const start = (currentPage - 1) * animePerPage;
     const end = start + animePerPage;
     const slicedData = animeFromDBData ? animeFromDBData.anime_data.slice(start, end) : [];
-
     const handleNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     }
-
     const handlePrevPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     }

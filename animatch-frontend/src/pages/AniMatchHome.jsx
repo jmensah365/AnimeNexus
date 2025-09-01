@@ -7,6 +7,9 @@ import AIRecCards from '../components/Cards/AIRecCards'
 import MainContentArea from '../components/AniMatchHome/MainContentArea'
 import Search from '../components/AniMatchHome/Search'
 import Sidebar from '../components/Sidebar'
+import { useAuth } from '../utils/Auth.jsx'
+
+
 
 const fetchKitsuApi = async () => {
     const response = await fetch('http://localhost:3000/api/anime/status/upcoming', {
@@ -21,7 +24,7 @@ const fetchKitsuApi = async () => {
         title: anime.title,
         synopsis: anime.synopsis,
         age_rating: anime.age_rating,
-        poster_image:  anime.original_image_url,
+        poster_image: anime.original_image_url,
         youtube_id: anime.youtube_id,
     }))
 
@@ -29,31 +32,26 @@ const fetchKitsuApi = async () => {
     return formattedData;
 }
 
-const fetchAnimeFromDB = async () => {
+const fetchAnimeFromDB = async (token) => {
     const response = await fetch('http://localhost:3000/api/anime/get-anime', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
     });
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
 
-const fetchAiRecs = async () => {
-    const response = await fetch('http://localhost:3000/ai/', {
+const fetchAiRecs = async (token) => {
+    const response = await fetch('http://localhost:3000/recommendations/', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
     });
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
-const signOut = async () => {
-    const response = await fetch('http://localhost:3000/auth/sign-out', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
@@ -67,92 +65,67 @@ const useFetchKitsuApi = () => {
     })
 }
 
-const useFetchAnimeFromDB = () => {
+const useFetchAnimeFromDB = (token) => {
     return useQuery({
         queryKey: ['animeFromDB'],
-        queryFn: fetchAnimeFromDB,
+        queryFn: () => fetchAnimeFromDB(token),
         refetchOnWindowFocus: false,
         retry: 3,
+        enabled: !!token
     })
 }
 
-const useFetchAiRecs = () => {
+const useFetchAiRecs = (token) => {
     return useQuery({
         queryKey: ['aiRecs'],
-        queryFn: fetchAiRecs,
+        queryFn: () => fetchAiRecs(token),
         refetchOnWindowFocus: false,
         retry: 3,
+        enabled: !!token,
     })
 }
 
-const useSignOut = () => {
-    return useMutation({mutationFn: signOut})
-}
 
 function AniMatchHome() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    const { session } = useAuth();
     const { data: kitsuAPIData, isLoading, error: kitsuAPIError, isSuccess: kitsuAPISuccess } = useFetchKitsuApi();
-    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB();
-    const { data: aiRecsData, isLoading: aiRecsLoading, error: aiRecsError, isSuccess: aiRecsSuccess } = useFetchAiRecs();
-    const { mutate: signOutMutation, isPending, isSuccess: signOutSuccess, isError: signOutError } = useSignOut();
+    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB(session?.access_token);
+    const { data: aiRecsData, isLoading: aiRecsLoading, error: aiRecsError, isSuccess: aiRecsSuccess } = useFetchAiRecs(session?.access_token);
 
-    useEffect(() => {
-        if (kitsuAPISuccess) {
-            console.log(kitsuAPIData);
-        }
-        if (kitsuAPIError) {
-            setErrorMessage(kitsuAPIError);
-            console.error(kitsuAPIError);
-        }
-    }, [kitsuAPISuccess, kitsuAPIError]);
 
-    useEffect(() => {
-        if (animeFromDBSuccess) {
-            // console.log(animeFromDBData);
-        }
-        if (animeFromDBError) {
-            setErrorMessage(animeFromDBError);
-            console.error(animeFromDBError);
-        }
-    }, [animeFromDBSuccess, animeFromDBError]);
+    // useEffect(() => {
+    //     if (kitsuAPISuccess) {
+    //         console.log(kitsuAPIData);
+    //     }
+    //     if (kitsuAPIError) {
+    //         setErrorMessage(kitsuAPIError);
+    //         console.error(kitsuAPIError);
+    //     }
+    // }, [kitsuAPISuccess, kitsuAPIError]);
 
-    useEffect(() => {
-        if (aiRecsSuccess) {
-            // console.log(aiRecsData);
-        }
-        if (aiRecsError) {
-            setErrorMessage(aiRecsError);
-            console.error(aiRecsError);
-        }
-    }, [aiRecsSuccess, aiRecsError, aiRecsData]);
+    // useEffect(() => {
+    //     if (animeFromDBSuccess) {
+    //         // console.log(animeFromDBData);
+    //     }
+    //     if (animeFromDBError) {
+    //         setErrorMessage(animeFromDBError);
+    //         console.error(animeFromDBError);
+    //     }
+    // }, [animeFromDBSuccess, animeFromDBError]);
 
-    useEffect(() => {
-        if (signOutSuccess) {
-            console.log("Successfully signed out");
-            navigate('/');
-        }
-        if (isPending) {
-            console.log("Signing out...");
-        }
-        if (signOutError) {
-            setErrorMessage(signOutError);
-            console.error("Failed to sign out: ", signOutError);
-        }
-    }, [signOutSuccess, isPending, signOutError, navigate]);
+    // useEffect(() => {
+    //     if (aiRecsSuccess) {
+    //         // console.log(aiRecsData);
+    //     }
+    //     if (aiRecsError) {
+    //         setErrorMessage(aiRecsError);
+    //         console.error(aiRecsError);
+    //     }
+    // }, [aiRecsSuccess, aiRecsError, aiRecsData]);
 
-    const handleSignOut = () => {
-        signOutMutation({
-            onSuccess: () => {
-                console.log("Successfully signed out");
-                navigate('/');
-            },
-            onError: (error) => {
-                setErrorMessage(error);
-                console.error("Failed to sign out: ", error);
-            }
-        });
-    }
+
 
 
 
@@ -168,12 +141,12 @@ function AniMatchHome() {
                     <div className=''>
                         <Carousel data={kitsuAPIData} autoSlide={true} autoSlideInterval={6000} />
                     </div>
-                    
+
                     {/* Ai Recs Cards Section */}
-                    <AIRecCards data={aiRecsData} error={aiRecsError} success={aiRecsSuccess}/> 
+                    <AIRecCards data={aiRecsData} error={aiRecsError} success={aiRecsSuccess} />
 
                     {/* Anime Cards based on preferences */}
-                    <MainContentArea data={animeFromDBData} error={animeFromDBError} success={animeFromDBSuccess}/>
+                    <MainContentArea data={animeFromDBData} error={animeFromDBError} success={animeFromDBSuccess} />
                 </div>
             </div>
 

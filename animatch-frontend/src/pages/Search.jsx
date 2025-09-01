@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, ClockIcon, CheckSquareOffsetIcon, SignOutIcon, CaretLeftIcon, CaretRightIcon, PlusCircleIcon, XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon, ArrowCircleUpIcon } from '@phosphor-icons/react'
+import { XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon, ArrowCircleUpIcon } from '@phosphor-icons/react'
 import Sidebar from '../components/Sidebar';
 
 const fetchAnime = async ({ pageParam = 0, queryKey }) => {
@@ -265,6 +265,7 @@ export default function Search() {
         enabled: !!debouncedQuery.trim(),
         staleTime: 1000 * 60 * 5,
     });
+    console.log(data);
 
     // Scroll to top on new search
     useEffect(() => {
