@@ -1,30 +1,19 @@
-import supabase from "../config/databaseConfig.js";
+import supabaseAdmin from '../config/databaseAdminConfig.js';
+import {createClient} from '@supabase/supabase-js'
 
 
-export const supabaseAuthMiddleware = async (req) => {
-    // Get tokens from cookies
-    const access_token = req.cookies['access-token']
-    const refresh_token = req.cookies['refresh-token']
+export const supabaseAuthMiddleware = async (req, res, next) => {
+    const token = req.headers.authorization?.replace('Bearer ','');
+    if (!token) return res.status(401).json({error: 'Missing auth token'});
 
-    // If tokens are not present, return an error
-    if (!access_token || !refresh_token) {
-        return {
-            error: true,
-            message: 'Unauthorized: Access token or refresh token is missing'
-        }
-    }
+    const {data: {user}, error} = await supabaseAdmin.auth.getUser(token);
+    if (error) return res.status(401).json({error: error.message});
 
-    try {
-        //set the session using the access and refresh tokens
-        const {data: { session }, error} = await supabase.auth.setSession({access_token, refresh_token});
-        if (error) throw error;
+    req.user = user;
 
-        // Get the user associated with the session
-        const {data: {user}, error: userError} = await supabase.auth.getUser();
-        if (userError) throw userError;
-
-        return {data: {session, user}, error: null};
-    } catch (error) {
-        return {error: true, message: `Authentication failed: ${error.message}`};
-    }
+    req.supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+        global: {headers: {Authorization: `Bearer ${token}`}}
+    });
+    
+    next();
 }

@@ -14,12 +14,12 @@ export const updateUserPreference = async (preferenceId, updatedData) => {
     return await updatePreference(preferenceId, updatedData);
 }
 
-export const fetchUserPreferences = async () => {
-    return await fetchPreferences();
+export const fetchUserPreferences = async (supabaseClient, userId) => {
+    return await fetchPreferences(supabaseClient, userId);
 }
 
-export const checkPreferenceFormCompletedService = async () => {
-    return await checkPreferenceFormCompleted();
+export const checkPreferenceFormCompletedService = async (supabaseClient, userId) => {
+    return await checkPreferenceFormCompleted(supabaseClient, userId);
 }
 
 export const updatePreferenceCheckService = async () => {

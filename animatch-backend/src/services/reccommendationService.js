@@ -12,8 +12,8 @@ export const insertAIReccommendations = async () => {
     return await insertAIRecs();
 }
 
-export const fetchAIReccommendations = async () => {
-    return await fetchAIRecs();
+export const fetchAIReccommendations = async (supabaseClient, userId) => {
+    return await fetchAIRecs(supabaseClient, userId);
 }
 
 export const generateAIReccommendations = async () => {

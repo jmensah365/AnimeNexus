@@ -28,7 +28,7 @@ const Episode_Counts = Object.freeze({
     '50+': '(50+)'
 });
 
-export const insertPreference = async ({ genres, mood, episode_count, anime_era }) => {
+export const insertPreference = async ({ genres, moods, episode_count, anime_era }) => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError) throw userError;
     if (!userData || !userData.user) {
@@ -48,7 +48,7 @@ export const insertPreference = async ({ genres, mood, episode_count, anime_era 
         return episode_count;
     })
 
-    const { data, error } = await supabase.from('preferences').insert({ genres, mood, user_id: userData.user.id, episode_counts, anime_eras }).select();
+    const { data, error } = await supabase.from('preferences').insert({ genres, moods, user_id: userData.user.id, episode_counts, anime_eras }).select();
     if (error) throw error;
     return data;
 }
@@ -103,17 +103,12 @@ export const updatePreference = async (preferenceId, updatedData) => {
     return response;
 }
 
-export const fetchPreferences = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
+export const fetchPreferences = async (supabaseClient, userId) => {
 
-    const { data: preference, error: fetchError } = await supabase
+    const { data: preference, error: fetchError } = await supabaseClient
         .from('preferences')
         .select()
-        .eq('user_id', userData.user.id);
+        .eq('user_id', userId);
     
 
     if (!preference) {
@@ -130,14 +125,9 @@ export const fetchPreferences = async () => {
     If it is return True, otherwise False
     This helps for the frontend to determine where to redirect the user after login
 */
-export const checkPreferenceFormCompleted = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
+export const checkPreferenceFormCompleted = async (supabaseClient, userId) => {
+    const response = await supabaseClient.from('preference_users').select('preference_survey_completed').eq('id', userId).single();
 
-    const response = await supabase.from('preference_users').select('preference_survey_completed').eq('id', userData.user.id).single();
 
     if (response.data.preference_survey_completed === true) {
         return true;

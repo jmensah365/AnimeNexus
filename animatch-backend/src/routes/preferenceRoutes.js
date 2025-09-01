@@ -1,14 +1,15 @@
 import express from 'express';
 import { addPreference, delPreference, fetchPreferences, updatePreference, checkPreferenceFormCompletedController, updatePreferenceCheck } from '../controllers/preferenceController.js';
+import { supabaseAuthMiddleware } from '../middlewares/supabaseMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', fetchPreferences);
-router.get('/completed', checkPreferenceFormCompletedController);
-router.post('/', addPreference);
-router.delete('/:preferenceId', delPreference);
-router.put('/:preferenceId', updatePreference);
-router.put('/', updatePreferenceCheck);
+router.get('/', supabaseAuthMiddleware, fetchPreferences);
+router.get('/completed', supabaseAuthMiddleware, checkPreferenceFormCompletedController);
+router.post('/', supabaseAuthMiddleware, addPreference);
+router.delete('/:preferenceId', supabaseAuthMiddleware, delPreference);
+router.put('/:preferenceId', supabaseAuthMiddleware, updatePreference);
+router.put('/', supabaseAuthMiddleware, updatePreferenceCheck);
 
 
 export default router;

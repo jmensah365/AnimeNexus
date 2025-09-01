@@ -2,13 +2,13 @@ import {addUserReaction, getUserReactions, removeUserReaction, updateUserReactio
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const fetchUserReactionController = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     try {
         const userReactionList = await getUserReactions();
 
@@ -28,13 +28,13 @@ export const fetchUserReactionController = async (req, res) => {
 }
 
 export const fetchUserReactionControllerWithAnimeTitles = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     try {
         const userReactionList = await getUserReactionsWithAnimeTitles();
 
@@ -54,13 +54,13 @@ export const fetchUserReactionControllerWithAnimeTitles = async (req, res) => {
 }
 
 export const insertUserReactionController = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const reactionData = req.body;
 
     if (!reactionData) throw new Error('Reaction data is missing');
@@ -94,13 +94,13 @@ export const insertUserReactionController = async (req, res) => {
 }
 
 export const updateUserReactionController = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const reactionId = req.params.reactionId;
     const updatedData = req.body;
 
@@ -128,13 +128,13 @@ export const updateUserReactionController = async (req, res) => {
 }
 
 export const deleteUserReactionController = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const reactionId = req.params.reactionId;
 
     if (!reactionId) throw new Error('Reaction ID is required');

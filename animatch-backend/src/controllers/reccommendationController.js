@@ -6,16 +6,8 @@ import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
  */
 
 export const fetchRecommendations = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
-
     try {
-        const recommendations = await fetchAIReccommendations();
+        const recommendations = await fetchAIReccommendations(req.supabase, req.user.id);
 
         if (!recommendations || recommendations.length === 0) {
             return res.status(404).json({
@@ -35,13 +27,6 @@ export const fetchRecommendations = async (req, res) => {
 }
 
 export const insertRecommendations = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
 
     try {
         const recommendations = await insertAIReccommendations();
@@ -64,13 +49,6 @@ export const insertRecommendations = async (req, res) => {
 }
 
 export const getRecommendations = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
 
     try {
         const recommendations = await generateAIReccommendations();
@@ -95,13 +73,13 @@ export const getRecommendations = async (req, res) => {
 }
 
 export const getRecommendationsWithInput = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
 
     //User input is sent in the request body. Not sure if this is the best way to do it, but it works for now.
     const user_input = req.body; 
@@ -129,13 +107,13 @@ export const getRecommendationsWithInput = async (req, res) => {
 }
 
 export const getDailySpinReccommendation = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
 
     try {
         const recommendations = await generateDailySpinReccommendation();

@@ -6,13 +6,13 @@ import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
  */
 
 export const addPreference = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const preferenceData = req.body; // Extract preference data from the request body
     if (!preferenceData) {
         return res.status(400).json({
@@ -37,13 +37,13 @@ export const addPreference = async (req, res) => {
 }
 
 export const delPreference = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const preferenceId = req.params.preferenceId; // Extract preference ID from the request parameters
     if (!preferenceId) {
         return res.status(400).json({
@@ -65,13 +65,13 @@ export const delPreference = async (req, res) => {
 }
 
 export const updatePreference = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     const preferenceId = req.params.preferenceId; // Extract preference ID from the request parameters
     const updatedData = req.body; // Extract updated data from the request body
     // console.log(updatedData);
@@ -90,7 +90,6 @@ export const updatePreference = async (req, res) => {
     }
     try {
         const { data, error } = await updateUserPreference(preferenceId, updatedData);
-        console.log(data);
         if (error) {
             return res.status(400).json({
                 error: true,
@@ -108,15 +107,8 @@ export const updatePreference = async (req, res) => {
 }
 
 export const fetchPreferences = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
     try {
-        const preference = await fetchUserPreferences();
+        const preference = await fetchUserPreferences(req.supabase, req.user.id);
         if (!preference || preference.length === 0) {
             return res.status(404).json({
                 message: 'No preferences found for this user'
@@ -130,16 +122,17 @@ export const fetchPreferences = async (req, res) => {
     }
 }
 
-export const checkPreferenceFormCompletedController = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to check preference form completion'
-        });
-    }
+export const checkPreferenceFormCompletedController = async (req, res, next) => {
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req, res, next);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to check preference form completion'
+    //     });
+    // }
     try {
-        const isCompleted = await checkPreferenceFormCompletedService();
+        const userId = req.user.id;
+        const isCompleted = await checkPreferenceFormCompletedService(req.supabase, userId);
         return res.status(200).json({ isCompleted });
     } catch (error) {
         return res.status(500).json({
@@ -149,13 +142,13 @@ export const checkPreferenceFormCompletedController = async (req, res) => {
 }
 
 export const updatePreferenceCheck = async (req, res) => {
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to update preference check'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to update preference check'
+    //     });
+    // }
     try {
         const updatedResponse = await updatePreferenceCheckService();
         return res.status(200).json({ updatedResponse });
