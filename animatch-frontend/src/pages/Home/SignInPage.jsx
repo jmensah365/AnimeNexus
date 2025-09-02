@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GoogleLogoIcon, FacebookLogoIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
+import { GoogleLogoIcon, FacebookLogoIcon, EyeSlashIcon, EyeIcon } from '@phosphor-icons/react'
 import HomeNavbar from '../../components/HomeNavBar'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import ErrorCard from '../../components/Cards/ErrorCard'
@@ -122,7 +122,7 @@ function SignInPage() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required />
-                                        <button type='button' onClick={() => setIsVisible(!isVisible)} className='absolute right-5 top-9 hover:cursor-pointer'>{isVisible ? (<EyeClosedIcon />) : (<EyeIcon />)}</button>
+                                        <button type='button' onClick={() => setIsVisible(!isVisible)} className='absolute right-5 top-9 hover:cursor-pointer'>{isVisible ? (<EyeSlashIcon />) : (<EyeIcon />)}</button>
                                     </div>
                                 </div>
                                 <p className='text-right text-sm text-black hover:underline cursor-pointer'>Forgot Password?</p>
