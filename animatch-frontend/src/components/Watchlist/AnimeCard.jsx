@@ -2,7 +2,7 @@ import { TrashIcon, PencilIcon } from '@phosphor-icons/react'
 import { Tooltip } from 'flowbite-react'
 import { getStatusColor, convertStatus } from '../../utils/watchlistHelpers'
 
-export default function AnimeCard({ watchlist, onClick, setDeleteTarget }) {
+export default function AnimeCard({ watchlist, onClick, setDeleteTarget, setUpdateTarget }) {
     return (
         <div
             key={watchlist.id}
@@ -27,7 +27,7 @@ export default function AnimeCard({ watchlist, onClick, setDeleteTarget }) {
                 <h2 className="text-red-400 font-medium text-2xl leading-tight">{watchlist.kitsu_anime_data.title}</h2>
                 <div className='absolute bottom-8 left-4 hover:scale-105 transition-all duration-300'>
                     <Tooltip content='Update' style='light' placement='right'>
-                        <PencilIcon size={24} color='red' />
+                        <PencilIcon size={24} color='red' onClick={(e) => {e.stopPropagation(); setUpdateTarget(watchlist)}} />
                     </Tooltip>
                 </div>
                 <div className='absolute bottom-8 right-4 hover:scale-105 transition-all duration-300'>

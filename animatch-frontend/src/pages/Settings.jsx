@@ -4,56 +4,81 @@ import Sidebar from '../components/Sidebar';
 import ErrorCard from '../components/Cards/ErrorCard';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Alert } from 'flowbite-react'
+import supabase from '../utils/supabaseClient';
+import { useAuth } from '../utils/Auth'
 
 // API functions
 const updateEmail = async (newEmail) => {
-    const response = await fetch('http://localhost:3000/auth/update-email', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newEmail }),
-        credentials: 'include',
+    const { response, error } = await supabase.auth.updateUser({
+        email: newEmail
     });
 
-    console.log(response);
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    if (error) throw error;
+    return response;
 };
 
-const updatePassword = async ({ newPassword }) => {
-    const response = await fetch('http://localhost:3000/auth/update-password', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: newPassword }),
-        credentials: 'include',
+const updatePassword = async (newPassword) => {
+    const { response, error } = await supabase.auth.updateUser({
+        password: newPassword
     });
 
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    if (error) throw error;
+    return response;
 };
 
-const fetchPreferences = async () => {
+const fetchPreferences = async (token) => {
     const response = await fetch('http://localhost:3000/preferences/', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
     });
 
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }
 
-const updatePreferences = async ({ genres, mood, moods ,anime_eras, episode_counts, preferenceId }) => {
-    if (mood !==  '') moods.push(mood);
+const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_counts, preferenceId }, token) => {
+    if (mood !== '') moods.push(mood);
     const response = await fetch(`http://localhost:3000/preferences/${preferenceId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ genres, moods, anime_eras, episode_counts }),
-        credentials: 'include',
     });
 
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 };
+
+const generateAndInsertAiRecs = async (token) => {
+    const response = await fetch('http://localhost:3000/recommendations/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    })
+
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+const generateAndInsertAnimeMetadata = async (token) => {
+    const response = await fetch('http://localhost:3000/api/anime/insert-metadata', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    })
+
+    if (!response.ok) throw new Error(await response.text())
+    return response.json();
+}
 
 // Data constants
 const genresList = [
@@ -90,6 +115,9 @@ const animeEras = [
 const episodeCounts = ['1-13', '13-26', '26-50+', '50+'];
 
 function Settings() {
+    //Auth session
+    const { session } = useAuth();
+    const token = session?.access_token;
     // Email state
     const [newEmail, setNewEmail] = useState('');
     const [emailSuccess, setEmailSuccess] = useState('');
@@ -97,6 +125,7 @@ function Settings() {
     // Password state
     const [newPassword, setNewPassword] = useState('');
     const [passwordSuccess, setPasswordSuccess] = useState('');
+    const [isVisible, setIsVisible] = useState(false);
     const passwordLength = newPassword.length >= 8;
     const hasUppercase = /[A-Z]/.test(newPassword);
     const hasLowercase = /[a-z]/.test(newPassword);
@@ -109,12 +138,19 @@ function Settings() {
     const [episode_counts, setEpisodeCounts] = useState([]);
     const [preferencesSuccess, setPreferencesSuccess] = useState('');
     const [moods, setMoods] = useState([]);
+    const [insertAISuccess, setInsertAISuccess] = useState('');
+    const [insertAnimeSuccess, setInsertAnimeSuccess] = useState('');
 
 
     // Error states
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [preferencesError, setPreferencesError] = useState('');
+    const [insertAIError, setInsertAIError] = useState('');
+    const [insertAnimeError, setInsertAnimeError] = useState('');
+
+    console.log(insertAISuccess, insertAIError);
+    console.log(insertAnimeSuccess, insertAnimeError);
 
     // Mutations
     const emailMutation = useMutation({
@@ -126,8 +162,7 @@ function Settings() {
         },
         onError: (error) => {
             try {
-                const parsedError = JSON.parse(error.message);
-                setEmailError(parsedError.message || "Failed to update email.");
+                setEmailError(error.message);
             } catch (e) {
                 setEmailError("Failed to update email. Please try again.");
             }
@@ -137,15 +172,14 @@ function Settings() {
 
     const passwordMutation = useMutation({
         mutationFn: updatePassword,
-        onSuccess: (data) => {
-            setPasswordSuccess(data.message);
+        onSuccess: () => {
+            setPasswordSuccess('Updated password successfully!');
             setNewPassword('');
             setPasswordError('');
         },
         onError: (error) => {
             try {
-                const parsedError = JSON.parse(error.message);
-                setPasswordError(parsedError.message || "Failed to update password.");
+                setPasswordError(error.message);
             } catch (e) {
                 setPasswordError("Failed to update password. Please try again.");
             }
@@ -153,8 +187,28 @@ function Settings() {
         }
     });
 
+    const insertAiRecsMutation = useMutation({
+        mutationFn: (token) => generateAndInsertAiRecs(token),
+        onSuccess: () => {
+            setInsertAISuccess('Added new AI reccommendations!')
+        },
+        onError: () => {
+            setInsertAIError('Could not add new AI reccommendations at this time. Please try again later.')
+        }
+    });
+
+    const insertAnimeMutation = useMutation({
+        mutationFn: (token) => generateAndInsertAnimeMetadata(token),
+        onSuccess: () => {
+            setInsertAnimeSuccess('Added new anime reccommendations!')
+        },
+        onError: () => {
+            setInsertAnimeError('Could not add new anime reccommendations at this time. Please try again later.')
+        }
+    })
+
     const preferencesMutation = useMutation({
-        mutationFn: updatePreferences,
+        mutationFn: (preferenceData) => updatePreferences(preferenceData, token),
         onSuccess: () => {
             setPreferencesSuccess('Preferences updated successfully!');
             setPreferencesError('');
@@ -163,6 +217,8 @@ function Settings() {
             setMoods([]);
             setAnimeEras([]);
             setEpisodeCounts([]);
+            insertAiRecsMutation.mutate(token);
+            insertAnimeMutation.mutate(token);
         },
         onError: (error) => {
             try {
@@ -176,11 +232,12 @@ function Settings() {
     });
 
     //Queries
-    const {data: preferences, isLoading: loadingPreferences, error: fetchPreferencesError} = useQuery({
+    const { data: preferences, isLoading: loadingPreferences, error: fetchPreferencesError } = useQuery({
         queryKey: ['fetchPreferences'],
-        queryFn: fetchPreferences,
+        queryFn: () => fetchPreferences(token),
         retry: false,
         refetchOnWindowFocus: false,
+        enabled: !!token
     });
     const preferenceId = preferences?.preference?.[0].id;
 
@@ -202,7 +259,9 @@ function Settings() {
         if (!passwordLength || !hasUppercase || !hasLowercase || !hasDigitAndSymbol) {
             setPasswordError('New password must be at least 8 characters long, have at least 1 uppercase and lowercase letter, and a symbol.');
             return;
-        } 
+        }
+
+        passwordMutation.mutate(newPassword)
     };
 
     const handlePreferencesSubmit = (e) => {
@@ -272,17 +331,18 @@ function Settings() {
                     <div className="flex-1 bg-gray-900 rounded-lg p-6">
                         <h2 className="text-lg font-semibold mb-4">Update Password</h2>
                         <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                            <div>
+                            <div className='relative'>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
                                     New Password
                                 </label>
                                 <input
-                                    type="password"
+                                    type={isVisible ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-red-500 focus:border-red-500"
                                     placeholder="Enter new password"
                                 />
+                                <button type='button' onClick={() => setIsVisible(!isVisible)} className='absolute right-5 top-10 hover:cursor-pointer'>{isVisible ? (<EyeSlashIcon />) : (<EyeIcon />)}</button>
                             </div>
                             <button
                                 type="submit"
@@ -291,21 +351,6 @@ function Settings() {
                             >
                                 {passwordMutation.isPending ? "Updating..." : "Update Password"}
                             </button>
-                            {/* <div className='space-y-0.5 text-sm font-semibold'>
-                                <h3 className='text-white font-semibold text-lg'>Password Requirements</h3>
-                                <div className="">
-                                    <span className='inline-flex items-center'> {passwordLength ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />} <p>At least 8 chars.</p></span>
-                                </div>
-                                <div className=" ">
-                                    <span className='inline-flex items-center'>{hasUppercase ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 uppercase</p></span>
-                                </div>
-                                <div className=" ">
-                                    <span className='inline-flex items-center'>{hasLowercase ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 lowercase</p></span>
-                                </div>
-                                <div className="">
-                                    <span className='inline-flex items-center'>{hasDigitAndSymbol ? <CheckIcon size={16} color='green' /> : <XIcon size={16} color='red' />}<p>At least 1 digit & symbol</p></span>
-                                </div>
-                            </div> */}
                             {passwordSuccess && <Alert color='success'>
                                 {passwordSuccess}
                             </Alert>}
@@ -356,7 +401,7 @@ function Settings() {
 
                         {/* Mood Checkboxes */}
                         <div>
-                        <label className="block text-lg font-medium text-white">Mood<span className='text-red-500'>*</span></label>
+                            <label className="block text-lg font-medium text-white">Mood<span className='text-red-500'>*</span></label>
                             <div className="grid grid-cols-2 gap-2 mt-2">
                                 {Object.entries(moodMappings).map(([label, mood]) => (
                                     <label key={mood} className="flex items-center space-x-2">
@@ -429,7 +474,11 @@ function Settings() {
                         </button>
                     </form>
                     {preferencesSuccess && (<Alert color='success' onDismiss={() => setPreferencesSuccess('')}>{preferencesSuccess}</Alert>)}
-                    {preferencesError && (<Alert color='failure'onDismiss={() => setPreferencesError('')} >{preferencesError}</Alert>)}
+                    {preferencesError && (<Alert color='failure' onDismiss={() => setPreferencesError('')} >{preferencesError}</Alert>)}
+                    {insertAISuccess && (<Alert color='success' onDismiss={() => setInsertAISuccess('')} >{insertAISuccess}</Alert>)}
+                    {insertAIError && (<Alert color='failure' onDismiss={() => setInsertAIError('')} >{insertAIError}</Alert>)}
+                    {insertAnimeSuccess && (<Alert color='success' onDismiss={() => setInsertAnimeSuccess('')} >{insertAnimeSuccess}</Alert>)}
+                    {insertAnimeError && (<Alert color='failure' onDismiss={() => setInsertAnimeError('')} >{insertAnimeError}</Alert>)}
                 </div>
             </div>
         </div>
