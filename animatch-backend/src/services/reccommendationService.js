@@ -8,20 +8,20 @@ import { insertAIRecs, fetchAIRecs } from '../models/reccommendationModel.js';
     It also fetches AI Recs from the DB and inserts them into the DB
      */
 
-export const insertAIReccommendations = async () => {
-    return await insertAIRecs();
+export const insertAIReccommendations = async (supabaseClient, userId) => {
+    return await insertAIRecs(supabaseClient, userId);
 }
 
 export const fetchAIReccommendations = async (supabaseClient, userId) => {
     return await fetchAIRecs(supabaseClient, userId);
 }
 
-export const generateAIReccommendations = async () => {
+export const generateAIReccommendations = async (supabaseClient, userId) => {
     const [preferences, watchlist, reactions, previous_recommendations] = await Promise.all([
-        fetchPreferences(),
-        fetchWatchlistWithAnimeTitles(),
-        fetchUserReactionsWithAnimeTitles(),
-        fetchAIRecs()
+        fetchPreferences(supabaseClient, userId),
+        fetchWatchlistWithAnimeTitles(supabaseClient, userId),
+        fetchUserReactionsWithAnimeTitles(supabaseClient, userId),
+        fetchAIRecs(supabaseClient, userId)
     ]);
 
     const userData = {preferences, watchlist, reactions, previous_recommendations};

@@ -3,13 +3,13 @@ import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const getWatchlistController = async (req, res) => {
     // Check if the user is authenticated
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     try {
         // Fetch the watchlist for the authenticated user
         const watchList = await getWatchlist();
@@ -33,16 +33,16 @@ export const getWatchlistController = async (req, res) => {
 
 export const getWatchlistControllerWithAnimeTitles = async (req, res) => {
     // Check if the user is authenticated
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
+    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
+    // if (error || !session) {
+    //     return res.status(401).json({
+    //         error: true,
+    //         message: 'Unauthorized: Please log in to add preferences'
+    //     });
+    // }
     try {
         // Fetch the watchlist for the authenticated user
-        const watchList = await getWatchlistWithAnimeTitles();
+        const watchList = await getWatchlistWithAnimeTitles(req.supabase, req.user.id);
 
         if(!watchList) {
             return res.status(404).json({
@@ -62,14 +62,6 @@ export const getWatchlistControllerWithAnimeTitles = async (req, res) => {
 }
 
 export const insertWatchlistController = async (req, res) => {
-    // Check if the user is authenticated
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
     // Extract watchlist data from the request body
     const watchlistData = req.body;
 
@@ -84,7 +76,7 @@ export const insertWatchlistController = async (req, res) => {
 
     try {
         // Insert the watchlist data into the database
-        const result = await insertWatchlist(watchlistData);
+        const result = await insertWatchlist(watchlistData, req.supabase, req.user.id);
 
         if (!result || result.length === 0) {
             return res.status(400).json({
@@ -114,15 +106,6 @@ export const insertWatchlistController = async (req, res) => {
 }
 
 export const updateWatchlistController = async (req, res) => {
-    // Check if the user is authenticated
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
-
     // Extract watchlist ID and updated data from the request
     const watchListId = req.params.watchListId;
     const updatedData = req.body;
@@ -143,7 +126,7 @@ export const updateWatchlistController = async (req, res) => {
 
     try {
         // Update the watchlist in the database
-        const result = await updateWatchlist(watchListId, updatedData);
+        const result = await updateWatchlist(watchListId, updatedData, req.supabase);
         if (!result || result.length === 0) {
             return res.status(400).json({
                 error: true,
@@ -172,14 +155,6 @@ export const updateWatchlistController = async (req, res) => {
 }
 
 export const removeWatchlistController = async (req, res) => {
-    // Check if the user is authenticated
-    const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    if (error || !session) {
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized: Please log in to add preferences'
-        });
-    }
     // Extract watchlist ID from the request parameters
     const watchListId = req.params.watchListId;
     
@@ -192,7 +167,7 @@ export const removeWatchlistController = async (req, res) => {
     
         try {
             // Remove the watchlist from the database
-            const result = await removeWatchlist(watchListId);
+            const result = await removeWatchlist(watchListId, req.supabase);
             if (!result || result.length === 0) {
                 return res.status(404).json({
                     error: true,

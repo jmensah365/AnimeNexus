@@ -26,20 +26,20 @@ export const fetchWatchlist = async () => {
     return watchList;
 }
 
-export const fetchWatchlistWithAnimeTitles = async () => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData || !userData.user) throw new Error('User not authenticated');
-    if (userError) throw userError;
-
+export const fetchWatchlistWithAnimeTitles = async (supabaseClient, userId) => {
     // Fetch user watchlist along with the associated anime titles from the kitsu_anime_data table
-    const {data: watchList, error: fetchError} = await supabase
+    const {data: watchList, error: fetchError} = await supabaseClient
     .from('watchlist')
-    .select(`anime_id, status, 
+    .select(`id, status, 
     kitsu_anime_data (
         id,
-        title
+        title,
+        image_url,
+        origin_genre
         )`)
-    .eq('user_id', userData.user.id);
+    .eq('user_id', userId);
+
+
 
     if (fetchError) throw fetchError;
     if (!watchList) {
@@ -49,10 +49,7 @@ export const fetchWatchlistWithAnimeTitles = async () => {
     return watchList;
 }
 
-export const createWatchlist = async ({anime_id, status}) => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData || !userData.user)  throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const createWatchlist = async ({anime_id, status}, supabaseClient, userId) => {
 
     //Validate the status type
     if (!Object.values(Watchlist_Status).includes(status)) {
@@ -61,7 +58,7 @@ export const createWatchlist = async ({anime_id, status}) => {
         status = Watchlist_Status[status.toUpperCase()];
     }
 
-    const response = await supabase.from('watchlist').insert({anime_id: anime_id, status, user_id: userData.user.id}).select();
+    const response = await supabaseClient.from('watchlist').insert({anime_id: anime_id, status, user_id: userId}).select();
 
     if (!response || response.length === 0) throw new Error('Failed to create watchlist');
     
@@ -69,17 +66,14 @@ export const createWatchlist = async ({anime_id, status}) => {
     return response;
 }
 
-export const updateExistingWatchlist = async (watchListId, updatedData) => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData || !userData.user) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const updateExistingWatchlist = async (watchListId, updatedData, supabaseClient) => {
 
     //check if specific watchlist exists before trying to update it
-    const {data: existingWatchlist, error: fetchError} = await supabase.from('watchlist').select().eq('id',watchListId);
+    const {data: existingWatchlist, error: fetchError} = await supabaseClient.from('watchlist').select().eq('id',watchListId);
     if (!existingWatchlist) throw new Error('Watchlist does not exist');
     if (fetchError) throw fetchError;
 
-    const response = await supabase.from('watchlist').update(updatedData).eq('id',watchListId).select();
+    const response = await supabaseClient.from('watchlist').update(updatedData).eq('id',watchListId).select();
 
     if (!response || response.length === 0) throw new Error('Failed to update watchlist');
     if (response.error) throw response.error;
@@ -87,18 +81,14 @@ export const updateExistingWatchlist = async (watchListId, updatedData) => {
     return response;
 }
 
-export const deleteWatchlist = async (watchListId) => {
-
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData || !userData.user) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const deleteWatchlist = async (watchListId, supabaseClient) => {
     
     //check if specific watchlist exists before trying to delete it
-    const {data: existingWatchlist, error: fetchError} = await supabase.from('watchlist').select().eq('id',watchListId);
+    const {data: existingWatchlist, error: fetchError} = await supabaseClient.from('watchlist').select().eq('id',watchListId);
     //error handling for fetch
     if (!existingWatchlist) throw new Error('Watchlist does not exist');
     if (fetchError) throw fetchError;
 
-    const response = await supabase.from('watchlist').delete().eq('id', watchListId);
+    const response = await supabaseClient.from('watchlist').delete().eq('id', watchListId);
     return response;
 }

@@ -6,8 +6,8 @@ export const getUserReactions = async () => {
     return await fetchUserReactions();
 }
 
-export const getUserReactionsWithAnimeTitles = async () => {
-    return await fetchUserReactionsWithAnimeTitles();
+export const getUserReactionsWithAnimeTitles = async (supabaseClient, userId) => {
+    return await fetchUserReactionsWithAnimeTitles(supabaseClient, userId);
 }
 
 export const addUserReaction = async (reaction) => {

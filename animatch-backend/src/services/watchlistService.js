@@ -6,18 +6,18 @@ export const getWatchlist = async () => {
     return await fetchWatchlist();
 }
 
-export const getWatchlistWithAnimeTitles = async () => {
-    return await fetchWatchlistWithAnimeTitles();
+export const getWatchlistWithAnimeTitles = async (supabaseClient, userId) => {
+    return await fetchWatchlistWithAnimeTitles(supabaseClient, userId);
 }
 
-export const insertWatchlist = async (watchlistData) => {
-    return await createWatchlist(watchlistData);
+export const insertWatchlist = async (watchlistData, supabaseClient, userId) => {
+    return await createWatchlist(watchlistData, supabaseClient, userId);
 }
 
-export const updateWatchlist = async (watchlistId, watchlistData) => {
-    return await updateExistingWatchlist(watchlistId, watchlistData);
+export const updateWatchlist = async (watchlistId, watchlistData, supabaseClient) => {
+    return await updateExistingWatchlist(watchlistId, watchlistData, supabaseClient);
 }
 
-export const removeWatchlist = async (watchlistId) => {
-    return await deleteWatchlist(watchlistId);
+export const removeWatchlist = async (watchlistId, supabaseClient) => {
+    return await deleteWatchlist(watchlistId, supabaseClient);
 }

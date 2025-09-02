@@ -31,21 +31,19 @@ export const fetchUserReactions = async () => {
     return reactions;
 }
 
-export const fetchUserReactionsWithAnimeTitles = async () => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData) throw new Error('User not authenticated');
-    if (userError) throw userError;
-
+export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) => {
+    console.log('in fetchUserReactionsWithAnimeTitles');
     // Fetch user reactions along with the assoaciated anime titles from the kitsu_anime_data table
-    const {data: reactions, error: fetchError} = await supabase
+    const {data: reactions, error: fetchError} = await supabaseClient
     .from('user_reactions')
     .select(`anime_id, reaction, kitsu_anime_data (id, title)`)
-    .eq('user_id', userData.user.id);
+    .eq('user_id', userId);
 
 
     if (fetchError) throw fetchError;
     if (!reactions) throw new Error('No reactions found for user');
 
+    console.log('exiting fetchUserReactionsWithAnimeTitles');
     return reactions;
 }
 

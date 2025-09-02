@@ -36,7 +36,7 @@ export const fetchUserReactionControllerWithAnimeTitles = async (req, res) => {
     //     });
     // }
     try {
-        const userReactionList = await getUserReactionsWithAnimeTitles();
+        const userReactionList = await getUserReactionsWithAnimeTitles(req.supabase, req.user.id);
 
         if (!userReactionList) {
             return res.status(404).json({

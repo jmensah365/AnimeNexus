@@ -28,12 +28,7 @@ const Episode_Counts = Object.freeze({
     '50+': '(50+)'
 });
 
-export const insertPreference = async ({ genres, moods, episode_count, anime_era }) => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
+export const insertPreference = async ({ genres, moods, episode_count, anime_era }, supabaseClient, userId) => {
 
     //spread anime eras and validate input    
     const anime_eras = anime_era.map(era => {
@@ -48,30 +43,20 @@ export const insertPreference = async ({ genres, moods, episode_count, anime_era
         return episode_count;
     })
 
-    const { data, error } = await supabase.from('preferences').insert({ genres, moods, user_id: userData.user.id, episode_counts, anime_eras }).select();
+    const { data, error } = await supabaseClient.from('preferences').insert({ genres, moods, user_id: userId, episode_counts, anime_eras }).select();
     if (error) throw error;
     return data;
 }
 
-export const deletePreference = async (preferenceId) => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
-    const response = await supabase.from('preferences').delete().eq('id', preferenceId);
+export const deletePreference = async (supabaseClient, preferenceId) => {
+    const response = await supabaseClient.from('preferences').delete().eq('id', preferenceId);
     return response;
 }
 
-export const updatePreference = async (preferenceId, updatedData) => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
+export const updatePreference = async (supabaseClient, preferenceId, updatedData) => {
 
     //check if the preference already exists 
-    const { data: preference, error: fetchError } = await supabase
+    const { data: preference, error: fetchError } = await supabaseClient
         .from('preferences')
         .select()
         .eq('id', preferenceId);
@@ -99,11 +84,12 @@ export const updatePreference = async (preferenceId, updatedData) => {
     })
 
 
-    const response = await supabase.from('preferences').update(updatedData).eq('id', preferenceId).select();
+    const response = await supabaseClient.from('preferences').update(updatedData).eq('id', preferenceId).select();
     return response;
 }
 
 export const fetchPreferences = async (supabaseClient, userId) => {
+    console.log('in fetchPreferences ');
 
     const { data: preference, error: fetchError } = await supabaseClient
         .from('preferences')
@@ -117,6 +103,7 @@ export const fetchPreferences = async (supabaseClient, userId) => {
     if (fetchError) {
         throw fetchError;
     }
+    console.log('exiting fetchPreferences ');
     return preference;
 }
 
@@ -140,19 +127,14 @@ export const checkPreferenceFormCompleted = async (supabaseClient, userId) => {
     This function updates the preference_survey_completed field in the preference_users table.
     Once the user completes the form on the frontend this function updates the field to true.
 */
-export const updatePreferenceCheck = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!userData || !userData.user) {
-        throw new Error('User not authenticated');
-    }
+export const updatePreferenceCheck = async (supabaseClient, userId) => {
 
     // Confirm if the user has an existing preference entry
-    const response = await supabase.from('preference_users').select('preference_survey_completed').eq('id', userData.user.id).single();
+    const response = await supabaseClient.from('preference_users').select('preference_survey_completed').eq('id', userId).single();
     if (!response) {
         throw new Error('Preference for user not found');
     }
-    const updatedResponse = await supabase.from('preference_users').update({ preference_survey_completed: true }).eq('id', userData.user.id).select();
+    const updatedResponse = await supabaseClient.from('preference_users').update({ preference_survey_completed: true }).eq('id', userId).select();
     return updatedResponse;
 }
 

@@ -10,7 +10,7 @@ import { fetchPreferences } from './preferenceModel.js'
 export const insertAnimeMetadata = async (supabaseClient, userId) => {
 
 
-    const preferences = await fetchPreferences();
+    const preferences = await fetchPreferences(supabaseClient, userId);
     if (!preferences) throw new Error("Error fetching preferences");
 
     const genres = preferences.flatMap(preference => preference.genres);

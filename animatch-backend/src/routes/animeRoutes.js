@@ -5,6 +5,11 @@ import { supabaseAuthMiddleware } from '../middlewares/supabaseMiddleware.js';
 //this file exposes the API endpoints
 const router = express.Router();
 
+/*
+    The supabase auth middleware is used to ensure a user is authenticated before each request in protected routes.
+ */
+
+    
 router.get("/category/:category", fetchAnimeListByCategory);
 router.get("/name/:name", fetchAnimeListByName);
 router.get("/age-rating/:age-rating", fetchAnimeListByAgeRating);
