@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, ClockIcon, CheckSquareOffsetIcon, SignOutIcon, CaretLeftIcon, CaretRightIcon, PlusCircleIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, CheckSquareOffsetIcon, SignOutIcon, MagnifyingGlassIcon, TelevisionIcon } from '@phosphor-icons/react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import supabase from '../utils/supabaseClient'
 
 const signOut = async () => {
-    const response = await fetch('http://localhost:3000/auth/sign-out', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    const {error} = await supabase.auth.signOut()
+    if (error) throw new error;
 }
 
 
@@ -22,10 +18,10 @@ function Sidebar() {
     const { mutate: signOutMutation, isPending, isSuccess: signOutSuccess, isError: signOutError } = useSignOut();
 
     const handleSignOut = () => {
-        signOutMutation(undefined, {
+        signOutMutation({
             onSuccess: () => {
                 console.log("Successfully signed out");
-                navigate('/');
+                navigate('/', {replace: true});
             },
             onError: (error) => {
                 setErrorMessage(error);
@@ -34,19 +30,6 @@ function Sidebar() {
         });
     }
 
-    useEffect(() => {
-        if (signOutSuccess) {
-            console.log("Successfully signed out");
-            navigate('/');
-        }
-        if (isPending) {
-            console.log("Signing out...");
-        }
-        if (signOutError) {
-            setErrorMessage(signOutError);
-            console.error("Failed to sign out: ", signOutError);
-        }
-    }, [signOutSuccess, isPending, signOutError, navigate]);
     return (
         <div className="w-64 bg-black border-r border-gray-800 p-3.5 hidden lg:block">
             {/* Menu Section */}
@@ -76,7 +59,7 @@ function Sidebar() {
                         <SparkleIcon size={18} aria-hidden="true" />
                         <span>Recs</span>
                     </a>
-                    <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black">
+                    <a href="/trending" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black">
                         <TrendUpIcon size={18} aria-hidden="true" />
                         <span>Trending Anime</span>
                     </a>
@@ -86,12 +69,12 @@ function Sidebar() {
                 <h3 className="text-sm font-medium text-gray-400 mb-4">Library</h3>
                 <nav className="space-y-2" role="navigation" aria-label="Library navigation">
                     <a href="/watchlist" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black">
-                        <ClockIcon size={18} aria-hidden="true" />
+                        <TelevisionIcon size={18} aria-hidden="true" />
                         <span>Watchlist</span>
                     </a>
-                    <a href="#" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black">
+                    <a href="" className="flex items-center space-x-3 text-gray-300 hover:text-white bg-transparent opacity-30 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-not-allowed pointer-events-none">
                         <CheckSquareOffsetIcon size={18} aria-hidden="true" />
-                        <span>Reactions</span>
+                        <span>Reactions (TBD)</span>
                     </a>
                 </nav>
             </div>
@@ -112,8 +95,6 @@ function Sidebar() {
                     </a>
                 </nav>
             </div>
-
-            {/* Main Content */}
         </div>
     )
 }

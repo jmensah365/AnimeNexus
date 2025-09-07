@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom'
 import Carousel from '../components/AniMatchHome/Carousel'
 import AIRecCards from '../components/Cards/AIRecCards'
 import MainContentArea from '../components/AniMatchHome/MainContentArea'
-import Search from '../components/AniMatchHome/Search'
+import { useFetchWatchlistWithInfo } from '../hooks/Watchlist/useWatchlist'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../utils/Auth.jsx'
+import TrendingSidebar from '../components/TrendingSidebar'
+import WatchlistSidebar from '../components/WatchlistSidebar'
 
 
 
@@ -56,6 +58,21 @@ const fetchAiRecs = async (token) => {
     return response.json();
 }
 
+async function getTrendingAnime() {
+    const response = await fetch("http://localhost:3000/api/anime/trending?perPage=20&page=1", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+
+        },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(await response.text())
+    return data
+}
+
 const useFetchKitsuApi = () => {
     return useQuery({
         queryKey: ['kitsuApi'],
@@ -93,41 +110,15 @@ function AniMatchHome() {
     const { data: kitsuAPIData, isLoading, error: kitsuAPIError, isSuccess: kitsuAPISuccess } = useFetchKitsuApi();
     const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB(session?.access_token);
     const { data: aiRecsData, isLoading: aiRecsLoading, error: aiRecsError, isSuccess: aiRecsSuccess } = useFetchAiRecs(session?.access_token);
+    const { data: watchlistWithAnimeInfo, isSuccess } = useFetchWatchlistWithInfo(session?.access_token); 
+
+    const { data: animeCache, isLoading: trendingAnimeLoading, isSuccess: trendingAnimeSuccess } = useQuery({
+        queryKey: ['getTrendingAnime'],
+        queryFn: getTrendingAnime
+    });
 
 
-    // useEffect(() => {
-    //     if (kitsuAPISuccess) {
-    //         console.log(kitsuAPIData);
-    //     }
-    //     if (kitsuAPIError) {
-    //         setErrorMessage(kitsuAPIError);
-    //         console.error(kitsuAPIError);
-    //     }
-    // }, [kitsuAPISuccess, kitsuAPIError]);
-
-    // useEffect(() => {
-    //     if (animeFromDBSuccess) {
-    //         // console.log(animeFromDBData);
-    //     }
-    //     if (animeFromDBError) {
-    //         setErrorMessage(animeFromDBError);
-    //         console.error(animeFromDBError);
-    //     }
-    // }, [animeFromDBSuccess, animeFromDBError]);
-
-    // useEffect(() => {
-    //     if (aiRecsSuccess) {
-    //         // console.log(aiRecsData);
-    //     }
-    //     if (aiRecsError) {
-    //         setErrorMessage(aiRecsError);
-    //         console.error(aiRecsError);
-    //     }
-    // }, [aiRecsSuccess, aiRecsError, aiRecsData]);
-
-
-
-
+    // console.log(animeCache);
 
 
     return (
@@ -153,23 +144,25 @@ function AniMatchHome() {
             {/* Right sidebar */}
             <div className="w-60 bg-black border-l border-gray-800 text-white p-6">
                 {/* Going to contain watchlist anime and popular anime (rotating) */}
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <h3 className="text-xl font-medium mb-2">Trending Anime</h3>
                     <ul className="space-y-2">
-                        <li className="bg-gray-800/50 p-3 rounded-lg">Anime 1</li>
-                        <li className="bg-gray-800/50 p-3 rounded-lg">Anime 2</li>
-                        <li className="bg-gray-800/50 p-3 rounded-lg">Anime 3</li>
+                        <li className="bg-gray-800/50 p-3 rounded-lg">{animeCache[0].title.english}</li>
+                        <li className="bg-gray-800/50 p-3 rounded-lg">{animeCache[1].title.english}</li>
+                        <li className="bg-gray-800/50 p-3 rounded-lg">{animeCache[2].title.english}</li>
                     </ul>
-                </div>
+                </div> */}
+                {animeCache && animeCache.length > 0 && <TrendingSidebar animeCache={animeCache}/>}
                 <hr className="border-gray-400 my-10" />
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <h3 className="text-xl font-medium mb-2">Watchlist</h3>
                     <ul className="space-y-2">
-                        <li className="bg-gray-800/50 p-3 rounded-lg">Anime 1</li>
-                        <li className="bg-gray-800/50 p-3 rounded-lg">Anime 2</li>
+                        <li className="bg-gray-800/50 p-3 rounded-lg">{watchlistWithAnimeInfo.result[0].kitsu_anime_data.title}</li>
+                        <li className="bg-gray-800/50 p-3 rounded-lg">{watchlistWithAnimeInfo.result[1].kitsu_anime_data.title}</li>
                         <li className="bg-gray-800/50 p-3 rounded-lg">Anime 3</li>
                     </ul>
-                </div>
+                </div> */}
+                <WatchlistSidebar watchlistWithAnimeInfo={watchlistWithAnimeInfo}/>
             </div>
         </div>
     )
