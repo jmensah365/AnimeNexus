@@ -89,7 +89,6 @@ export const updatePreference = async (supabaseClient, preferenceId, updatedData
 }
 
 export const fetchPreferences = async (supabaseClient, userId) => {
-    console.log('in fetchPreferences ');
 
     const { data: preference, error: fetchError } = await supabaseClient
         .from('preferences')
@@ -103,7 +102,7 @@ export const fetchPreferences = async (supabaseClient, userId) => {
     if (fetchError) {
         throw fetchError;
     }
-    console.log('exiting fetchPreferences ');
+
     return preference;
 }
 

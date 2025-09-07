@@ -32,7 +32,6 @@ export const fetchUserReactions = async () => {
 }
 
 export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) => {
-    console.log('in fetchUserReactionsWithAnimeTitles');
     // Fetch user reactions along with the assoaciated anime titles from the kitsu_anime_data table
     const {data: reactions, error: fetchError} = await supabaseClient
     .from('user_reactions')
@@ -43,7 +42,6 @@ export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) 
     if (fetchError) throw fetchError;
     if (!reactions) throw new Error('No reactions found for user');
 
-    console.log('exiting fetchUserReactionsWithAnimeTitles');
     return reactions;
 }
 

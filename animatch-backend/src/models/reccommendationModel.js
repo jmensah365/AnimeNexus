@@ -6,7 +6,6 @@ import { generateAIReccommendations } from '../services/reccommendationService.j
 */
 
 export const fetchAIRecs = async (supabaseClient, userId) => {
-    console.log('in fetchAIRecs');
     // Fetch AI Recs for user in ascending order of similarity score, so the user can see their highest recommendations first
     const {data: aiRecs, error: fetchError} = await supabaseClient.from('ai_recommendations').select().eq('user_id', userId).order('similarity_score', { ascending: false });
 
@@ -14,7 +13,6 @@ export const fetchAIRecs = async (supabaseClient, userId) => {
     if (!aiRecs) {
         throw new Error('No AI recommendations found for the user');
     }
-    console.log('exiting fetchAIRecs');
     return aiRecs;
 }
 
