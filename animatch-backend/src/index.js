@@ -20,10 +20,10 @@ app.use(cookieParser());
 
 app.use('/api/anime', animeRoutes);
 app.use('/auth',authRoutes);
-app.use('/preference',preferenceRoutes);
-app.use('/watchlist', watchlistRoutes);
-app.use('/user-reaction', userReactionRoutes);
-app.use('/ai', reccommendationRoutes);
+app.use('/preferences',preferenceRoutes);
+app.use('/watchlists', watchlistRoutes);
+app.use('/user-reactions', userReactionRoutes);
+app.use('/recommendations', reccommendationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
