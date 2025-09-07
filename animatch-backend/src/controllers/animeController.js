@@ -1,5 +1,5 @@
 import { insertAnimeMetadata, fetchAnimeData } from "../models/animeModel.js";
-import { getAnimeListByCategory, getAnimeListByName, getAnimeListByAgeRating, getAnimeListBySeasonYear, getAnimeListByStatus, getAnimeListBySeason, getEpisodesTest,getAllCategories } from "../services/animeService.js";
+import { getAnimeListByCategory, getAnimeListByName, getAnimeListByAgeRating, getAnimeListBySeasonYear, getAnimeListByStatus, getAnimeListBySeason, getEpisodesTest,getAllCategories, getTrendingAnime } from "../services/animeService.js";
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 /*
@@ -120,14 +120,6 @@ export const addAnimeMetadata = async (req, res, next) => {
 
 
 export const getAnimeData = async(req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
-
     try {
         const animeData = await fetchAnimeData(req.supabase, req.user.id);
         if (!animeData || animeData.length === 0) {
@@ -144,6 +136,19 @@ export const getAnimeData = async(req, res) => {
         return res.status(500).json({
             error: true,
             message: `Failed to fetch anime data: ${error.message}`
+        });
+    }
+}
+
+export const getTrendingAnimeController = async (req,res) => {
+    try{
+        const {perPage = 10, page = 1} = req.query;
+        const anime = await getTrendingAnime(Number(perPage), Number(page));
+        res.status(200).json(anime)
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `Failed to fetch trending anime data: ${error.message}`
         });
     }
 }
