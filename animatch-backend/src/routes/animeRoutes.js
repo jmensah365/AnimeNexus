@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchAnimeListByAgeRating, fetchAnimeListByCategory, fetchAnimeListByName, fetchAnimeListBySeasonYear, fetchAnimeListByStatus, fetchAnimeListBySeason, addAnimeMetadata, getAnimeData, fetchAnimeEpisodes, fetchAllCategories } from '../controllers/animeController.js';
+import { fetchAnimeListByAgeRating, fetchAnimeListByCategory, fetchAnimeListByName, fetchAnimeListBySeasonYear, fetchAnimeListByStatus, fetchAnimeListBySeason, addAnimeMetadata, getAnimeData, fetchAnimeEpisodes, fetchAllCategories , getTrendingAnimeController} from '../controllers/animeController.js';
 import { supabaseAuthMiddleware } from '../middlewares/supabaseMiddleware.js';
 
 //this file exposes the API endpoints
@@ -19,6 +19,7 @@ router.get("/season/:season", fetchAnimeListBySeason);
 router.post("/insert-metadata", supabaseAuthMiddleware, addAnimeMetadata );
 router.get("/get-anime", supabaseAuthMiddleware, getAnimeData);
 router.get('/episodes', fetchAnimeEpisodes);
-router.get("/categories", fetchAllCategories)
+router.get("/categories", fetchAllCategories);
+router.get("/trending", getTrendingAnimeController );
 
 export default router;

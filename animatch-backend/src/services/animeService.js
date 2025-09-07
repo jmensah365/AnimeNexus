@@ -1,6 +1,7 @@
 import {fetchAnime } from "../utils/fetchKitsuApi.js";
-import { KITSU_API_URL } from "../config/apiConfig.js";
+import { KITSU_API_URL, ANILIST_API_URL } from "../config/apiConfig.js";
 import fetch from "node-fetch";
+import supabaseAdmin from "../config/databaseAdminConfig.js";
 
 //this file contains the functions that interact with the Kitsu API to fetch anime data
 
@@ -195,4 +196,116 @@ export const getEpisodesTest = async () => {
 
     return episodes;
     
+}
+
+const fetchTrendingFromAniList = async (perPage = 20, page = 1) => {
+    const query = `
+        query ($page: Int, $perPage: Int) {
+        Page(page: $page, perPage: $perPage) {
+            media(sort: TRENDING_DESC, type: ANIME) {
+            id
+            title {
+                romaji
+                english
+                native
+            }
+            coverImage {
+                large
+                medium
+            }
+            trailer{
+                id
+            }
+            description(asHtml: false)
+            averageScore
+            popularity
+            format
+            status
+            episodes
+            genres
+            startDate {
+                month
+                day
+                year
+            }
+            endDate {
+                month
+                day
+                year
+            }
+            }
+        }
+        }
+    `;
+
+    const variables = {page, perPage}
+
+    const res = await fetch(ANILIST_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({query, variables})
+    });
+
+    const data = await res.json();
+
+    if (data.errors) {
+        throw new Error(`AniList error: ${JSON.stringify(data.errors)}`);
+    }
+
+    return data.data.Page.media;
+}
+
+export const getTrendingAnime = async (perPage = 20, page = 1) => {
+    //check cache (latest timestamp)
+    const {data: cache, error} = await supabaseAdmin.from('trending').select('*').order('cached_at', {ascending: false});
+
+    if (error) throw error;
+
+    const stillValid = cache?.length > 0 && new Date(cache[0].expires_at) > new Date();
+
+    if (stillValid) {
+        return cache.map((anime) => ({
+            id: anime.id,
+            title: {
+                romaji: anime.title_romaji,
+                english: anime.title_english,
+                native: anime.title_native,
+            },
+            coverImage: {
+                large: anime.large_image,
+                medium: anime.medium_image
+            },
+            description: anime.description,
+            averageScore: anime.average_score,
+            popularity: anime.popularity,
+            youtube_id: anime.youtube_id,
+            cached_at: anime.cached_at,
+            expires_at: anime.expires_at,
+        }))
+    }
+
+    //fetch from AniList
+    const freshData = await fetchTrendingFromAniList(perPage, page);
+
+    //update anime data using fresh data
+    await supabaseAdmin.from("trending").delete().not('id','is', null)
+
+    const insertData = freshData.map((a) => ({
+        anime_id: a.id,
+        title_romaji: a.title.romaji,
+        title_english: a.title.english,
+        title_native: a.title.native,
+        large_image: a.coverImage.large,
+        medium_image: a.coverImage.medium,
+        description: a.description,
+        average_score: a.averageScore,
+        popularity: a.popularity,
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        ...(a.trailer?.id && {youtube_id: a.trailer.id})
+    }));
+    const {response, error: insertFreshDataError} = await supabaseAdmin.from("trending").insert(insertData).select();
+    
+    return freshData;
 }
