@@ -140,7 +140,7 @@ const AnimeModal = ({ modalData, onClose }) => {
                                                     <span className="text-gray-400 text-sm">Type</span>
                                                 </div>
                                                 <span className="text-white font-semibold">
-                                                    {/* {modalData.show_type.charAt(0).toUpperCase() + modalData.show_type.slice(1) || 'N/A'} */}
+                                                    {modalData.show_type.charAt(0).toUpperCase() + modalData.show_type.slice(1) || 'N/A'}
                                                 </span>
                                             </div>
 

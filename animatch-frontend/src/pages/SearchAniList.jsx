@@ -3,62 +3,116 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon, ArrowCircleUpIcon } from '@phosphor-icons/react'
 import Sidebar from '../components/Sidebar';
-import { createPortal } from 'react-dom';
 
-const fetchAnime = async ({ pageParam = 0, queryKey }) => {
+const fetchAnime = async ({ pageParam = 1, queryKey }) => {
     const [_key, { query, limit }] = queryKey;
-    if (!query.trim()) return { data: [], meta: {} };
+    if (!query.trim()) return { data: [], pageInfo: {} };
 
-    const res = await fetch(
-        `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(
-            query
-        )}&page[limit]=${limit}&page[offset]=${pageParam}`
-    );
+    const gqlQuery = `
+        query ($search: String, $page: Int, $perPage: Int) {
+            Page(page: $page, perPage: $perPage) {
+            pageInfo {
+                currentPage
+                hasNextPage
+            }
+            media(search: $search, type: ANIME) {
+                id
+                title {
+                romaji
+                english
+                native
+                }
+                coverImage {
+                large
+                medium
+                }
+                description(asHtml: false)
+                episodes
+                status
+                format
+                startDate {
+                year
+                month
+                day
+                }
+                endDate {
+                year
+                month
+                day
+                }
+                trailer {
+                id
+                site
+                }
+            }
+            }
+        }
+        `;
 
-    if (!res.ok) throw new Error('Failed to fetch anime');
-    return res.json();
+    const variables = {
+        search: query,
+        page: pageParam,
+        perPage: limit,
+    };
+
+    const res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify({ query: gqlQuery, variables }),
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch anime");
+    const json = await res.json();
+    return json.data.Page;
 };
 
-const AnimeModal = ({modalData, onClose}) => {
+
+const AnimeModal = ({ modalData, onClose }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         if (modalData) {
-            setTimeout(() => setIsVisible(true), 10)
+            setTimeout(() => setIsVisible(true), 10);
         }
     }, [modalData]);
 
     const handleClose = () => {
         setIsVisible(false);
         setTimeout(onClose, 300);
-    }
+    };
 
     const handleBackgroundClick = (event) => {
         if (event.target === event.currentTarget) {
             handleClose();
         }
-    }
+    };
 
     const getStatusColor = (status) => {
+        if (!status) return 'gray-400';
         switch (status.toLowerCase()) {
             case 'finished':
-                return 'green-400'
-            case 'current':
-                return 'blue-400'
+                return 'green-400';
+            case 'releasing':
+                return 'blue-400';
+            case 'not_yet_released':
             case 'upcoming':
-                return 'yellow-400'
+                return 'yellow-400';
             default:
-                return 'gray-400'
+                return 'gray-400';
         }
-    }
+    };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return 'Ongoing';
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
+    const formatDate = (date) => {
+        if (!date?.year) return 'Unknown';
+        const { year, month, day } = date;
+        return `${year}${month ? `-${String(month).padStart(2, '0')}` : ''}${day ? `-${String(day).padStart(2, '0')}` : ''}`;
     };
 
     if (!modalData) return null;
+
     return (
         <AnimatePresence>
             {modalData && isVisible && (
@@ -86,24 +140,21 @@ const AnimeModal = ({modalData, onClose}) => {
                         </button>
 
                         <div className="overflow-y-auto max-h-[90vh]">
-                            {/* Header with Background Gradient */}
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent z-10" />
-                                <div className="p-5 relative z-20">
-                                    <motion.h1
-                                        initial={{ y: 20, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ delay: 0.2 }}
-                                        className="text-4xl md:text-5xl font-bold text-white mb-2 text-center leading-tight"
-                                    >
-                                        {modalData.attributes.canonicalTitle || modalData.attributes.titles.en }
-                                    </motion.h1>
-                                </div>
+                            {/* Header */}
+                            <div className="relative p-5 text-center">
+                                <motion.h1
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight"
+                                >
+                                    {modalData.title.english || modalData.title.romaji}
+                                </motion.h1>
                             </div>
 
                             {/* Main Content */}
                             <div className="px-8 pb-8">
-                                <div className="flex flex-col  gap-8">
+                                <div className="flex flex-col gap-8">
                                     {/* Image Section */}
                                     <motion.div
                                         initial={{ x: -20, opacity: 0 }}
@@ -113,9 +164,9 @@ const AnimeModal = ({modalData, onClose}) => {
                                     >
                                         <div className="relative group">
                                             <img
-                                                src={modalData.attributes.posterImage.small}
-                                                alt={modalData.attributes.canonicalTitle || modalData.attributes.titles.en}
-                                                className="w-64 h-80 object-cover rounded-xl shadow-2xl mx-auto lg:mx-0 transition-transform group-hover:scale-105"
+                                                src={modalData.coverImage?.large}
+                                                alt={modalData.title.english || modalData.title.romaji}
+                                                className="w-64 h-80 object-cover rounded-xl shadow-2xl mx-auto transition-transform group-hover:scale-105"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl" />
                                         </div>
@@ -132,41 +183,31 @@ const AnimeModal = ({modalData, onClose}) => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <StarFourIcon className="w-4 h-4 text-yellow-400" weight="fill" />
-                                                    <span className="text-gray-400 text-sm">Age Rating</span>
-                                                </div>
-                                                <span className="text-white font-semibold">
-                                                    {modalData.attributes.ageRating || 'N/A'}
-                                                </span>
-                                            </div>
-
-                                            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                                                <div className="flex items-center gap-2 mb-1">
                                                     <TelevisionIcon className="w-4 h-4 text-blue-400" weight="bold" />
                                                     <span className="text-gray-400 text-sm">Episodes</span>
                                                 </div>
                                                 <span className="text-white font-semibold">
-                                                    {modalData.attributes.episodeCount || 'N/A'}
+                                                    {modalData.episodes || 'N/A'}
                                                 </span>
                                             </div>
 
                                             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <UserIcon className="w-4 h-4 text-purple-400" weight="bold" />
-                                                    <span className="text-gray-400 text-sm">Type</span>
+                                                    <span className="text-gray-400 text-sm">Format</span>
                                                 </div>
                                                 <span className="text-white font-semibold">
-                                                    {modalData.attributes.showType.charAt(0).toUpperCase() + modalData.attributes.showType.slice(1) || 'N/A'}
+                                                    {modalData.format || 'N/A'}
                                                 </span>
                                             </div>
 
                                             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <div className={`w-2 h-2 rounded-full bg-${getStatusColor(modalData.attributes.status)}`} />
+                                                    <div className={`w-2 h-2 rounded-full bg-${getStatusColor(modalData.status)}`} />
                                                     <span className="text-gray-400 text-sm">Status</span>
                                                 </div>
-                                                <span className={`font-semibold text-${getStatusColor(modalData.attributes.status)}`}>
-                                                    {modalData.attributes.status.charAt(0).toUpperCase() + modalData.attributes.status.slice(1)}
+                                                <span className={`font-semibold text-${getStatusColor(modalData.status)}`}>
+                                                    {modalData.status?.replace(/_/g, ' ') || 'Unknown'}
                                                 </span>
                                             </div>
                                         </div>
@@ -178,7 +219,9 @@ const AnimeModal = ({modalData, onClose}) => {
                                                 Synopsis
                                             </h3>
                                             <p className="text-gray-300 leading-relaxed">
-                                                {modalData.attributes.synopsis || modalData.attributes.description || 'No synopsis available for this anime.'}
+                                                {modalData.description
+                                                    ? modalData.description.replace(/<[^>]*>/g, "")
+                                                    : 'No synopsis available.'}
                                             </p>
                                         </div>
 
@@ -190,7 +233,7 @@ const AnimeModal = ({modalData, onClose}) => {
                                                     <span className="text-gray-400 text-sm">Start Date</span>
                                                 </div>
                                                 <span className="text-white font-medium">
-                                                    {formatDate(modalData.attributes.startDate)}
+                                                    {formatDate(modalData.startDate)}
                                                 </span>
                                             </div>
 
@@ -200,15 +243,15 @@ const AnimeModal = ({modalData, onClose}) => {
                                                     <span className="text-gray-400 text-sm">End Date</span>
                                                 </div>
                                                 <span className="text-white font-medium">
-                                                    {formatDate(modalData.attributes.endDate)}
+                                                    {formatDate(modalData.endDate)}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {/* Trailer Button */}
-                                        {modalData.attributes.youtubeVideoId && (
+                                        {modalData.trailer?.site === "youtube" && (
                                             <motion.a
-                                                href={`https://www.youtube.com/watch?v=${modalData.attributes.youtubeVideoId}`}
+                                                href={`https://www.youtube.com/watch?v=${modalData.trailer.id}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center justify-center gap-3 w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-red-500/25 group"
@@ -227,8 +270,9 @@ const AnimeModal = ({modalData, onClose}) => {
                 </motion.div>
             )}
         </AnimatePresence>
-    )
-}
+    );
+};
+
 
 export default function Search() {
     const [query, setQuery] = useState('');
@@ -253,20 +297,18 @@ export default function Search() {
         isError,
         error,
     } = useInfiniteQuery({
-        queryKey: ['animeSearch', { query: debouncedQuery, limit }],
+        queryKey: ["animeSearch", { query: debouncedQuery, limit }],
         queryFn: fetchAnime,
         getNextPageParam: (lastPage) => {
-            if (lastPage?.links?.next) {
-                const url = new URL(lastPage.links.next);
-                const offset = url.searchParams.get('page[offset]');
-                return Number(offset);
+            if (lastPage?.pageInfo?.hasNextPage) {
+                return lastPage.pageInfo.currentPage + 1;
             }
             return undefined;
         },
         enabled: !!debouncedQuery.trim(),
         staleTime: 1000 * 60 * 5,
     });
-    console.log(data);
+
 
     // Scroll to top on new search
     useEffect(() => {
@@ -330,33 +372,36 @@ export default function Search() {
                 {/* Results Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {data?.pages.map((page) =>
-                        page.data.map((anime) => (
+                        page.media.map((anime) => (
                             <motion.div
-                                key={`${anime.id}`}
+                                key={anime.id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3 }}
                                 className="cursor-pointer rounded-lg bg-gray-900 shadow-lg hover:shadow-red-600 transition-shadow overflow-hidden"
                                 onClick={() => setSelectedAnime(anime)}
-                                title={anime.attributes.canonicalTitle}
+                                title={anime.title.english || anime.title.romaji}
                             >
                                 <img
-                                    src={anime.attributes.posterImage?.small}
-                                    alt={anime.attributes.canonicalTitle}
-                                    className="w-full h-60 object-contain object-center"
+                                    src={anime.coverImage?.large}
+                                    alt={anime.title.english || anime.title.romaji}
+                                    className="w-full h-[450px] object-cover object-center"
                                     loading="lazy"
                                 />
                                 <div className="p-4">
                                     <h3 className="text-lg font-semibold truncate">
-                                        {anime.attributes.canonicalTitle}
+                                        {anime.title.english || anime.title.romaji}
                                     </h3>
                                     <p className="mt-1 text-gray-400 text-sm line-clamp-3">
-                                        {anime.attributes.synopsis || 'No synopsis available.'}
+                                        {anime.description
+                                            ? anime.description.replace(/<[^>]*>/g, "").slice(0, 120) + "..."
+                                            : "No synopsis available."}
                                     </p>
                                 </div>
                             </motion.div>
                         ))
                     )}
+
 
                     {/* Skeleton placeholders for next page */}
                     {isFetchingNextPage &&
@@ -369,14 +414,14 @@ export default function Search() {
                 <div ref={loadMoreRef} className="h-12 flex justify-center items-center mt-8">
                     {!hasNextPage && debouncedQuery && (
                         <button type='button' className='text-gray-300 animate-bounce cursor-pointer' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                            <span className='inline-flex items-center justify-center gap-2'>Scroll back to the top <ArrowCircleUpIcon/></span>
+                            <span className='inline-flex items-center justify-center gap-2'>Scroll back to the top <ArrowCircleUpIcon /></span>
                         </button>
                     )}
                 </div>
             </main>
 
             {/* Modal */}
-            {createPortal(<AnimeModal modalData={selectedAnime} />, document.body)}
+            <AnimeModal modalData={selectedAnime} />
         </div>
     );
 }

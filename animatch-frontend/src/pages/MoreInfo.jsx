@@ -6,13 +6,18 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import ErrorCard from '../components/Cards/ErrorCard';
 import { Alert } from 'flowbite-react';
+import { useAuth } from '../utils/Auth';
 
-const insertPreferences = async ({ genres, mood, anime_era, episode_count }) => {
+const insertPreferences = async ({ genres, mood, moods, anime_era, episode_count, token}) => {
+    console.log(genres);
+    if (mood !== '') {moods.push(mood);}
     const response = await fetch('http://localhost:3000/preferences/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ genres, mood, anime_era, episode_count }),
-        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ genres, moods, anime_era, episode_count }),
     });
 
 
@@ -22,11 +27,13 @@ const insertPreferences = async ({ genres, mood, anime_era, episode_count }) => 
 
 }
 
-const updatePreferenceFormCompletion = async () => {
+const updatePreferenceFormCompletion = async (token) => {
     const response = await fetch('http://localhost:3000/preferences/', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
     });
 
     if (!response.ok) throw new Error(await response.text());
@@ -35,8 +42,8 @@ const updatePreferenceFormCompletion = async () => {
 }
 
 
-const useInsertPreferences = () => {
-    return useMutation({ mutationFn: insertPreferences });
+const useInsertPreferences = (token) => {
+    return useMutation({ mutationFn: (preferenceData) => insertPreferences(preferenceData,token) });
 }
 
 
@@ -56,25 +63,37 @@ const animeErasMapping = {
     'The Current Era (2020s-Current)': 'The_Current_Era'
 }
 
-const animeEras = [
-    'The_Foundations', 'The_Classics', 'The_Boom', 'The_Digital_Revolution',
-    'The_Streaming_Era', 'The_Current_Era'
-];
+const moodMappings = {
+    "😊 Happy": "happy",
+    "😢 Sad": "sad",
+    "😐 Neutral": "neutral",
+    "😴 Tired": "tired",
+    "🤔 Thoughtful": "thoughtful",
+    "🔥 Excited": "excited",
+    "😌 Relaxed": "relaxed",
+    "😡 Mad": "mad"
+}
 
 const episodeCounts = ['1-13', '13-26', '26-50+', '50+'];
 
 export default function AnimePreferencesForm() {
+    //Auth session
+    const { session } = useAuth();
+    const token = session?.access_token;
+
     const [genres, setGenres] = useState([]);
     const [mood, setMood] = useState('');
+    const [moods, setMoods] = useState([]);
     const [anime_era, setAnimeEras] = useState([]);
     const [episode_count, setEpisodeCounts] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-    console.log(anime_era);
+    console.log(moods);
 
-    const { mutate: insertPreferenceMutate, isError, isPending } = useInsertPreferences();
+
+    const { mutate: insertPreferenceMutate, isError, isPending } = useInsertPreferences(token);
     const updatePreferenceFormCompletionMutate = useMutation({
-        mutationFn: updatePreferenceFormCompletion,
+        mutationFn: () => updatePreferenceFormCompletion(token),
         onSuccess: (data) => {
             console.log("Preference form completed");
         },
@@ -89,17 +108,16 @@ export default function AnimePreferencesForm() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        insertPreferenceMutate({ genres, mood, anime_era, episode_count },
+        insertPreferenceMutate({ genres, moods, anime_era, episode_count, token },
             {
                 onSuccess: async (data) => {
-                    updatePreferenceFormCompletionMutate.mutate();
+                    updatePreferenceFormCompletionMutate.mutate(token);
                     navigate('/welcome');
                 },
 
                 onError: (error) => {
                     try {
-                        const parsedError = JSON.parse(error.message);
-                        setErrorMessage(parsedError.message || "An error occurred during sign in.");
+                        setErrorMessage(error.message || "An error occurred during sign in.");
                     } catch (e) {
                         setErrorMessage("An error occurred during submitting preferences. Please try again.");
                         console.error(e);
@@ -170,13 +188,29 @@ export default function AnimePreferencesForm() {
 
                     {/* Mood Input */}
                     <div>
+                            <label className="block text-sm font-medium text-black">Mood</label>
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                {Object.entries(moodMappings).map(([label, mood]) => (
+                                    <label key={mood} className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={moods.includes(mood)}
+                                            onChange={() => handleCheckboxChange(setMoods, mood)}
+                                            className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
+                                        />
+                                        <span className="text-sm text-black">{label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    <div>
                         <label className="block text-sm font-medium text-gray-700">Mood</label>
                         <input
                             type="text"
                             value={mood}
                             onChange={(e) => setMood(e.target.value)}
                             className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm px-3 py-2"
-                            placeholder="Describe your mood..."
+                            placeholder="Describe your mood... (optional)"
                         />
                     </div>
 

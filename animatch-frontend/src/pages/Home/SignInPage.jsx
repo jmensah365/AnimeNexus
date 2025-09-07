@@ -63,6 +63,20 @@ function SignInPage() {
         }
     });
 
+    const handleGoogleSignUp = async () => {
+        try {
+            await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                }
+            });
+        } catch (error) {
+            console.error('Google sign-in error:', error.message);
+            setErrorMessage(error.message);
+        }
+    }
+
 
 
 
@@ -140,7 +154,7 @@ function SignInPage() {
                             </div>
                             <div className='flex flex-row gap-5 justify-center'>
                                 {/* <GoogleOAuth handleGoogleSignIn={handleGoogleSignIn} /> */}
-                                <GoogleButton/>
+                                <GoogleButton onClick={handleGoogleSignUp}/>
                             </div>
                             <p className='text-black'>Haven't signed up? <a onClick={() => navigateTo('/register')} className='text-black hover:underline cursor-pointer'>Sign up!</a></p>
                         </div>

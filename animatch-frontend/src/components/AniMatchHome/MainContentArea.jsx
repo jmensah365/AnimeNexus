@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, ClockIcon, CheckSquareOffsetIcon, SignOutIcon, CaretLeftIcon, CaretRightIcon, PlusCircleIcon, XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon } from '@phosphor-icons/react'
-import {motion, AnimatePresence} from 'framer-motion'
+import { BookmarkSimpleIcon } from '@phosphor-icons/react'
+import { motion, AnimatePresence } from 'framer-motion'
 import AnimeModal from './AnimeModal'
+import { Tooltip } from 'flowbite-react'
+import { useCreateWatchlist } from '../../hooks/Watchlist/useWatchlist'
 
 
 
@@ -14,6 +16,8 @@ function MainContentArea({ data, error, success }) {
     const openModal = (anime) => { setModalData(anime); }
 
     const closeModal = () => { setModalData(null); }
+
+    const [hovered, setHovered] = useState(false);
 
     //Handle modal close using escape key
     useEffect(() => {
@@ -96,9 +100,15 @@ function MainContentArea({ data, error, success }) {
                                     <div className='absolute top-15 left-3 text-white'>
                                         <p className="text-xs font-medium">{anime.synopsis.slice(0, 200)}...</p>
                                     </div>
+                                    <div className='absolute bottom-4 left-2 hover:scale-110 transition-all duration-300' onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+                                        <Tooltip content='Add to Watchlist' style='light' placement='right'>
+                                            {/* <BookmarkSimpleIcon size={24} color='red' /> */}
+                                            {hovered ? ( <BookmarkSimpleIcon size={24} color='red' weight='fill' />) :  <BookmarkSimpleIcon size={24} color='red' />}
+                                        </Tooltip>
+                                    </div>
                                 </div>
                             </div>
-                            <p className='text-gray-400 text-sm mt-2 font-bold leading-tight'>{anime.title}</p>
+                            {anime.title.length > 40 ? (<p className='text-gray-400 text-sm mt-2 font-bold leading-tight'>{anime.title.slice(0, 40)}...</p>) : <p className='text-gray-400 text-sm mt-2 font-bold leading-tight'>{anime.title}</p>}
                         </div>
 
                     ))}
@@ -107,9 +117,9 @@ function MainContentArea({ data, error, success }) {
             <div className='flex items-center justify-center'>
                 <h1>Spin-The-Wheel</h1>
             </div>
-            {modalData && createPortal (
-                    <AnimeModal modalData={modalData} onClose={closeModal}/>, document.body
-                )}
+            {modalData && createPortal(
+                <AnimeModal modalData={modalData} onClose={closeModal} />, document.body
+            )}
         </>
     )
 }

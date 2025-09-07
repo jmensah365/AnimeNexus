@@ -57,6 +57,7 @@ export const deleteWatchlist = async ({ anime_id }, token) => {
             'Authorization': `Bearer ${token}`
         },
     });
+    console.log(response);
     if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    return;
 }

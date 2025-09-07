@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import {  SparkleIcon, CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
+import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
-import {useAuth} from '../utils/Auth'
+import { useAuth } from '../utils/Auth'
+import { Tooltip } from 'flowbite-react'
+import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlist } from '../hooks/Watchlist/useWatchlist'
 
 const fetchAnimeFromDB = async (token) => {
     const response = await fetch('http://localhost:3000/api/anime/get-anime', {
         method: 'GET',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
@@ -36,43 +38,99 @@ const SkeletonCard = () => {
     )
 };
 
-const AnimeCard = ({ anime, onClick }) => {
+const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist }) => {
+    const [hovered, setHovered] = useState(false);
+
     return (
         <div
             key={anime.id}
             onClick={() => onClick(anime)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(anime); } }}
-            className='relative p-2 group cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-red-600/70 focus:outline-none focus:ring-2 focus:ring-red-500'
-            tabIndex={0}
-            role='button'
-            aria-label={`View details for ${anime.title}`}
+            className="relative p-2 group cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-red-600/70"
         >
-            <div className='overflow-hidden mb-3'>
+            <div className="overflow-hidden mb-3">
                 <img
                     src={anime.image_url}
                     alt={anime.title}
-                    className='aspect-auto w-full h-96 rounded-sm object-fit object-fit transition-all duration-300  cursor-pointer'
-                    loading='lazy' />
+                    className="aspect-auto w-full h-96 rounded-sm object-fit transition-all duration-300"
+                    loading="lazy"
+                />
             </div>
 
-            <div className='absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6'>
-                <h2 className='text-red-400 font-medium text-2xl leading-tight'>{anime.title}</h2>
-                <p className='text-white'>{anime.episode_count} Episodes</p>
-                <p className=' text-white  leading-relaxed'>{anime.synopsis.slice(0, 100)}...</p>
+            <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6">
+                <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
+                <p className="text-white">{anime.episode_count} Episodes</p>
+                <p className="text-white">{anime.synopsis.slice(0, 100)}...</p>
+
+                <div
+                    className="absolute bottom-8 left-4 hover:scale-110 transition-all duration-300 z-50"
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                >
+                    <Tooltip
+                        content={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
+                        style="light"
+                        placement="right"
+                    >
+                        <BookmarkSimpleIcon
+                            size={24}
+                            color="red"
+                            weight={hovered || isWatchlisted ? "fill" : "regular"}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleWatchlist(anime.id, isWatchlisted);
+                            }}
+                        />
+                    </Tooltip>
+                </div>
             </div>
         </div>
-    )
+    );
 };
 
 
 
+
 function AnimeRecs() {
-    const {session} = useAuth();
+    const { session } = useAuth();
     const navigate = useNavigate();
+
+    const deleteMutation = useDeleteWatchlist(session?.access_token);
+    const createMutation = useCreateWatchlist(session?.access_token);
+
+    // --- Local watchlist state (persisted in localStorage) ---
+    const [watchlist, setWatchlist] = useState(() => {
+        const saved = localStorage.getItem("watchlist") || "[]";
+        return JSON.parse(saved);
+    });
+
+    // Keep localStorage in sync whenever watchlist changes
+    useEffect(() => {
+        localStorage.setItem("watchlist", JSON.stringify(watchlist));
+    }, [watchlist]);
+
+    // Toggle function
+    const toggleWatchlist = async (animeId, isWatchlisted) => {
+        try {
+            if (isWatchlisted) {
+                console.log('Here');
+                // remove
+                setWatchlist((prev) => prev.filter((id) => id !== animeId));
+                // Optionally call backend remove mutation here
+                deleteMutation.mutate({anime_id: animeId})
+            } else {
+                // add
+                setWatchlist((prev) => [...prev, animeId]);
+                await createMutation.mutateAsync({ anime_id: animeId, status: "plan_to_watch" });
+            }
+        } catch (err) {
+            console.error("Watchlist update failed:", err);
+        }
+    };
+
+    const { data: watchlistWithAnimeInfo, isSuccess } = useFetchWatchlistWithInfo(session?.access_token);
     const [modalData, setModalData] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB(session?.access_token);
-
     //Pagination
     const animePerPage = 24;
     const [currentPage, setCurrentPage] = useState(1);
@@ -138,6 +196,8 @@ function AnimeRecs() {
                                     key={anime.id}
                                     anime={anime}
                                     onClick={openModal}
+                                    onToggleWatchlist={toggleWatchlist}
+                                    isWatchlisted={watchlist.includes(anime.id)}
                                 />
                             ))}
                         </div>

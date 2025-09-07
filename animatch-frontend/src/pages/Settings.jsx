@@ -149,8 +149,6 @@ function Settings() {
     const [insertAIError, setInsertAIError] = useState('');
     const [insertAnimeError, setInsertAnimeError] = useState('');
 
-    console.log(insertAISuccess, insertAIError);
-    console.log(insertAnimeSuccess, insertAnimeError);
 
     // Mutations
     const emailMutation = useMutation({
