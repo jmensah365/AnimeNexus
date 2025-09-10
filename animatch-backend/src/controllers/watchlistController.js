@@ -1,15 +1,7 @@
-import {getWatchlist, insertWatchlist, removeWatchlist, updateWatchlist, getWatchlistWithAnimeTitles} from '../services/watchlistService.js';
+import {getWatchlist, insertWatchlist, removeWatchlist, updateWatchlist, getWatchlistWithAnimeTitles, removeWatchlistByAnimeId} from '../services/watchlistService.js';
 import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const getWatchlistController = async (req, res) => {
-    // Check if the user is authenticated
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     try {
         // Fetch the watchlist for the authenticated user
         const watchList = await getWatchlist();
@@ -32,14 +24,7 @@ export const getWatchlistController = async (req, res) => {
 }
 
 export const getWatchlistControllerWithAnimeTitles = async (req, res) => {
-    // Check if the user is authenticated
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
+
     try {
         // Fetch the watchlist for the authenticated user
         const watchList = await getWatchlistWithAnimeTitles(req.supabase, req.user.id);
@@ -190,4 +175,41 @@ export const removeWatchlistController = async (req, res) => {
                 message: `Something went wrong: ${error.message}`
             })
         }
+}
+
+export const removeWatchlistByAnimeIdController = async (req, res) => {
+    const animeId = req.params.animeId;
+
+    if (!animeId) {
+        return res.status(400).json({
+            error: true,
+            message: 'Watchlist ID is missing'
+        });
+    }
+
+    try {
+        // Remove the watchlist from the database
+        const result = await removeWatchlistByAnimeId(animeId, req.supabase);
+        if (!result || result.length === 0) {
+            return res.status(404).json({
+                error: true,
+                message: 'Watchlist not found or already deleted'
+            });
+        }
+        if (result.error) {
+            return res.status(400).json({
+                error: true,
+                message: `Failed to delete watchlist ${result.error}`
+            });
+        }
+        // Return a success message
+        return res.status(204).json({
+            message: 'Watchlist deleted successfully'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `Something went wrong: ${error.message}`
+        })
+    }
 }

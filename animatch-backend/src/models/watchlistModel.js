@@ -92,3 +92,16 @@ export const deleteWatchlist = async (watchListId, supabaseClient) => {
     const response = await supabaseClient.from('watchlist').delete().eq('id', watchListId);
     return response;
 }
+
+export const deleteWatchlistByAnimeId = async (animeId, supabaseClient) => {
+    
+    //check if specific watchlist exists before trying to delete it
+    const {data: existingWatchlist, error: fetchError} = await supabaseClient.from('watchlist').select().eq('anime_id',animeId);
+    //error handling for fetch
+    if (!existingWatchlist) throw new Error('Watchlist does not exist');
+    if (fetchError) throw fetchError;
+
+    const response = await supabaseClient.from('watchlist').delete().eq('anime_id', animeId);
+    console.log(response);
+    return response;
+}
