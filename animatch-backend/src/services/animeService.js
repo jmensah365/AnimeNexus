@@ -29,6 +29,7 @@ export const getAllCategories = async () => {
     return allCategories
 }
 
+
 export const getAnimeListByCategory = async (category) => {
     //maxPages and limit are set to 5 and 10 respectively
     let allAnimeData = [];
@@ -68,6 +69,98 @@ export const getAnimeListByCategory = async (category) => {
     }
     return allAnimeData;
 }
+
+// Helper function to extract platform name from URL
+const extractPlatformName = (url) => {
+    if (url.includes('crunchyroll.com')) return 'Crunchyroll';
+    if (url.includes('hulu.com')) return 'Hulu';
+    if (url.includes('funimation.com')) return 'Funimation';
+    if (url.includes('netflix.com')) return 'Netflix';
+    if (url.includes('hidive.com')) return 'HIDIVE';
+    if (url.includes('vrv.co')) return 'VRV';
+    // Add more platforms as needed
+    return 'Unknown';
+};
+
+// Helper function to process streaming links from API response
+const processStreamingLinks = (apiResponse) => {
+    if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data)) {
+        return [];
+    }
+    
+    return apiResponse.data.map(link => ({
+        platform_url: link.attributes.url,
+        subtitles: link.attributes.subs || [],
+        dubs: link.attributes.dubs || [],
+        platform_name: extractPlatformName(link.attributes.url)
+    }));
+};
+
+const batchGetStreamingLinks = async (animeIds) => {
+    const streamingLinksMap = {};
+    
+    // Use Promise.allSettled to handle individual failures gracefully
+    const results = await Promise.allSettled(
+        animeIds.map(async (animeId) => {
+            try {
+                const url = `${KITSU_API_URL}/${animeId}/streaming-links`;
+                const apiResponse = await fetchAnime(url);
+                const processedLinks = processStreamingLinks(apiResponse);
+                return { animeId, streamingLinks: processedLinks };
+            } catch (error) {
+                console.error(`Error fetching streaming links for anime ${animeId}:`, error);
+                return { animeId, streamingLinks: [] };
+            }
+        })
+    );
+    
+    results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+            const { animeId, streamingLinks } = result.value;
+            streamingLinksMap[animeId] = streamingLinks;
+        } else {
+            console.error('Failed to fetch streaming links:', result.reason);
+            // Set empty array for failed requests
+            const animeId = animeIds[index]
+            streamingLinksMap[animeId] = [];
+        }
+    });
+    
+    return streamingLinksMap;
+}; 
+
+// Function to enrich anime data with streaming links
+export const enrichAnimeWithStreaming = async (animeList) => {
+    try {
+        const animeIds = animeList.map(anime => anime.kitsu_id);
+        const streamingLinksMap = await batchGetStreamingLinks(animeIds);
+        
+        return animeList.map(anime => {
+            const streamingLinks = streamingLinksMap[anime.kitsu_id] || [];
+            
+            // Debug logging to help identify issues
+            if (!Array.isArray(streamingLinks)) {
+                console.error(`Streaming links for anime ${anime.kitsu_id} is not an array:`, streamingLinks);
+                return {
+                    ...anime,
+                    streaming_links: [],
+                };
+            }
+            
+            return {
+                ...anime,
+                streaming_links: streamingLinks,
+            };
+        });
+    } catch (error) {
+        console.error('Error in enrichAnimeWithStreaming:', error);
+        // Return original anime list without streaming data if enrichment fails
+        return animeList.map(anime => ({
+            ...anime,
+            streaming_links: [],
+        }));
+    }
+};
 
 export const getAnimeListByName = async (name) => {
     //&page[limit]=${limit}&page[offset]=${offset}

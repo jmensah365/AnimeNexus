@@ -1,6 +1,6 @@
 
 import supabase from '../config/databaseConfig.js'
-import { getAnimeListByCategory} from '../services/animeService.js'
+import { getAnimeListByCategory, enrichAnimeWithStreaming} from '../services/animeService.js'
 import { fetchPreferences } from './preferenceModel.js'
 
 /* This model handles getting anime from the kitsu API based on a user preferences and inserting them into the DB for ease of access */
@@ -21,15 +21,16 @@ export const insertAnimeMetadata = async (supabaseClient, userId) => {
     for (const genre of genres) {
         try {
             const animeData = await getAnimeListByCategory(genre);
+            const enrichedAnimeData = await enrichAnimeWithStreaming(animeData);
             
 
-            if (!animeData || animeData.length === 0) {
+            if (!enrichedAnimeData || enrichedAnimeData.length === 0) {
                 console.warn(`No anime data found for category: ${genre}`);
                 continue; //Skip this genre so the loop doesnt end on an error
             }
 
             // Filter out anime that already exist in the database for this user
-            const animeDataWithUser = animeData.map(anime => ({...anime, user_id: userId}));
+            const animeDataWithUser = enrichedAnimeData.map(anime => ({...anime, user_id: userId}));
 
 
             if (animeDataWithUser.length > 0) {

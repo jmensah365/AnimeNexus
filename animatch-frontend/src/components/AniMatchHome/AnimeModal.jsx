@@ -1,6 +1,8 @@
-import React, {useState, useEffect} from 'react'
-import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, ClockIcon, CheckSquareOffsetIcon, SignOutIcon, CaretLeftIcon, CaretRightIcon, PlusCircleIcon, XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon } from '@phosphor-icons/react'
-import {motion, AnimatePresence} from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon, HouseLineIcon } from '@phosphor-icons/react'
+import { SiCrunchyroll, SiNetflix } from "react-icons/si"
+import { motion, AnimatePresence } from 'framer-motion'
+import { FaPlay } from "react-icons/fa";
 
 const AnimeModal = ({ modalData, onClose }) => {
     console.log(modalData);
@@ -41,6 +43,10 @@ const AnimeModal = ({ modalData, onClose }) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     };
+
+    const openLinks = (platform_url) => {
+        window.open(platform_url, '_blank', 'noopener,noreferrer');
+    }
 
     if (!modalData) return null;
 
@@ -188,6 +194,34 @@ const AnimeModal = ({ modalData, onClose }) => {
                                                     {formatDate(modalData.end_date)}
                                                 </span>
                                             </div>
+                                        </div>
+
+                                        <div className='flex flex-wrap items-center justify-center gap-3 p-4 bg-gray-800/30 rounded-lg border border-gray-700/30'>
+                                            {modalData.streaming_links && modalData.streaming_links.map((links, index) => {
+                                                const getPlatformStyles = (platformName) => {
+                                                    const styles = {
+                                                        'Crunchyroll': 'bg-orange-500 hover:bg-orange-600 text-white',
+                                                        'Netflix': 'bg-red-600 hover:bg-red-700 text-white',
+                                                        'Hulu': 'bg-green-500 hover:bg-green-600 text-white'
+                                                    };
+                                                    return styles[platformName] || 'bg-gray-500 hover:bg-gray-600 text-white';
+                                                };
+
+                                                return (
+                                                    <button
+                                                        key={index}
+                                                        className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium cursor-pointer
+                                                        transition-all duration-200 hover:scale-105 active:scale-95
+                                                        shadow-md hover:shadow-lg ${getPlatformStyles(links.platform_name)}`}
+                                                        onClick={() => openLinks(links.platform_url)}
+                                                    >
+                                                        {links.platform_name == 'Crunchyroll' && <SiCrunchyroll size={20} />}
+                                                        {links.platform_name == 'Netflix' && <SiNetflix size={20} />}
+                                                        {links.platform_name == 'Hulu' && <FaPlay size={16} />}
+                                                        <span>Watch on {links.platform_name}</span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
 
                                         {/* Trailer Button */}
