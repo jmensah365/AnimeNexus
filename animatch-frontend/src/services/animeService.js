@@ -11,7 +11,7 @@ export const generateAndInsertAnimeMetadata = async (token) => {
         return response.json();
 }
 
-const fetchKitsuApi = async () => {
+export const fetchKitsuApi = async () => {
     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/status/upcoming`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -32,7 +32,7 @@ const fetchKitsuApi = async () => {
     return formattedData;
 }
 
-const fetchAnimeFromDB = async (token) => {
+export const fetchAnimeFromDB = async (token) => {
     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/get-anime`, {
         method: 'GET',
         headers: {
@@ -44,7 +44,7 @@ const fetchAnimeFromDB = async (token) => {
     return response.json();
 }
 
-const fetchAiRecs = async (token) => {
+export const fetchAiRecs = async (token) => {
     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/recommendations/`, {
         method: 'GET',
         headers: {
@@ -56,17 +56,17 @@ const fetchAiRecs = async (token) => {
     return response.json();
 }
 
-async function getTrendingAnime() {
+export const getTrendingAnime = async () => {
     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/trending?perPage=20&page=1`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-
         },
     });
 
     const data = await response.json();
+    console.log(data);
     if (!response.ok) throw new Error(await response.text())
     return data
 }

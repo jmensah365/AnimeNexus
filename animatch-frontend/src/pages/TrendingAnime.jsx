@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Sidebar from '../components/Sidebar';
+import { useGetTrendingAnime } from '../hooks/useAnime';
 
-
-async function getTrendingAnime() {
-    const response = await fetch("http://localhost:3000/api/anime/trending?perPage=20&page=1", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-
-        },
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(await response.text())
-    return data
-}
 
 const SkeletonCard = () => {
     return (
@@ -35,15 +21,12 @@ function timeAgo(date) {
 }
 
 function TrendingAnime() {
-    const { data: animeCache, isLoading: trendingAnimeLoading, isSuccess: trendingAnimeSuccess } = useQuery({
-        queryKey: ['getTrendingAnime'],
-        queryFn: getTrendingAnime
-    });
+    const getTrendingAnime = useGetTrendingAnime();
 
 
 
-    const cachedAt = animeCache?.[0]?.cached_at;
-    const expiresAt = animeCache?.[0]?.expires_at;
+    const cachedAt = getTrendingAnime?.data?.[0]?.cached_at;
+    const expiresAt = getTrendingAnime?.data?.[0]?.expires_at;
 
 
     const AnimeCard = ({ anime, onClick }) => {
@@ -86,14 +69,6 @@ function TrendingAnime() {
         )
     };
 
-
-    // const mutation = useMutation({
-    //     mutationFn: getTrendingAnime
-    // });
-
-    // const handleClick = () => {
-    //     mutation.mutate();
-    // }
     return (
         <div className='flex animate-fade-down bg-black min-h-screen'>
             <Sidebar />
@@ -104,10 +79,10 @@ function TrendingAnime() {
                         Last updated {timeAgo(cachedAt)}. Next refresh is at {new Date(expiresAt).toLocaleString()}
                     </p>
                     <div className='grid grid-cols-1 sm:gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-                        {trendingAnimeLoading && Array.from({ length: 20 }).map((_, i) => (
+                        {getTrendingAnime.isLoading && Array.from({ length: 20 }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
-                        {trendingAnimeSuccess && animeCache.map((anime) => (
+                        {getTrendingAnime.isSuccess && getTrendingAnime.data.map((anime) => (
                                 <AnimeCard
                                     key={anime.id}
                                     anime={anime}

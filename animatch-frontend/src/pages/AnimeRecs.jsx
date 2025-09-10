@@ -1,34 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
 import { useAuth } from '../utils/Auth'
 import { Tooltip } from 'flowbite-react'
-import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlist } from '../hooks/Watchlist/useWatchlist'
-
-const fetchAnimeFromDB = async (token) => {
-    const response = await fetch('http://localhost:3000/api/anime/get-anime', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
-
-const useFetchAnimeFromDB = (token) => {
-    return useQuery({
-        queryKey: ['animeFromDB'],
-        queryFn: () => fetchAnimeFromDB(token),
-        refetchOnWindowFocus: false,
-        retry: 3,
-        enabled: !!token
-    })
-}
+import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlistByAnimeId } from '../hooks/useWatchlist'
+import { useFetchAnimeFromDB } from '../hooks/useAnime'
 
 const SkeletonCard = () => {
     return (
@@ -87,57 +65,75 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist }) => {
     );
 };
 
-
-
-
 function AnimeRecs() {
     const { session } = useAuth();
     const navigate = useNavigate();
 
-    const deleteMutation = useDeleteWatchlist(session?.access_token);
+    const deleteMutation = useDeleteWatchlistByAnimeId(session?.access_token);
     const createMutation = useCreateWatchlist(session?.access_token);
 
-    // --- Local watchlist state (persisted in localStorage) ---
-    const [watchlist, setWatchlist] = useState(() => {
-        const saved = localStorage.getItem("watchlist") || "[]";
-        return JSON.parse(saved);
-    });
+    // Fetch watchlist from backend
+    const { data: watchlistWithAnimeInfo, isSuccess: watchlistSuccess, isLoading: watchlistLoading } = useFetchWatchlistWithInfo(session?.access_token);
 
-    // Keep localStorage in sync whenever watchlist changes
+    // Local watchlist state - will be synced with backend
+    const [watchlist, setWatchlist] = useState([]);
+    const [isWatchlistInitialized, setIsWatchlistInitialized] = useState(false);
+
+    // Initialize watchlist from backend when data is available
     useEffect(() => {
-        localStorage.setItem("watchlist", JSON.stringify(watchlist));
-    }, [watchlist]);
+        if (watchlistSuccess && watchlistWithAnimeInfo && !isWatchlistInitialized) {
+            // Extract anime IDs from the backend response
+            const backendWatchlistAnimeIds = watchlistWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id );
+            setWatchlist(backendWatchlistAnimeIds);
+            setIsWatchlistInitialized(true);
+            console.log('Watchlist initialized from backend:', backendWatchlistAnimeIds);
+        }
+    }, [watchlistSuccess, watchlistWithAnimeInfo, isWatchlistInitialized]);
 
-    // Toggle function
+    // Toggle function with optimistic updates
     const toggleWatchlist = async (animeId, isWatchlisted) => {
         try {
             if (isWatchlisted) {
-                console.log('Here');
-                // remove
+                // Optimistically update UI first
                 setWatchlist((prev) => prev.filter((id) => id !== animeId));
-                // Optionally call backend remove mutation here
-                deleteMutation.mutate({anime_id: animeId})
+                
+                // Then call backend
+                await deleteMutation.mutateAsync({ anime_id: animeId });
+                console.log('Removed from watchlist:', animeId);
             } else {
-                // add
+                // Optimistically update UI first
                 setWatchlist((prev) => [...prev, animeId]);
+                
+                // Then call backend
                 await createMutation.mutateAsync({ anime_id: animeId, status: "plan_to_watch" });
+                console.log('Added to watchlist:', animeId);
             }
         } catch (err) {
             console.error("Watchlist update failed:", err);
+            
+            // Revert optimistic update on error
+            if (isWatchlisted) {
+                // If removal failed, add it back
+                setWatchlist((prev) => [...prev, animeId]);
+            } else {
+                // If addition failed, remove it
+                setWatchlist((prev) => prev.filter((id) => id !== animeId));
+            }
         }
     };
 
-    const { data: watchlistWithAnimeInfo, isSuccess } = useFetchWatchlistWithInfo(session?.access_token);
     const [modalData, setModalData] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const { data: animeFromDBData, isLoading: animeFromDBLoading, error: animeFromDBError, isSuccess: animeFromDBSuccess } = useFetchAnimeFromDB(session?.access_token);
-    //Pagination
+    const animeFromDB = useFetchAnimeFromDB(session?.access_token);
+
+    // Pagination
     const animePerPage = 24;
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = Math.ceil(animeFromDBData?.anime_data.length / animePerPage);
+    const totalPages = Math.ceil(animeFromDB?.data?.anime_data.length / animePerPage);
     const start = (currentPage - 1) * animePerPage;
     const end = start + animePerPage;
-    const slicedData = animeFromDBData ? animeFromDBData.anime_data.slice(start, end) : [];
+    const slicedData = animeFromDB.data ? animeFromDB.data.anime_data.slice(start, end) : [];
+    
     const handleNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     }
@@ -145,10 +141,8 @@ function AnimeRecs() {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     }
 
-
     const openModal = (anime) => { setModalData(anime); }
     const closeModal = () => { setModalData(null); }
-
 
     // Handle modal close using escape key
     useEffect(() => {
@@ -168,16 +162,17 @@ function AnimeRecs() {
     }, [modalData]);
 
     useEffect(() => {
-        if (animeFromDBSuccess) {
+        if (animeFromDB.isSuccess) {
             // console.log(animeFromDBData);
         }
-        if (animeFromDBError) {
-            setErrorMessage(animeFromDBError);
-            console.error(animeFromDBError);
+        if (animeFromDB.isError) {
+            setErrorMessage(animeFromDB.error);
+            console.error(animeFromDB.error);
         }
-    }, [animeFromDBSuccess, animeFromDBError]);
+    }, [animeFromDB.isSuccess, animeFromDB.isError]);
 
-
+    // Show loading state while both anime data and watchlist are loading
+    const isLoading = animeFromDB.isLoading || (session?.access_token && !isWatchlistInitialized && watchlistLoading);
 
     return (
         <>
@@ -186,12 +181,14 @@ function AnimeRecs() {
                 <Sidebar />
                 <div className='flex flex-1 p-4 sm:p-6'>
                     <div className='flex-1'>
-                        <h1 className='text-xl sm:text-3xl text-white font-bold p-6 inline-flex gap-1.5'>Anime Recommendations <SparkleIcon /></h1>
+                        <h1 className='text-xl sm:text-3xl text-white font-bold p-6 inline-flex gap-1.5'>
+                            Anime Recommendations <SparkleIcon />
+                        </h1>
                         <div className='grid grid-cols-1 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-                            {animeFromDBLoading && Array.from({ length: animePerPage }).map((_, i) => (
+                            {isLoading && Array.from({ length: animePerPage }).map((_, i) => (
                                 <SkeletonCard key={i} />
                             ))}
-                            {animeFromDBSuccess && slicedData.map((anime) => (
+                            {animeFromDB.isSuccess && slicedData.map((anime) => (
                                 <AnimeCard
                                     key={anime.id}
                                     anime={anime}
@@ -202,7 +199,7 @@ function AnimeRecs() {
                             ))}
                         </div>
                         {/* Pagination */}
-                        {animeFromDBSuccess && (
+                        {animeFromDB.isSuccess && (
                             <div className="flex justify-between items-center mt-6 px-2">
                                 <button
                                     onClick={handlePrevPage}

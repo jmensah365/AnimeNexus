@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Sidebar from '../components/Sidebar'
-import { useFetchWatchlistWithInfo, useFetchUserAnime, useCreateWatchlist, useDeleteWatchlist, useUpdateWatchlist } from '../hooks/Watchlist/useWatchlist'
+import { useFetchWatchlistWithInfo, useFetchUserAnime, useCreateWatchlist, useDeleteWatchlist, useUpdateWatchlist } from '../hooks/useWatchlist'
 import StatusSection from '../components/Watchlist/StatusSection'
 import AddWatchlistModal from '../components/Watchlist/AddWatchlistModal'
 import DeleteModal from '../components/Watchlist/DeleteModal'
@@ -88,7 +88,7 @@ export default function Watchlist() {
                             anime={deleteTarget}
                             onClose={() => setDeleteTarget(null)}
                             onConfirm={() => {
-                                deleteMutation.mutate({ anime_id: deleteTarget.id })
+                                deleteMutation.mutate({ watchlist_id: deleteTarget.id })
                                 setDeleteTarget(null)
                             }}
                         />, document.body)}

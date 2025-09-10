@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { XIcon, EyeIcon, EyeSlashIcon, CheckIcon } from '@phosphor-icons/react';
 import Sidebar from '../components/Sidebar';
-import ErrorCard from '../components/Cards/ErrorCard';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Alert } from 'flowbite-react'
 import supabase from '../utils/supabaseClient';
 import { useAuth } from '../utils/Auth'
+import { useFetchPreferences } from '../hooks/usePreference';
+import { useGenAndInsertAnime } from '../hooks/useAnime';
+import { useGenAndInsetAIRecs } from '../hooks/useAI';
 
 // API functions
 const updateEmail = async (newEmail) => {
@@ -26,22 +28,10 @@ const updatePassword = async (newPassword) => {
     return response;
 };
 
-const fetchPreferences = async (token) => {
-    const response = await fetch('http://localhost:3000/preferences/', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
 
 const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_counts, preferenceId }, token) => {
     if (mood !== '') moods.push(mood);
-    const response = await fetch(`http://localhost:3000/preferences/${preferenceId}`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/${preferenceId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -54,31 +44,7 @@ const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_coun
     return response.json();
 };
 
-const generateAndInsertAiRecs = async (token) => {
-    const response = await fetch('http://localhost:3000/recommendations/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    })
 
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
-
-const generateAndInsertAnimeMetadata = async (token) => {
-    const response = await fetch('http://localhost:3000/api/anime/insert-metadata', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    })
-
-    if (!response.ok) throw new Error(await response.text())
-    return response.json();
-}
 
 // Data constants
 const genresList = [
@@ -106,11 +72,6 @@ const moodMappings = {
     "😌 Relaxed": "relaxed",
     "😡 Mad": "mad"
 }
-
-const animeEras = [
-    'The_Foundations', 'The_Classics', 'The_Boom', 'The_Digital_Revolution',
-    'The_Streaming_Era', 'The_Current_Era'
-];
 
 const episodeCounts = ['1-13', '13-26', '26-50+', '50+'];
 
@@ -185,25 +146,9 @@ function Settings() {
         }
     });
 
-    const insertAiRecsMutation = useMutation({
-        mutationFn: (token) => generateAndInsertAiRecs(token),
-        onSuccess: () => {
-            setInsertAISuccess('Added new AI reccommendations!')
-        },
-        onError: () => {
-            setInsertAIError('Could not add new AI reccommendations at this time. Please try again later.')
-        }
-    });
+    const genAndInsertAnime = useGenAndInsertAnime(token);
+    const genAndInsertAIRecs = useGenAndInsetAIRecs(token);
 
-    const insertAnimeMutation = useMutation({
-        mutationFn: (token) => generateAndInsertAnimeMetadata(token),
-        onSuccess: () => {
-            setInsertAnimeSuccess('Added new anime reccommendations!')
-        },
-        onError: () => {
-            setInsertAnimeError('Could not add new anime reccommendations at this time. Please try again later.')
-        }
-    })
 
     const preferencesMutation = useMutation({
         mutationFn: (preferenceData) => updatePreferences(preferenceData, token),
@@ -215,8 +160,8 @@ function Settings() {
             setMoods([]);
             setAnimeEras([]);
             setEpisodeCounts([]);
-            insertAiRecsMutation.mutate(token);
-            insertAnimeMutation.mutate(token);
+            genAndInsertAnime.mutate(token);
+            genAndInsertAIRecs.mutate(token);
         },
         onError: (error) => {
             try {
@@ -230,14 +175,8 @@ function Settings() {
     });
 
     //Queries
-    const { data: preferences, isLoading: loadingPreferences, error: fetchPreferencesError } = useQuery({
-        queryKey: ['fetchPreferences'],
-        queryFn: () => fetchPreferences(token),
-        retry: false,
-        refetchOnWindowFocus: false,
-        enabled: !!token
-    });
-    const preferenceId = preferences?.preference?.[0].id;
+    const preferences = useFetchPreferences(token);
+    const preferenceId = preferences.data?.preference?.[0].id;
 
 
 
@@ -473,10 +412,6 @@ function Settings() {
                     </form>
                     {preferencesSuccess && (<Alert color='success' onDismiss={() => setPreferencesSuccess('')}>{preferencesSuccess}</Alert>)}
                     {preferencesError && (<Alert color='failure' onDismiss={() => setPreferencesError('')} >{preferencesError}</Alert>)}
-                    {insertAISuccess && (<Alert color='success' onDismiss={() => setInsertAISuccess('')} >{insertAISuccess}</Alert>)}
-                    {insertAIError && (<Alert color='failure' onDismiss={() => setInsertAIError('')} >{insertAIError}</Alert>)}
-                    {insertAnimeSuccess && (<Alert color='success' onDismiss={() => setInsertAnimeSuccess('')} >{insertAnimeSuccess}</Alert>)}
-                    {insertAnimeError && (<Alert color='failure' onDismiss={() => setInsertAnimeError('')} >{insertAnimeError}</Alert>)}
                 </div>
             </div>
         </div>

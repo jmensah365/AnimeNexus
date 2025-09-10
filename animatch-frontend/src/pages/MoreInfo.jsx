@@ -7,44 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ErrorCard from '../components/Cards/ErrorCard';
 import { Alert } from 'flowbite-react';
 import { useAuth } from '../utils/Auth';
-
-const insertPreferences = async ({ genres, mood, moods, anime_era, episode_count, token}) => {
-    console.log(genres);
-    if (mood !== '') {moods.push(mood);}
-    const response = await fetch('http://localhost:3000/preferences/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ genres, moods, anime_era, episode_count }),
-    });
-
-
-    if (!response.ok) throw new Error(await response.text());
-
-    return response.json();
-
-}
-
-const updatePreferenceFormCompletion = async (token) => {
-    const response = await fetch('http://localhost:3000/preferences/', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-
-}
-
-
-const useInsertPreferences = (token) => {
-    return useMutation({ mutationFn: (preferenceData) => insertPreferences(preferenceData,token) });
-}
+import { useInsertPreferences, useUpdateFormCompletionStatus } from '../hooks/usePreference';
 
 
 
@@ -88,42 +51,14 @@ export default function AnimePreferencesForm() {
     const [episode_count, setEpisodeCounts] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-    console.log(moods);
-
-
-    const { mutate: insertPreferenceMutate, isError, isPending } = useInsertPreferences(token);
-    const updatePreferenceFormCompletionMutate = useMutation({
-        mutationFn: () => updatePreferenceFormCompletion(token),
-        onSuccess: (data) => {
-            console.log("Preference form completed");
-        },
-        onError: (error) => {
-            console.error("Failed to update preference form completion status: ", error);
-            setErrorMessage("Failed to update preference form completion status.");
-        }
-    });
-
     const navigate = useNavigate();
+
+    const updateFormCompletionStatus = useUpdateFormCompletionStatus(token);
+    const insertPreferencesMutation = useInsertPreferences(updateFormCompletionStatus, token, navigate, setErrorMessage);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        insertPreferenceMutate({ genres, moods, anime_era, episode_count, token },
-            {
-                onSuccess: async (data) => {
-                    updatePreferenceFormCompletionMutate.mutate(token);
-                    navigate('/welcome');
-                },
-
-                onError: (error) => {
-                    try {
-                        setErrorMessage(error.message || "An error occurred during sign in.");
-                    } catch (e) {
-                        setErrorMessage("An error occurred during submitting preferences. Please try again.");
-                        console.error(e);
-                    }
-                }
-            })
+        insertPreferencesMutation.mutate({ genres, mood, moods, anime_era, episode_count })
     }
 
     const handleAddGenre = (genre) => {
@@ -256,10 +191,10 @@ export default function AnimePreferencesForm() {
                         type="submit"
                         className="w-full py-2 px-4 bg-gradient-to-br from-red-500 to-red-700 cursor-pointer hover:scale-102 transtion-all duration-500 text-white text-sm font-medium rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
-                        {isPending ? 'Submitting Preferences...' : 'Submit Preferences'}
+                        {insertPreferencesMutation.isPending ? 'Submitting Preferences...' : 'Submit Preferences'}
                     </button>
                 </form>
-                {isError &&
+                {insertPreferencesMutation.isError &&
                     <Alert color='failure'>
                         {errorMessage}
                     </Alert>}

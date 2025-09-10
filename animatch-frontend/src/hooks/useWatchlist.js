@@ -27,7 +27,15 @@ export const useUpdateWatchlist = (token) => {
 export const useDeleteWatchlist = (token) => {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: (animeId) => service.deleteWatchlist(animeId, token),
+        mutationFn: (watchlistId) => service.deleteWatchlist(watchlistId, token),
+        onSuccess: () => queryClient.invalidateQueries(['fetchWatchlistWithInfo']),
+    })
+}
+
+export const useDeleteWatchlistByAnimeId = (token) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (animeId) => service.deleteWatchlistByAnimeId(animeId, token),
         onSuccess: () => queryClient.invalidateQueries(['fetchWatchlistWithInfo']),
     })
 }

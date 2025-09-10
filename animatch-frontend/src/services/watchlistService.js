@@ -49,8 +49,21 @@ export const updateWatchlist = async ({ anime_id, status }, token) => {
     return response.json();
 }
 
-export const deleteWatchlist = async ({ anime_id }, token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${anime_id}`, {
+export const deleteWatchlist = async ({ watchlist_id }, token) => {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${watchlist_id}`, {
+        method: 'DELETE',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    return;
+}
+
+export const deleteWatchlistByAnimeId = async({anime_id}, token) => {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/anime-id/${anime_id}`, {
         method: 'DELETE',
         headers: { 
             'Content-Type': 'application/json',

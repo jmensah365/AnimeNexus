@@ -14,7 +14,6 @@ export default function AuthCallback() {
             //Check if user has completed more info survey
             const {data : data, error} = await supabase.from('preference_users').select('preference_survey_completed').eq('id', session.user.id).single();
 
-            console.log(data.preference_survey_completed);
 
             if (error) throw error;
 

@@ -3,6 +3,7 @@ import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, ClockIcon, Che
 import {motion, AnimatePresence} from 'framer-motion'
 
 const AnimeModal = ({ modalData, onClose }) => {
+    console.log(modalData);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {

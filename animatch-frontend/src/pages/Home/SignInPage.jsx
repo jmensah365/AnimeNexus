@@ -6,6 +6,8 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import ErrorCard from '../../components/Cards/ErrorCard'
 import GoogleButton from '../../components/Buttons/GoogleButton'
 import supabase from '../../utils/supabaseClient'
+import { useCheckifFormIsCompleted } from '../../hooks/usePreference'
+import { useAuth } from '../../utils/Auth'
 
 const signIn = async ({ email, password }) => {
     const {data, error} = await supabase.auth.signInWithPassword({
@@ -22,17 +24,17 @@ const useSignIn = () => {
     return useMutation({ mutationFn: signIn });
 }
 
-const checkifFormIsCompleted = async (token) => {
-    const response = await fetch('http://localhost:3000/preferences/completed', {
-        method: 'GET',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    })
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
+// const checkifFormIsCompleted = async (token) => {
+//     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/completed`, {
+//         method: 'GET',
+//         headers: { 
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${token}`
+//         },
+//     })
+//     if (!response.ok) throw new Error(await response.text());
+//     return response.json();
+// }
 
 
 
@@ -43,7 +45,6 @@ function SignInPage() {
     const [isVisible, setIsVisible] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const navigateTo = (path) => {
@@ -51,17 +52,8 @@ function SignInPage() {
     }
 
     const { mutate: signInMutate, isError, isPending } = useSignIn();
-    const formCheckMutation = useMutation({
-        mutationFn: (token) => checkifFormIsCompleted(token),
-        onSuccess: (data) => {
-            if (data.isCompleted) navigateTo('/home');
-            else navigateTo('/auth/callback');
-        },
-        onError: (error) => {
-            console.error("Failed to check form completion status: ", error);
-            setErrorMessage("Failed to check form completion status:, error");
-        }
-    });
+    const formCheckMutation = useCheckifFormIsCompleted(navigateTo, setErrorMessage);
+
 
     const handleGoogleSignUp = async () => {
         try {
@@ -88,7 +80,7 @@ function SignInPage() {
             {
                 onSuccess: async (data) => {
                     const token = data.session.access_token;
-                    formCheckMutation.mutate(token); // Check if the user has completed the preference form
+                    formCheckMutation.mutate(token);
                 },
 
                 onError: (error) => {
