@@ -42,7 +42,7 @@ export default function TrendingSidebar({ animeCache }) {
             </ul>
             <button
                 onClick={() => navigate('/trending')}
-                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer"
+                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer hover:scale-102 duration-300"
             >
                 See All
             </button>

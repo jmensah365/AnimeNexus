@@ -12,7 +12,7 @@ export default function WatchlistSidebar({ watchlistWithAnimeInfo }) {
                 <p className="text-gray-400 text-sm italic">Your watchlist is empty... time to add some anime ✨</p>
             ) : (
                 <ul className="space-y-3">
-                    {watchlist.slice(0, 3).map((item, idx) => (
+                    {watchlist.slice(0, 4).map((item, idx) => (
                         <li
                             key={item.id || idx}
                             className={`flex items-center gap-3 ${getStatusColor(item?.status)} p-3 rounded-xl transition cursor-pointer hover:scale-102`}
@@ -32,7 +32,7 @@ export default function WatchlistSidebar({ watchlistWithAnimeInfo }) {
             )}
             <button
                 onClick={() => navigate('/watchlist')}
-                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer"
+                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer hover:scale-102 duration-300"
             >
                 See All
             </button>

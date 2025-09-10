@@ -4,7 +4,7 @@ import { BookmarkSimpleIcon } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimeModal from './AnimeModal'
 import { Tooltip } from 'flowbite-react'
-import { useCreateWatchlist } from '../../hooks/Watchlist/useWatchlist'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -18,6 +18,8 @@ function MainContentArea({ data, error, success }) {
     const closeModal = () => { setModalData(null); }
 
     const [hovered, setHovered] = useState(false);
+
+    const navigate = useNavigate();
 
     //Handle modal close using escape key
     useEffect(() => {
@@ -113,6 +115,12 @@ function MainContentArea({ data, error, success }) {
 
                     ))}
                 </div>
+                <button
+                onClick={() => navigate('/anime-recs')}
+                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer hover:scale-102 duration-300"
+            >
+                See All
+            </button>
             </div>
             <div className='flex items-center justify-center'>
                 <h1>Spin-The-Wheel</h1>
