@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import * as service from '../../services/watchlistService'
+import * as service from '../services/watchlistService'
 
 export const useFetchWatchlistWithInfo = (token) =>
     useQuery({queryKey: ['fetchWatchlistWithInfo'], queryFn: () => service.fetchWatchlistWithInfo(token), refetchOnWindowFocus: false, retry: 3, enabled:!!token })

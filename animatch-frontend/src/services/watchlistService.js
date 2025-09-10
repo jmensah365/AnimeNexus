@@ -1,6 +1,6 @@
 
 export const fetchWatchlistWithInfo = async (token) => {
-    const response = await fetch('http://localhost:3000/watchlists/with-titles', {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/with-titles`, {
         method: 'GET',
         headers: { 
             'Content-Type': 'application/json',
@@ -12,7 +12,7 @@ export const fetchWatchlistWithInfo = async (token) => {
 }
 
 export const fetchUserAnime = async (token) => {
-    const response = await fetch('http://localhost:3000/api/anime/get-anime', {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/get-anime`, {
         method: 'GET',
         headers: { 
             'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export const fetchUserAnime = async (token) => {
 }
 
 export const createWatchlist = async ({ anime_id, status }, token) => {
-    const response = await fetch('http://localhost:3000/watchlists/', {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ export const createWatchlist = async ({ anime_id, status }, token) => {
 }
 
 export const updateWatchlist = async ({ anime_id, status }, token) => {
-    const response = await fetch(`http://localhost:3000/watchlists/${anime_id}`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${anime_id}`, {
         method: 'PUT',
         headers: { 
             'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const updateWatchlist = async ({ anime_id, status }, token) => {
 }
 
 export const deleteWatchlist = async ({ anime_id }, token) => {
-    const response = await fetch(`http://localhost:3000/watchlists/${anime_id}`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${anime_id}`, {
         method: 'DELETE',
         headers: { 
             'Content-Type': 'application/json',
