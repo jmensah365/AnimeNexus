@@ -5,10 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AnimeModal from './AnimeModal'
 import { Tooltip } from 'flowbite-react'
 import { useNavigate } from 'react-router-dom'
+import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlistByAnimeId } from '../../hooks/useWatchlist'
+import { useAuth } from '../../utils/Auth'
 
 
 
 function MainContentArea({ data, error, success }) {
+    const { session } = useAuth();
+
     const slicedData = data ? data.anime_data.slice(0, 10) : [];
 
     const [modalData, setModalData] = useState(null);
@@ -38,33 +42,61 @@ function MainContentArea({ data, error, success }) {
         }
     }, [modalData]);
 
+    const deleteMutation = useDeleteWatchlistByAnimeId(session?.access_token);
+    const createMutation = useCreateWatchlist(session?.access_token);
 
-    //Handle click outside modal
-    const handleBackgroundClick = (event) => {
-        if (event.target === event.currentTarget) {
-            closeModal();
+    // Fetch watchlist from backend
+    const { data: watchlistWithAnimeInfo, isSuccess: watchlistSuccess, isLoading: watchlistLoading } = useFetchWatchlistWithInfo(session?.access_token);
+
+    // Local watchlist state - will be synced with backend
+    const [watchlist, setWatchlist] = useState([]);
+    const [isWatchlistInitialized, setIsWatchlistInitialized] = useState(false);
+
+    // Initialize watchlist from backend when data is available
+    useEffect(() => {
+        if (watchlistSuccess && watchlistWithAnimeInfo && !isWatchlistInitialized) {
+            // Extract anime IDs from the backend response
+            const backendWatchlistAnimeIds = watchlistWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id);
+            setWatchlist(backendWatchlistAnimeIds);
+            setIsWatchlistInitialized(true);
+            console.log('Watchlist initialized from backend:', backendWatchlistAnimeIds);
         }
-    }
+    }, [watchlistSuccess, watchlistWithAnimeInfo, isWatchlistInitialized]);
 
-    const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
-            case 'finished':
-                return 'green-400'
-            case 'current':
-                return 'blue-400'
-            case 'upcoming':
-                return 'yellow-400'
-            default:
-                return 'gray-400'
+    // Toggle function with optimistic updates
+    const toggleWatchlist = async (animeId, isWatchlisted) => {
+        try {
+            if (isWatchlisted) {
+                // Optimistically update UI first
+                setWatchlist((prev) => prev.filter((id) => id !== animeId));
+
+                // Then call backend
+                await deleteMutation.mutateAsync({ anime_id: animeId });
+                console.log('Removed from watchlist:', animeId);
+            } else {
+                // Optimistically update UI first
+                setWatchlist((prev) => [...prev, animeId]);
+
+                // Then call backend
+                await createMutation.mutateAsync({ anime_id: animeId, status: "plan_to_watch" });
+                console.log('Added to watchlist:', animeId);
+            }
+        } catch (err) {
+            console.error("Watchlist update failed:", err);
+
+            // Revert optimistic update on error
+            if (isWatchlisted) {
+                // If removal failed, add it back
+                setWatchlist((prev) => [...prev, animeId]);
+            } else {
+                // If addition failed, remove it
+                setWatchlist((prev) => prev.filter((id) => id !== animeId));
+            }
         }
-    }
+    };
 
-    //Format date
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-    }
+
+
 
     if (error) {
         return (
@@ -103,9 +135,20 @@ function MainContentArea({ data, error, success }) {
                                         <p className="text-xs font-medium">{anime.synopsis.slice(0, 200)}...</p>
                                     </div>
                                     <div className='absolute bottom-4 left-2 hover:scale-110 transition-all duration-300' onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-                                        <Tooltip content='Add to Watchlist' style='light' placement='right'>
-                                            {/* <BookmarkSimpleIcon size={24} color='red' /> */}
-                                            {hovered ? ( <BookmarkSimpleIcon size={24} color='red' weight='fill' />) :  <BookmarkSimpleIcon size={24} color='red' />}
+                                        <Tooltip
+                                            content={watchlist.includes(anime.id) ? "Remove from watchlist" : "Add to watchlist"}
+                                            style="light"
+                                            placement="right"
+                                        >
+                                            <BookmarkSimpleIcon
+                                                size={24}
+                                                color="red"
+                                                weight={hovered || watchlist.includes(anime.id) ? "fill" : "regular"}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleWatchlist(anime.id,  watchlist.includes(anime.id));
+                                                }}
+                                            />
                                         </Tooltip>
                                     </div>
                                 </div>
@@ -116,11 +159,11 @@ function MainContentArea({ data, error, success }) {
                     ))}
                 </div>
                 <button
-                onClick={() => navigate('/anime-recs')}
-                className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer hover:scale-102 duration-300"
-            >
-                See All
-            </button>
+                    onClick={() => navigate('/anime-recs')}
+                    className="mt-4 w-full text-sm font-medium bg-red-600 hover:bg-red-700 transition text-white py-2 rounded-lg cursor-pointer hover:scale-102 duration-300"
+                >
+                    See All
+                </button>
             </div>
             <div className='flex items-center justify-center'>
                 <h1>Spin-The-Wheel</h1>
