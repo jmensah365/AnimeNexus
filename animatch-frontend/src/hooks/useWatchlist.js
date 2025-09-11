@@ -4,8 +4,6 @@ import * as service from '../services/watchlistService'
 export const useFetchWatchlistWithInfo = (token) =>
     useQuery({queryKey: ['fetchWatchlistWithInfo'], queryFn: () => service.fetchWatchlistWithInfo(token), refetchOnWindowFocus: false, retry: 3, enabled:!!token })
 
-export const useFetchUserAnime = (token) =>
-    useQuery({queryKey: ['fetchUserAnime'], queryFn: () => service.fetchUserAnime(token), refetchOnWindowFocus: false, retry: 3, enabled:!!token })
 
 export const useCreateWatchlist = (token) => {
     const queryClient = useQueryClient()

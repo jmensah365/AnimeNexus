@@ -11,17 +11,6 @@ export const fetchWatchlistWithInfo = async (token) => {
     return response.json();
 }
 
-export const fetchUserAnime = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/get-anime`, {
-        method: 'GET',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-    if (!response.ok) throw new Error(await response.text());
-    return response.json();
-}
 
 export const createWatchlist = async ({ anime_id, status }, token) => {
     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/`, {

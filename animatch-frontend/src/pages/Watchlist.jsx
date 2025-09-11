@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Sidebar from '../components/Sidebar'
-import { useFetchWatchlistWithInfo, useFetchUserAnime, useCreateWatchlist, useDeleteWatchlist, useUpdateWatchlist } from '../hooks/useWatchlist'
+import { useFetchWatchlistWithInfo, useCreateWatchlist, useDeleteWatchlist, useUpdateWatchlist } from '../hooks/useWatchlist'
+import { useFetchAnimeFromDB } from '../hooks/useAnime'
 import StatusSection from '../components/Watchlist/StatusSection'
 import AddWatchlistModal from '../components/Watchlist/AddWatchlistModal'
 import DeleteModal from '../components/Watchlist/DeleteModal'
@@ -13,7 +14,7 @@ export default function Watchlist() {
     const { session } = useAuth();
     const token = session?.access_token;
     const { data: watchlistWithAnimeInfo, isSuccess } = useFetchWatchlistWithInfo(token);
-    const { data: userAnime, isSuccess: userAnimeSuccess } = useFetchUserAnime(token);
+    const { data: userAnime, isSuccess: userAnimeSuccess } = useFetchAnimeFromDB(token);
     const createMutation = useCreateWatchlist(token);
     const deleteMutation = useDeleteWatchlist(token);
     const updateMutation = useUpdateWatchlist(token);
