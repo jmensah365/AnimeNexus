@@ -6,6 +6,7 @@ import { useGenAndInsertAnime } from '../hooks/useAnime';
 import { useGenAndInsetAIRecs } from '../hooks/useAI';
 
 
+
 function WelcomePage() {
   const { session } = useAuth();
   const token = session?.access_token;
