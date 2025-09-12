@@ -1,6 +1,6 @@
 import { TrashIcon, PencilIcon } from '@phosphor-icons/react'
 import { Tooltip } from 'flowbite-react'
-import { getStatusColor, convertStatus } from '../../utils/watchlistHelpers'
+import { getStatusColor, convertText } from '../../utils/watchlistHelpers'
 
 export default function AnimeCard({ watchlist, onClick, setDeleteTarget, setUpdateTarget }) {
     return (
@@ -20,7 +20,7 @@ export default function AnimeCard({ watchlist, onClick, setDeleteTarget, setUpda
                     loading="lazy"
                 />
                 <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(watchlist.status)} `}>
-                    {convertStatus(watchlist.status)}
+                    {convertText(watchlist.status)}
                 </div>
             </div>
             <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex flex-col p-6">

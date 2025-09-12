@@ -1,11 +1,14 @@
-export const convertStatus = (status) => {
-    switch (status) {
+export const convertText = (text) => {
+    switch (text) {
         case 'plan_to_watch': return 'Plan To Watch'
         case 'watching': return 'Watching'
         case 'completed': return 'Completed'
         case 'dropped': return 'Dropped'
         case 'on_hold': return 'On Hold'
-        default: return status
+        case 'liked': return 'Liked'
+        case 'disliked': return 'Disliked'
+        case 'not_interested': return 'Not Interested'
+        default: return text
     }
 }
 

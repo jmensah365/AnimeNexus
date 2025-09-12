@@ -8,6 +8,8 @@ import WatchlistSidebar from '../components/WatchlistSidebar'
 import { useFetchKitsuAPI, useFetchAnimeFromDB, useFetchAIRecs, useGetTrendingAnime  } from '../hooks/useAnime'
 import { useAuth } from '../utils/Auth.jsx'
 import { useFetchWatchlistWithInfo } from '../hooks/useWatchlist'
+import { useFetchReactionsWithInfo } from '../hooks/useReactions'
+import ReactionsSidebar from '../components/ReactionsSidebar'
 
 
 
@@ -21,7 +23,8 @@ function AniMatchHome() {
     const databaseAnimeQuery = useFetchAnimeFromDB(token);
     const AIRecsQuery = useFetchAIRecs(token);
     const trendingAnimeQuery = useGetTrendingAnime();
-    const { data: watchlistWithAnimeInfo, isSuccess } = useFetchWatchlistWithInfo(session?.access_token); 
+    const { data: watchlistWithAnimeInfo, isSuccess: watchlistSuccess } = useFetchWatchlistWithInfo(session?.access_token); 
+    const { data: reactionsWithAnimeInfo, isSuccess: reactionsSuccess } = useFetchReactionsWithInfo(session?.access_token); 
 
 
     return (
@@ -50,6 +53,8 @@ function AniMatchHome() {
                 {trendingAnimeQuery.isSuccess && trendingAnimeQuery?.data.length > 0 && <TrendingSidebar animeCache={trendingAnimeQuery.data}/>}
                 <hr className="border-gray-400 my-10" />
                 <WatchlistSidebar watchlistWithAnimeInfo={watchlistWithAnimeInfo}/>
+                <hr className="border-gray-400 my-10" />
+                <ReactionsSidebar reactionsWithAnimeInfo={reactionsWithAnimeInfo}/>
             </div>
         </div>
     )

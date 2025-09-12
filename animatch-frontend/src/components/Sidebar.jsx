@@ -72,9 +72,9 @@ function Sidebar() {
                         <TelevisionIcon size={18} aria-hidden="true" />
                         <span>Watchlist</span>
                     </a>
-                    <a href="" className="flex items-center space-x-3 text-gray-300 hover:text-white bg-transparent opacity-30 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-not-allowed pointer-events-none">
+                    <a href="/reactions" className="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-red-400/10 px-3 py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black">
                         <CheckSquareOffsetIcon size={18} aria-hidden="true" />
-                        <span>Reactions (TBD)</span>
+                        <span>Reactions</span>
                     </a>
                 </nav>
             </div>
