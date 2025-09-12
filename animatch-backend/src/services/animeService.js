@@ -78,7 +78,8 @@ const extractPlatformName = (url) => {
     if (url.includes('netflix.com')) return 'Netflix';
     if (url.includes('hidive.com')) return 'HIDIVE';
     if (url.includes('vrv.co')) return 'VRV';
-    // Add more platforms as needed
+    if (url.includes('youtube.com')) return 'Youtube';
+    if (url.includes('tubitv')) return 'TubiTV';
     return 'Unknown';
 };
 
