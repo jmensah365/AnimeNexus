@@ -10,14 +10,14 @@ export const getUserReactionsWithAnimeTitles = async (supabaseClient, userId) =>
     return await fetchUserReactionsWithAnimeTitles(supabaseClient, userId);
 }
 
-export const addUserReaction = async (reaction) => {
-    return await createUserReaction(reaction);
+export const addUserReaction = async (reaction, supabaseClient, userId) => {
+    return await createUserReaction(reaction, supabaseClient, userId);
 }
 
-export const updateUserReactionService = async (reactionId, updatedData) => {
-    return await updateUserReaction(reactionId, updatedData);
+export const updateUserReactionService = async (reactionId, updatedData, supabaseClient) => {
+    return await updateUserReaction(reactionId, updatedData, supabaseClient);
 }
 
-export const removeUserReaction = async (reactionId) => {
-    return await deleteUserReaction(reactionId);
+export const removeUserReaction = async (reactionId, supabaseClient) => {
+    return await deleteUserReaction(reactionId, supabaseClient);
 }

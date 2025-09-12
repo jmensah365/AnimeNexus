@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get('/', fetchUserReactionController);
 router.get('/with-titles', supabaseAuthMiddleware, fetchUserReactionControllerWithAnimeTitles);
-router.post('/', insertUserReactionController);
-router.put('/:reactionId', updateUserReactionController);
-router.delete('/:reactionId', deleteUserReactionController);
+router.post('/', supabaseAuthMiddleware, insertUserReactionController);
+router.put('/:reactionId', supabaseAuthMiddleware, updateUserReactionController);
+router.delete('/:reactionId', supabaseAuthMiddleware, deleteUserReactionController);
 
 export default router;

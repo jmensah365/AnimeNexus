@@ -1,14 +1,7 @@
 import {addUserReaction, getUserReactions, removeUserReaction, updateUserReactionService, getUserReactionsWithAnimeTitles} from '../services/userReactionService.js';
-import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const fetchUserReactionController = async (req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
+
     try {
         const userReactionList = await getUserReactions();
 
@@ -28,13 +21,6 @@ export const fetchUserReactionController = async (req, res) => {
 }
 
 export const fetchUserReactionControllerWithAnimeTitles = async (req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     try {
         const userReactionList = await getUserReactionsWithAnimeTitles(req.supabase, req.user.id);
 
@@ -54,13 +40,6 @@ export const fetchUserReactionControllerWithAnimeTitles = async (req, res) => {
 }
 
 export const insertUserReactionController = async (req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     const reactionData = req.body;
 
     if (!reactionData) throw new Error('Reaction data is missing');
@@ -68,7 +47,8 @@ export const insertUserReactionController = async (req, res) => {
     if (!reactionData.reaction) throw new Error('Reaction type is required');
 
     try {
-        const response = await addUserReaction(reactionData);
+        console.log(req.user.id);
+        const response = await addUserReaction(reactionData, req.supabase, req.user.id);
         if(!response || response.length === 0) {
             return res.status(400).json({
                 error: true,
@@ -94,13 +74,6 @@ export const insertUserReactionController = async (req, res) => {
 }
 
 export const updateUserReactionController = async (req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     const reactionId = req.params.reactionId;
     const updatedData = req.body;
 
@@ -109,7 +82,7 @@ export const updateUserReactionController = async (req, res) => {
 
     try {
 
-        const response = await updateUserReactionService(reactionId, updatedData);
+        const response = await updateUserReactionService(reactionId, updatedData, req.supabase);
 
         if (!response || response.length === 0) return response.status(400).json({error: true, message: 'Failed to update user reaction'});
         if (response.error) throw new Error(`Failed to update user reaction ${response.error}`);
@@ -128,19 +101,12 @@ export const updateUserReactionController = async (req, res) => {
 }
 
 export const deleteUserReactionController = async (req, res) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     const reactionId = req.params.reactionId;
 
     if (!reactionId) throw new Error('Reaction ID is required');
 
     try {
-        const response = await removeUserReaction(reactionId);
+        const response = await removeUserReaction(reactionId, req.supabase);
 
         if (!response || response.length === 0) return res.status(400).json({error: true, message: 'Failed to delete user reaction'});
         if (response.error) throw new Error(`Failed to delete user reaction ${response.error}`);

@@ -16,13 +16,10 @@ const UserReaction_reaction = Object.freeze({
     NO_INTERACTION: 'no_interaction'
 });
 
-export const fetchUserReactions = async () => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const fetchUserReactions = async (supabaseClient, userId) => {
 
     // Fetch user reactions from the user_reactions table
-    const {data: reactions, error: fetchError} = await supabase.from('user_reactions').select().eq('user_id', userData.user.id);
+    const {data: reactions, error: fetchError} = await supabaseClient.from('user_reactions').select().eq('user_id', userId);
 
     if (fetchError) throw fetchError;
 
@@ -35,7 +32,7 @@ export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) 
     // Fetch user reactions along with the assoaciated anime titles from the kitsu_anime_data table
     const {data: reactions, error: fetchError} = await supabaseClient
     .from('user_reactions')
-    .select(`anime_id, reaction, kitsu_anime_data (id, title)`)
+    .select(`anime_id, reaction, kitsu_anime_data (id, title, image_url)`)
     .eq('user_id', userId);
 
 
@@ -45,17 +42,13 @@ export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) 
     return reactions;
 }
 
-export const createUserReaction = async ({anime_id, reaction}) => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData) throw new Error('User not authenticated');
-    if (userError) throw userError;
-
+export const createUserReaction = async ({anime_id, reaction}, supabaseClient, userId) => {
 
     // Validate the reaction type
     if (!Object.values(UserReaction_reaction).includes(reaction)) throw new Error('Invalid reaction type');
     else reaction = UserReaction_reaction[reaction.toUpperCase()];
 
-    const response = await supabase.from('user_reactions').insert({anime_id: anime_id, reaction, user_id: userData.user.id}).select();
+    const response = await supabaseClient.from('user_reactions').insert({anime_id: anime_id, reaction, user_id: userId}).select();
 
     if(!response || response.length == 0) throw new Error('Failed to create user reaction');
     if (response.error) throw response.error;
@@ -64,17 +57,14 @@ export const createUserReaction = async ({anime_id, reaction}) => {
     return response;
 }
 
-export const updateUserReaction = async (reactionId, updatedData) => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const updateUserReaction = async (reactionId, updatedData, supabaseClient) => {
 
     //check if the specific user reaction exists before trying to update it
-    const {data: existingReaction, error: fetchError} = await supabase.from('user_reactions').select().eq('id', reactionId);
+    const {data: existingReaction, error: fetchError} = await supabaseClient.from('user_reactions').select().eq('id', reactionId);
     if (!existingReaction) throw new Error('User reaction does not exist');
     if (fetchError) throw fetchError;
 
-    const response = await supabase.from('user_reactions').update(updatedData).eq('id', reactionId).select();
+    const response = await supabaseClient.from('user_reactions').update(updatedData).eq('id', reactionId).select();
 
     if (!response || response.length === 0) throw new Error('Failed to update user reaction');
     if (response.error) throw response.error;
@@ -82,18 +72,15 @@ export const updateUserReaction = async (reactionId, updatedData) => {
     return response;
 }
 
-export const deleteUserReaction = async (reactionId) => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const deleteUserReaction = async (reactionId, supabaseClient) => {
 
     //check if the specific user reaction exists before trying to delete it
-    const {data: existingReaction, error: fetchError} = await supabase.from('user_reactions').select().eq('id', reactionId);
+    const {data: existingReaction, error: fetchError} = await supabaseClient.from('user_reactions').select().eq('id', reactionId);
     if (!existingReaction) throw new Error('User reaction does not exist');
     if (fetchError) throw fetchError;
 
 
-    const response = await supabase.from('user_reactions').delete().eq('id', reactionId);
+    const response = await supabaseClient.from('user_reactions').delete().eq('id', reactionId);
 
     if(!response || response.length === 0) throw new Error('Failed to delete user reaction');
     if (response.error) throw response.error;
