@@ -15,12 +15,9 @@ const Watchlist_Status = Object.freeze({
     PLAN_TO_WATCH: 'plan_to_watch'
 });
 
-export const fetchWatchlist = async () => {
-    const {data: userData, error: userError} = await supabase.auth.getUser();
-    if (!userData || !userData.user) throw new Error('User not authenticated');
-    if (userError) throw userError;
+export const fetchWatchlist = async (supabaseClient, userId) => {
 
-    const {data: watchList, error: fetchError} = await supabase.from('watchlist').select().eq('user_id', userData.user.id);
+    const {data: watchList, error: fetchError} = await supabaseClient.from('watchlist').select().eq('user_id', userId);
     if (fetchError) throw fetchError;
 
     return watchList;
@@ -102,6 +99,5 @@ export const deleteWatchlistByAnimeId = async (animeId, supabaseClient) => {
     if (fetchError) throw fetchError;
 
     const response = await supabaseClient.from('watchlist').delete().eq('anime_id', animeId);
-    console.log(response);
     return response;
 }

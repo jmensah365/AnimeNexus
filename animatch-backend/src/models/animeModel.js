@@ -63,11 +63,7 @@ export const insertAnimeMetadata = async (supabaseClient, userId) => {
 }
 
 export const fetchAnimeData = async (supabaseClient, userId) => {
-    // const { data: userData, error: userError } = await supabase.auth.getUser();
-    // if (userError) throw userError;
-    // if (!userData || !userData.user) {
-    //     throw new Error('User not authenticated');
-    // }
+
 
     // Limit the number of anime data fetched to 10 for performance reasons
     const {data, error} = await supabaseClient.from('kitsu_anime_data').select().eq('user_id', userId);
@@ -76,4 +72,19 @@ export const fetchAnimeData = async (supabaseClient, userId) => {
     if (!data || data.length === 0) throw new Error('No anime found for this user');
 
     return data;
+}
+
+export const deleteAnimeById = async (supabaseClient, animeId) => {
+    const {data: anime, error: fetchError} = await supabaseClient.from('kitsu_anime_data').select().eq('id', animeId).single();
+    if (!anime) {
+        throw new Error('The anime could not be not found');
+
+        
+    }
+
+    if (fetchError) throw fetchError;
+
+    const response = await supabaseClient.from('kitsu_anime_data').delete().eq('id', animeId);
+
+    return response;
 }
