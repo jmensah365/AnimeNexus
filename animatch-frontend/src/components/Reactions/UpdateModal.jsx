@@ -1,28 +1,25 @@
+import { PencilIcon, XIcon, CheckCircleIcon } from '@phosphor-icons/react';
 import React, { useState, useEffect } from 'react'
-import { PlusCircleIcon, CheckCircleIcon, XIcon } from '@phosphor-icons/react' 
 
-function AddReactionModal({ isOpen, onClose, userAnime, onSubmit, isLoading, isSuccess, resetMutation }) {
-    const [selectedAnime, setSelectedAnime] = useState('')
-    const [selectedReaction, setSelectedReaction] = useState('')
+function UpdateModal({ isOpen, onClose, onSubmit, anime, isLoading, isSuccess, resetMutation }) {
+    const [selectedReaction, setSelectedReaction] = useState('');
 
     useEffect(() => {
         if (isSuccess) {
             const timer = setTimeout(() => handleClose(), 1000)
             return () => clearTimeout(timer)
         }
-    }, [isSuccess])
+    }, [isSuccess]);
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (selectedAnime && selectedReaction) {
-            onSubmit({ anime_id: selectedAnime, reaction: selectedReaction })
-            setSelectedAnime('')
+        if (selectedReaction) {
+            onSubmit(selectedReaction)
             setSelectedReaction('')
         }
     }
 
     const handleClose = () => {
-        setSelectedAnime('')
         setSelectedReaction('')
         resetMutation()
         onClose()
@@ -40,32 +37,18 @@ function AddReactionModal({ isOpen, onClose, userAnime, onSubmit, isLoading, isS
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center z-50 p-4">
+        <div className='fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4'>
             <div className="bg-zinc-900 rounded-xl max-w-md w-full max-h-[65vh] overflow-y-auto border border-zinc-700 mt-10">
                 <div className="flex items-center justify-between p-6 border-b border-zinc-700">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <PlusCircleIcon size={20} />
-                        Add Reaction
+                        <PencilIcon size={20} />
+                        Update {anime?.kitsu_anime_data.title}
                     </h2>
                     <button onClick={handleClose} className="text-gray-400 hover:text-white transition-colors cursor-pointer">
                         <XIcon size={24} />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Select Anime</label>
-                        <select
-                            value={selectedAnime}
-                            onChange={(e) => setSelectedAnime(e.target.value)}
-                            className="w-full bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 max-h-32"
-                            required
-                        >
-                            <option value="">Choose an anime...</option>
-                            {userAnime.map((anime) => (
-                                <option key={anime.id} value={anime.id}>{anime.title}</option>
-                            ))}
-                        </select>
-                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Reaction</label>
                         <div className="grid grid-cols-1 gap-2">
@@ -81,7 +64,7 @@ function AddReactionModal({ isOpen, onClose, userAnime, onSubmit, isLoading, isS
                                     className={`cursor-pointer p-3 rounded-lg text-left transition-all ${selectedReaction === reaction.value
                                         ? `${getReactionColor(reaction.value)} text-white`
                                         : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
-                                    }`}
+                                        }`}
                                 >
                                     {reaction.label}
                                 </button>
@@ -91,23 +74,23 @@ function AddReactionModal({ isOpen, onClose, userAnime, onSubmit, isLoading, isS
                     <div className="flex gap-3 pt-4">
                         <button
                             type="submit"
-                            disabled={!selectedAnime || !selectedReaction || isLoading}
+                            disabled={!selectedReaction || isLoading}
                             className={`flex-1 px-4 py-2 ${isSuccess ? 'bg-green-400' : 'bg-red-600 hover:bg-red-700'} text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer`}
                         >
                             {isSuccess ? (
                                 <>
                                     <CheckCircleIcon size={16} className="text-white" />
-                                    Added!
+                                    Updated!
                                 </>
                             ) : isLoading ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Adding...
+                                    Updating...
                                 </>
                             ) : (
                                 <>
                                     <CheckCircleIcon size={16} />
-                                    Add Reaction
+                                    Update Reaction
                                 </>
                             )}
                         </button>
@@ -118,4 +101,4 @@ function AddReactionModal({ isOpen, onClose, userAnime, onSubmit, isLoading, isS
     )
 }
 
-export default AddReactionModal
+export default UpdateModal

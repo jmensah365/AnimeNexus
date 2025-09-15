@@ -1,4 +1,5 @@
 export const generateAndInsertAnimeMetadata = async (token) => {
+    console.log('here');
         const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/insert-metadata`, {
         method: 'POST',
         headers: {

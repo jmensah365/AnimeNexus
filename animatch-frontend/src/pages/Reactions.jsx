@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom';
 import Sidebar from '../components/Sidebar'
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { useAuth } from '../utils/Auth'
@@ -6,13 +7,14 @@ import { useCreateReaction, useDeleteReaction, useFetchReactionsWithInfo, useUpd
 import { useFetchAnimeFromDB } from '../hooks/useAnime';
 import AddReactionModal from '../components/Reactions/AddReactionModal';
 import StatusSection from '../components/Watchlist/StatusSection';
+import DeleteModal from '../components/Reactions/DeleteModal';
+import UpdateModal from '../components/Reactions/UpdateModal';
 
 function Reactions() {
     const { session } = useAuth();
     const token = session?.access_token;
 
     const { data: reactionData, isSuccess: reactionSuccess } = useFetchReactionsWithInfo(token);
-    console.log(reactionData);
     const { data: userAnime, isSuccess: userAnimeSuccess } = useFetchAnimeFromDB(token);
     const createMutation = useCreateReaction(token);
     const deleteMutation = useDeleteReaction(token);
@@ -20,6 +22,8 @@ function Reactions() {
 
 
     const [showAddModal, setShowAddModal] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [updateTarget, setUpdateTarget] = useState(null);
     const [filter, setFilter] = useState('all');
 
     const filterOptions = [
@@ -63,12 +67,37 @@ function Reactions() {
                         />
                     )}
 
+                    {updateTarget && createPortal(
+                        <UpdateModal
+                            isOpen={!!updateTarget}
+                            anime={updateTarget}
+                            onClose={() => setUpdateTarget(null)}
+                            onSubmit={(reaction) => {
+                                updateMutation.mutate({ anime_id: updateTarget.id, reaction })
+                            }}
+                            isLoading={updateMutation.isPending}
+                            isSuccess={updateMutation.isSuccess}
+                            resetMutation={updateMutation.reset}
+                        />, document.body
+                    )}
+
+                    {deleteTarget && createPortal(
+                        <DeleteModal
+                            isOpen={!!deleteTarget}
+                            anime={deleteTarget}
+                            onClose={() => setDeleteTarget(null)}
+                            onConfirm={() => {
+                                deleteMutation.mutate({ reaction_id: deleteTarget.id })
+                                setDeleteTarget(null)
+                            }}
+                        />, document.body)}
+
                     {filter === 'all'
                         ? Object.entries(grouped || {}).map(([reaction, items]) => (
-                            <StatusSection key={reaction} title={reaction} items={items} onClick={() => { }}  />
+                            <StatusSection key={reaction} title={reaction} items={items} onClick={() => { }} setDeleteTarget={setDeleteTarget} setUpdateTarget={setUpdateTarget} />
                         ))
                         : grouped[filter] && (
-                            <StatusSection title={filter} items={grouped[filter]} onClick={() => { }}  />
+                            <StatusSection title={filter} items={grouped[filter]} onClick={() => { }} setDeleteTarget={setDeleteTarget} setUpdateTarget={setUpdateTarget} />
                         )
                     }
                 </div>

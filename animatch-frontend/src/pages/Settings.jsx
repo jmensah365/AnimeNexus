@@ -8,6 +8,7 @@ import { useAuth } from '../utils/Auth'
 import { useFetchPreferences } from '../hooks/usePreference';
 import { useGenAndInsertAnime } from '../hooks/useAnime';
 import { useGenAndInsetAIRecs } from '../hooks/useAI';
+import { useNavigate } from 'react-router-dom';
 
 // API functions
 const updateEmail = async (newEmail) => {
@@ -76,6 +77,7 @@ const moodMappings = {
 const episodeCounts = ['1-13', '13-26', '26-50+', '50+'];
 
 function Settings() {
+    const navigate = useNavigate();
     //Auth session
     const { session } = useAuth();
     const token = session?.access_token;
@@ -147,7 +149,7 @@ function Settings() {
     });
 
     const genAndInsertAnime = useGenAndInsertAnime(token);
-    const genAndInsertAIRecs = useGenAndInsetAIRecs(token);
+    const genAndInsertAIRecs = useGenAndInsetAIRecs(token, navigate);
 
 
     const preferencesMutation = useMutation({

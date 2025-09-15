@@ -4,7 +4,6 @@ import SignInPage from "./pages/Home/SignInPage.jsx";
 import SignUpPage from "./pages/Home/SignUpPage.jsx";
 import HomePage from "./pages/Home/HomePage.jsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ProtectedRoute from "./utils/Wrapper.jsx";
 import MoreInfo from "./pages/MoreInfo.jsx";
 import AniMatchHome from "./pages/AniMatchHome.jsx";
 import About from "./pages/Home/About.jsx";
@@ -16,6 +15,7 @@ import SettingsPage from "./pages/Settings.jsx";
 import WelcomePage from './pages/WelcomePage.jsx';
 import AuthCallback from "./pages/AuthCallback.jsx";
 import TrendingAnime from "./pages/TrendingAnime.jsx";
+import Reactions from "./pages/Reactions.jsx";
 import { RequireAuth } from "./utils/Auth.jsx";
 
 export const queryClient = new QueryClient();
@@ -39,6 +39,7 @@ function App() {
             <Route path='/anime-recs' element={ <AnimeRecs /> } />
             <Route path='/watchlist' element={ <Watchlist /> } />
             <Route path='/search' element={ <Search /> } />
+            <Route path='/reactions' element={ <Reactions /> } />
             <Route path='/trending' element={ <TrendingAnime /> } />
             <Route path='/settings' element={ <SettingsPage /> } />
           </Route>

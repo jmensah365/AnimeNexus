@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon } from '@phosphor-icons/react'
+import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon, HeartStraightIcon } from '@phosphor-icons/react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
 import { useAuth } from '../utils/Auth'
 import { Tooltip } from 'flowbite-react'
 import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlistByAnimeId } from '../hooks/useWatchlist'
+import { useCreateReaction, useFetchReactionsWithInfo, useDeleteReactionByAnimeId } from '../hooks/useReactions'
 import { useFetchAnimeFromDB } from '../hooks/useAnime'
 
 const SkeletonCard = () => {
@@ -16,8 +17,9 @@ const SkeletonCard = () => {
     )
 };
 
-const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist }) => {
+const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorited, onToggleReaction }) => {
     const [hovered, setHovered] = useState(false);
+    const [reactionHovered, setReactionHovered] = useState(false);
 
     return (
         <div
@@ -60,6 +62,27 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist }) => {
                         />
                     </Tooltip>
                 </div>
+                <div
+                    className="absolute bottom-8 right-4 hover:scale-110 transition-all duration-300 z-50"
+                    onMouseEnter={() => setReactionHovered(true)}
+                    onMouseLeave={() => setReactionHovered(false)}
+                >
+                    <Tooltip
+                        content={isFavorited ? "Remove liked" : "Add like"}
+                        style="light"
+                        placement="left"
+                    >
+                        <HeartStraightIcon
+                            size={24}
+                            color="red"
+                            weight={reactionHovered || isFavorited ? "fill" : "regular"}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleReaction(anime.id, isFavorited);
+                            }}
+                        />
+                    </Tooltip>
+                </div>
             </div>
         </div>
     );
@@ -79,11 +102,12 @@ function AnimeRecs() {
     const [watchlist, setWatchlist] = useState([]);
     const [isWatchlistInitialized, setIsWatchlistInitialized] = useState(false);
 
+
     // Initialize watchlist from backend when data is available
     useEffect(() => {
         if (watchlistSuccess && watchlistWithAnimeInfo && !isWatchlistInitialized) {
             // Extract anime IDs from the backend response
-            const backendWatchlistAnimeIds = watchlistWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id );
+            const backendWatchlistAnimeIds = watchlistWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id);
             setWatchlist(backendWatchlistAnimeIds);
             setIsWatchlistInitialized(true);
             console.log('Watchlist initialized from backend:', backendWatchlistAnimeIds);
@@ -96,21 +120,21 @@ function AnimeRecs() {
             if (isWatchlisted) {
                 // Optimistically update UI first
                 setWatchlist((prev) => prev.filter((id) => id !== animeId));
-                
+
                 // Then call backend
                 await deleteMutation.mutateAsync({ anime_id: animeId });
                 console.log('Removed from watchlist:', animeId);
             } else {
                 // Optimistically update UI first
                 setWatchlist((prev) => [...prev, animeId]);
-                
+
                 // Then call backend
                 await createMutation.mutateAsync({ anime_id: animeId, status: "plan_to_watch" });
                 console.log('Added to watchlist:', animeId);
             }
         } catch (err) {
             console.error("Watchlist update failed:", err);
-            
+
             // Revert optimistic update on error
             if (isWatchlisted) {
                 // If removal failed, add it back
@@ -118,6 +142,61 @@ function AnimeRecs() {
             } else {
                 // If addition failed, remove it
                 setWatchlist((prev) => prev.filter((id) => id !== animeId));
+            }
+        }
+    };
+
+
+    const createReactionMutation = useCreateReaction(session?.access_token);
+    const deleteReactionMutation = useDeleteReactionByAnimeId(session?.access_token);
+
+    // Fetch reactions from backend
+    const { data: reactionsWithAnimeInfo, isSuccess: reactionsSuccess, isLoading: reactionsLoading } = useFetchReactionsWithInfo(session?.access_token);
+
+    // Local watchlist state - will be synced with backend
+    const [reactions, setReactions] = useState([]);
+    const [isReactionsInitialized, setIsReactionsInitialized] = useState(false);
+
+
+    // Initialize reactions from backend when data is available
+    useEffect(() => {
+        if (reactionsSuccess && reactionsWithAnimeInfo && !isReactionsInitialized) {
+            // Extract anime IDs from the backend response
+            const backendReactionAnimeIds = reactionsWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id);
+            setReactions(backendReactionAnimeIds);
+            setIsReactionsInitialized(true);
+            console.log('Reactions initialized from backend:', backendReactionAnimeIds);
+        }
+    }, [reactionsSuccess, reactionsWithAnimeInfo, isReactionsInitialized]);
+
+    // Toggle function with optimistic updates
+    const toggleReaction = async (animeId, isFavorited) => {
+        try {
+            if (isFavorited) {
+                // Optimistically update UI first
+                setReactions((prev) => prev.filter((id) => id !== animeId));
+
+                // Then call backend
+                await deleteReactionMutation.mutateAsync({ anime_id: animeId });
+                console.log('Removed reaction:', animeId);
+            } else {
+                // Optimistically update UI first
+                setReactions((prev) => [...prev, animeId]);
+
+                // Then call backend
+                await createReactionMutation.mutateAsync({ anime_id: animeId, reaction: "liked" });
+                console.log('Added reaction:', animeId);
+            }
+        } catch (err) {
+            console.error("Reaction update failed:", err);
+
+            // Revert optimistic update on error
+            if (isFavorited) {
+                // If removal failed, add it back
+                setReactions((prev) => [...prev, animeId]);
+            } else {
+                // If addition failed, remove it
+                setReactions((prev) => prev.filter((id) => id !== animeId));
             }
         }
     };
@@ -133,7 +212,7 @@ function AnimeRecs() {
     const start = (currentPage - 1) * animePerPage;
     const end = start + animePerPage;
     const slicedData = animeFromDB.data ? animeFromDB.data.anime_data.slice(start, end) : [];
-    
+
     const handleNextPage = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     }
@@ -195,6 +274,8 @@ function AnimeRecs() {
                                     onClick={openModal}
                                     onToggleWatchlist={toggleWatchlist}
                                     isWatchlisted={watchlist.includes(anime.id)}
+                                    isFavorited={reactions.includes(anime.id)}
+                                    onToggleReaction={toggleReaction}
                                 />
                             ))}
                         </div>

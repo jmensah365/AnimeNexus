@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { BookmarkSimpleIcon } from '@phosphor-icons/react'
+import { BookmarkSimpleIcon, HeartStraightIcon} from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimeModal from './AnimeModal'
 import { Tooltip } from 'flowbite-react'
 import { useNavigate } from 'react-router-dom'
 import { useCreateWatchlist, useFetchWatchlistWithInfo, useDeleteWatchlistByAnimeId } from '../../hooks/useWatchlist'
+import { useCreateReaction, useFetchReactionsWithInfo, useDeleteReactionByAnimeId } from '../../hooks/useReactions'
 import { useAuth } from '../../utils/Auth'
 
 
@@ -22,6 +23,7 @@ function MainContentArea({ data, error, success }) {
     const closeModal = () => { setModalData(null); }
 
     const [hovered, setHovered] = useState(false);
+    const [reactionHovered, setReactionHovered] = useState(false);
 
     const navigate = useNavigate();
 
@@ -95,6 +97,60 @@ function MainContentArea({ data, error, success }) {
         }
     };
 
+    const createReactionMutation = useCreateReaction(session?.access_token);
+    const deleteReactionMutation = useDeleteReactionByAnimeId(session?.access_token);
+
+    // Fetch reactions from backend
+    const { data: reactionsWithAnimeInfo, isSuccess: reactionsSuccess, isLoading: reactionsLoading } = useFetchReactionsWithInfo(session?.access_token);
+
+    // Local watchlist state - will be synced with backend
+    const [reactions, setReactions] = useState([]);
+    const [isReactionsInitialized, setIsReactionsInitialized] = useState(false);
+
+
+    // Initialize reactions from backend when data is available
+    useEffect(() => {
+        if (reactionsSuccess && reactionsWithAnimeInfo && !isReactionsInitialized) {
+            // Extract anime IDs from the backend response
+            const backendReactionAnimeIds = reactionsWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id);
+            setReactions(backendReactionAnimeIds);
+            setIsReactionsInitialized(true);
+            console.log('Reactions initialized from backend:', backendReactionAnimeIds);
+        }
+    }, [reactionsSuccess, reactionsWithAnimeInfo, isReactionsInitialized]);
+
+    // Toggle function with optimistic updates
+    const toggleReaction = async (animeId, isFavorited) => {
+        try {
+            if (isFavorited) {
+                // Optimistically update UI first
+                setReactions((prev) => prev.filter((id) => id !== animeId));
+
+                // Then call backend
+                await deleteReactionMutation.mutateAsync({ anime_id: animeId });
+                console.log('Removed reaction:', animeId);
+            } else {
+                // Optimistically update UI first
+                setReactions((prev) => [...prev, animeId]);
+
+                // Then call backend
+                await createReactionMutation.mutateAsync({ anime_id: animeId, reaction: "liked" });
+                console.log('Added reaction:', animeId);
+            }
+        } catch (err) {
+            console.error("Reaction update failed:", err);
+
+            // Revert optimistic update on error
+            if (isFavorited) {
+                // If removal failed, add it back
+                setReactions((prev) => [...prev, animeId]);
+            } else {
+                // If addition failed, remove it
+                setReactions((prev) => prev.filter((id) => id !== animeId));
+            }
+        }
+    };
+
 
 
 
@@ -146,7 +202,28 @@ function MainContentArea({ data, error, success }) {
                                                 weight={hovered || watchlist.includes(anime.id) ? "fill" : "regular"}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    toggleWatchlist(anime.id,  watchlist.includes(anime.id));
+                                                    toggleWatchlist(anime.id, watchlist.includes(anime.id));
+                                                }}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                    <div
+                                        className="absolute bottom-4 right-2 hover:scale-110 transition-all duration-300 z-50"
+                                        onMouseEnter={() => setReactionHovered(true)}
+                                        onMouseLeave={() => setReactionHovered(false)}
+                                    >
+                                        <Tooltip
+                                            content={reactions.includes(anime.id) ? "Remove liked" : "Add like"}
+                                            style="light"
+                                            placement="left"
+                                        >
+                                            <HeartStraightIcon
+                                                size={24}
+                                                color="red"
+                                                weight={reactionHovered || reactions.includes(anime.id) ? "fill" : "regular"}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleReaction(anime.id, reactions.includes(anime.id));
                                                 }}
                                             />
                                         </Tooltip>

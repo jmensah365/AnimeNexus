@@ -34,3 +34,11 @@ export const useDeleteReaction = (token) => {
         onSuccess: () => queryClient.invalidateQueries(['fetchReactionsWithInfo']),
     })
 }
+
+export const useDeleteReactionByAnimeId = (token) => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (animeId) => service.deleteReactionByAnimeId(animeId, token),
+        onSuccess: () => queryClient.invalidateQueries(['fetchReactionsWithInfo']),
+    })
+}

@@ -48,3 +48,16 @@ export const deleteReaction = async ({ reaction_id }, token) => {
     if (!response.ok) throw new Error(await response.text());
     return;
 }
+
+export const deleteReactionByAnimeId = async ({ anime_id }, token) => {
+    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/user-reactions/anime-id/${anime_id}`, {
+        method: 'DELETE',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    return;
+}
