@@ -1,4 +1,4 @@
-import {createUserReaction, fetchUserReactions, updateUserReaction, deleteUserReaction, fetchUserReactionsWithAnimeTitles} from '../models/userReactionModel.js';
+import {createUserReaction, fetchUserReactions, updateUserReaction, deleteUserReaction, fetchUserReactionsWithAnimeTitles, deleteReactionByAnimeId} from '../models/userReactionModel.js';
 
 // This service handles user reactions to anime, allowing users to add, update, delete, and fetch their reactions.
 
@@ -20,4 +20,8 @@ export const updateUserReactionService = async (reactionId, updatedData, supabas
 
 export const removeUserReaction = async (reactionId, supabaseClient) => {
     return await deleteUserReaction(reactionId, supabaseClient);
+}
+
+export const removeReactionByAnimeId = async (animeId, supabaseClient) => {
+    return await deleteReactionByAnimeId(animeId, supabaseClient)
 }

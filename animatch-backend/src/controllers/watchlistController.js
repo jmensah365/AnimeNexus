@@ -1,5 +1,4 @@
 import {getWatchlist, insertWatchlist, removeWatchlist, updateWatchlist, getWatchlistWithAnimeTitles, removeWatchlistByAnimeId} from '../services/watchlistService.js';
-import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 export const getWatchlistController = async (req, res) => {
     try {

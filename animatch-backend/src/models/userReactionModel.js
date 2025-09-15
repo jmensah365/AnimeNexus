@@ -1,12 +1,9 @@
-import supabase from "../config/databaseConfig.js";
+
 
 /* This model handles user reactions to anime. Whether they like, dislike, not interested, or no interaction yet
     A user is able to create, update, fetch, and delete their reactions to anime.
      */
 
-/*
-    Get User is in each function to ensure the user is valid and authenticated before performing any operations.
-*/
 
 //This object helps map the types of reactions a user can have to anime to the ENUM stored in the database.
 const UserReaction_reaction = Object.freeze({
@@ -32,7 +29,7 @@ export const fetchUserReactionsWithAnimeTitles = async (supabaseClient, userId) 
     // Fetch user reactions along with the assoaciated anime titles from the kitsu_anime_data table
     const {data: reactions, error: fetchError} = await supabaseClient
     .from('user_reactions')
-    .select(`anime_id, reaction, kitsu_anime_data (id, title, image_url)`)
+    .select(`id, reaction, kitsu_anime_data (id, title, image_url)`)
     .eq('user_id', userId);
 
 
@@ -85,5 +82,17 @@ export const deleteUserReaction = async (reactionId, supabaseClient) => {
     if(!response || response.length === 0) throw new Error('Failed to delete user reaction');
     if (response.error) throw response.error;
 
+    return response;
+}
+
+export const deleteReactionByAnimeId = async (animeId, supabaseClient) => {
+    
+    //check if specific watchlist exists before trying to delete it
+    const {data: existingReaction, error: fetchError} = await supabaseClient.from('user_reactions').select().eq('anime_id',animeId);
+    //error handling for fetch
+    if (!existingReaction) throw new Error('Reaction does not exist');
+    if (fetchError) throw fetchError;
+
+    const response = await supabaseClient.from('user_reactions').delete().eq('anime_id', animeId);
     return response;
 }

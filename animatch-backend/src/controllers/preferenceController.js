@@ -1,5 +1,4 @@
 import { saveUserPreference, deleteUserPreference, updateUserPreference, fetchUserPreferences, checkPreferenceFormCompletedService, updatePreferenceCheckService } from "../services/preferenceService.js";
-import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
 
 
 export const addPreference = async (req, res) => {
@@ -97,7 +96,7 @@ export const fetchPreferences = async (req, res) => {
     }
 }
 
-export const checkPreferenceFormCompletedController = async (req, res, next) => {
+export const checkPreferenceFormCompletedController = async (req, res) => {
     try {
         const userId = req.user.id;
         const isCompleted = await checkPreferenceFormCompletedService(req.supabase, userId);

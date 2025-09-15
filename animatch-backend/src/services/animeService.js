@@ -139,7 +139,6 @@ export const enrichAnimeWithStreaming = async (animeList) => {
         return animeList.map(anime => {
             const streamingLinks = streamingLinksMap[anime.kitsu_id] || [];
             
-            // Debug logging to help identify issues
             if (!Array.isArray(streamingLinks)) {
                 console.error(`Streaming links for anime ${anime.kitsu_id} is not an array:`, streamingLinks);
                 return {

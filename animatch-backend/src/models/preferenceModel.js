@@ -1,4 +1,4 @@
-import supabase from "../config/databaseConfig.js";
+
 
 /* This model handles collecting and storing a user anime preferences.
     They are able to insert, update, delete, and fetch their preferences.
@@ -7,9 +7,7 @@ import supabase from "../config/databaseConfig.js";
     and updating the preference_survey_completed field in the preference_users table accordingly.
  */
 
-/*
-    Get User is in each function to ensure the user is valid and authenticated before performing any operations.
-*/
+
 
 // Define the anime eras and episode counts so it can map correctly to the ENUM in Supabase
 const Anime_Eras = Object.freeze({
@@ -69,7 +67,6 @@ export const updatePreference = async (supabaseClient, preferenceId, updatedData
         throw fetchError;
     }
 
-    //TODO: Update genres and mood
 
     updatedData.anime_eras = updatedData.anime_eras.map(era => {
         if (!Object.keys(Anime_Eras).includes(era.toUpperCase())) throw new Error('Invalid anime era');

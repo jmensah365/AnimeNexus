@@ -1,10 +1,5 @@
 import { insertAnimeMetadata, fetchAnimeData } from "../models/animeModel.js";
 import { getAnimeListByCategory, getAnimeListByName, getAnimeListByAgeRating, getAnimeListBySeasonYear, getAnimeListByStatus, getAnimeListBySeason, getEpisodesTest,getAllCategories, getTrendingAnime } from "../services/animeService.js";
-import { supabaseAuthMiddleware } from "../middlewares/supabaseMiddleware.js";
-
-/*
-    The supabase auth middleware is used to ensure a user is authenticated before each request in protected routes.
- */
 
 export const fetchAllCategories = async (req, res, next) => {
     try {
@@ -88,13 +83,6 @@ export const fetchAnimeEpisodes = async (req, res) => {
 }
 
 export const addAnimeMetadata = async (req, res, next) => {
-    // const {data: {session}, error} = await supabaseAuthMiddleware(req);
-    // if (error || !session) {
-    //     return res.status(401).json({
-    //         error: true,
-    //         message: 'Unauthorized: Please log in to add preferences'
-    //     });
-    // }
     try{
         const dataToInsert = await insertAnimeMetadata(req.supabase, req.user.id);
         if (!dataToInsert || dataToInsert.length === 0) {

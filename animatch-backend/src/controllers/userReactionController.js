@@ -1,4 +1,4 @@
-import {addUserReaction, getUserReactions, removeUserReaction, updateUserReactionService, getUserReactionsWithAnimeTitles} from '../services/userReactionService.js';
+import {addUserReaction, getUserReactions, removeUserReaction, updateUserReactionService, getUserReactionsWithAnimeTitles, removeReactionByAnimeId} from '../services/userReactionService.js';
 
 export const fetchUserReactionController = async (req, res) => {
 
@@ -47,7 +47,6 @@ export const insertUserReactionController = async (req, res) => {
     if (!reactionData.reaction) throw new Error('Reaction type is required');
 
     try {
-        console.log(req.user.id);
         const response = await addUserReaction(reactionData, req.supabase, req.user.id);
         if(!response || response.length === 0) {
             return res.status(400).json({
@@ -107,6 +106,28 @@ export const deleteUserReactionController = async (req, res) => {
 
     try {
         const response = await removeUserReaction(reactionId, req.supabase);
+
+        if (!response || response.length === 0) return res.status(400).json({error: true, message: 'Failed to delete user reaction'});
+        if (response.error) throw new Error(`Failed to delete user reaction ${response.error}`);
+
+        return res.status(204).json({
+            message: 'User reaction deleted successfully'
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: `Something went wrong: ${error.message}`
+        })
+    }
+}
+export const deleteReactionByAnimeIdController = async (req, res) => {
+    const animeId = req.params.animeId;
+
+    if (!animeId) throw new Error('Anime ID is required');
+
+    try {
+        const response = await removeReactionByAnimeId(animeId, req.supabase);
 
         if (!response || response.length === 0) return res.status(400).json({error: true, message: 'Failed to delete user reaction'});
         if (response.error) throw new Error(`Failed to delete user reaction ${response.error}`);

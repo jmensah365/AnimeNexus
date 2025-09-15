@@ -1,10 +1,7 @@
-import supabase from "../config/databaseConfig.js";
+
 
 /* This model handles a user's watchlist for anime. A user can create, update, fetch, and delete their watchlists. */
 
-/*
-    Get User is in each function to ensure the user is valid and authenticated before performing any operations.
-*/
 
 // This object helps map the types of watchlist status a user can have to the ENUM stored in the database.
 const Watchlist_Status = Object.freeze({

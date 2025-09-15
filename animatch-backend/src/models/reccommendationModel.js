@@ -1,4 +1,4 @@
-import supabase from '../config/databaseConfig.js';
+
 import { generateAIReccommendations } from '../services/reccommendationService.js';
 
 /*

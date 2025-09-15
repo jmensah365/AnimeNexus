@@ -1,5 +1,4 @@
 
-import supabase from '../config/databaseConfig.js'
 import { getAnimeListByCategory, enrichAnimeWithStreaming} from '../services/animeService.js'
 import { fetchPreferences } from './preferenceModel.js'
 
