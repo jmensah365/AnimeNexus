@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query';
+import React from 'react'
 import Sidebar from '../components/Sidebar';
 import { useGetTrendingAnime } from '../hooks/useAnime';
 

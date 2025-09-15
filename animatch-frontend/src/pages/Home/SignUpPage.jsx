@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
-import { data, useNavigate } from 'react-router-dom';
-import { GoogleLogoIcon, FacebookLogoIcon, XIcon, EyeClosedIcon, EyeIcon, CheckIcon } from '@phosphor-icons/react'
+import React, {useState } from 'react';
+import {useNavigate } from 'react-router-dom';
+import { XIcon, EyeClosedIcon, EyeIcon, CheckIcon } from '@phosphor-icons/react'
 import HomeNavBar from '../../components/HomeNavBar.jsx';
 import SuccessCard from '../../components/Cards/SuccessCard.jsx';
 import ErrorCard from '../../components/Cards/ErrorCard.jsx';

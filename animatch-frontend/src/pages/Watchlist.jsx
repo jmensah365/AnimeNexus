@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import Sidebar from '../components/Sidebar'
 import { useFetchWatchlistWithInfo, useCreateWatchlist, useDeleteWatchlist, useUpdateWatchlist } from '../hooks/useWatchlist'

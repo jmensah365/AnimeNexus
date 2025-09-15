@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { XIcon, EyeIcon, EyeSlashIcon, CheckIcon } from '@phosphor-icons/react';
+import { XIcon, EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import Sidebar from '../components/Sidebar';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Alert } from 'flowbite-react'
 import supabase from '../utils/supabaseClient';
 import { useAuth } from '../utils/Auth'

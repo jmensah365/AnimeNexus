@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CaretCircleLeftIcon, CaretCircleRightIcon, PauseIcon, PlayCircleIcon, PlayIcon, ProhibitIcon, SmileySadIcon, XIcon } from '@phosphor-icons/react';
-import StyledButton from '../Buttons/StyledButton';
+import { CaretCircleLeftIcon, CaretCircleRightIcon, PauseIcon, PlayCircleIcon, PlayIcon, SmileySadIcon } from '@phosphor-icons/react';
 
 function Carousel({ data, autoSlide = true, autoSlideInterval = 6000 }) {
     const [currentIndex, setCurrentIndex] = useState(0);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { HouseIcon, SparkleIcon, UserCircleGearIcon, TrendUpIcon, CheckSquareOffsetIcon, SignOutIcon, MagnifyingGlassIcon, TelevisionIcon } from '@phosphor-icons/react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'

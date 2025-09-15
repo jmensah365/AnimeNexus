@@ -1,5 +1,5 @@
 import { XIcon, TrashIcon } from '@phosphor-icons/react'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export default function DeleteModal({ isOpen, onClose, onConfirm, anime }) {
     if (!isOpen) return null

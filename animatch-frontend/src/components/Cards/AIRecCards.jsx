@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { CaretLeftIcon, CaretRightIcon, XCircleIcon, SparkleIcon, StarIcon, CalendarIcon, PlayIcon, TagIcon } from '@phosphor-icons/react';
+import React, {useState } from 'react'
+import { CaretLeftIcon, CaretRightIcon, SparkleIcon, StarIcon, CalendarIcon, PlayIcon, TagIcon } from '@phosphor-icons/react';
 import CloseButton from '../Buttons/CloseButton';
 
 function AIRecCards({ data, error, success }) {

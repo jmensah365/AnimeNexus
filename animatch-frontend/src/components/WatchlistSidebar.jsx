@@ -1,4 +1,3 @@
-import { CheckSquareOffsetIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 import { convertText, getStatusColor } from "../utils/watchlistHelpers";
 export default function WatchlistSidebar({ watchlistWithAnimeInfo }) {

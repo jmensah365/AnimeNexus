@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, {useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GoogleLogoIcon, FacebookLogoIcon, EyeSlashIcon, EyeIcon } from '@phosphor-icons/react'
+import { EyeSlashIcon, EyeIcon } from '@phosphor-icons/react'
 import HomeNavbar from '../../components/HomeNavBar'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import ErrorCard from '../../components/Cards/ErrorCard'
 import GoogleButton from '../../components/Buttons/GoogleButton'
 import supabase from '../../utils/supabaseClient'
 import { useCheckifFormIsCompleted } from '../../hooks/usePreference'
-import { useAuth } from '../../utils/Auth'
 
 const signIn = async ({ email, password }) => {
     const {data, error} = await supabase.auth.signInWithPassword({

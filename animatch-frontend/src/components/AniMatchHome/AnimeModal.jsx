@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon, HouseLineIcon } from '@phosphor-icons/react'
+import React from 'react'
+import { XIcon, CalendarIcon, PlayIcon, TelevisionIcon, UserIcon, StarFourIcon } from '@phosphor-icons/react'
 import { SiCrunchyroll, SiNetflix } from "react-icons/si"
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaPlay } from "react-icons/fa";
 
 const AnimeModal = ({ modalData, onClose }) => {
-    console.log(modalData);
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        if (modalData) {
-            setTimeout(() => setIsVisible(true), 10)
-        }
-    }, [modalData]);
 
     const handleClose = () => {
-        setIsVisible(false);
         setTimeout(onClose, 300);
     }
 

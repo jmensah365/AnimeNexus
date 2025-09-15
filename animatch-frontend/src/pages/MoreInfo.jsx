@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { CheckIcon, XIcon, PlusCircleIcon } from '@phosphor-icons/react';
-import AniMatchLogo from '/AniMatchLogo.png'
-import ShinyText from '../styles/ShinyText';
-import { useMutation } from '@tanstack/react-query';
+import { XIcon } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
-import ErrorCard from '../components/Cards/ErrorCard';
 import { Alert } from 'flowbite-react';
 import { useAuth } from '../utils/Auth';
 import { useInsertPreferences, useUpdateFormCompletionStatus } from '../hooks/usePreference';

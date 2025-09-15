@@ -10,7 +10,6 @@ import About from "./pages/Home/About.jsx";
 import AnimeRecs from "./pages/AnimeRecs.jsx";
 import Watchlist from "./pages/Watchlist.jsx";
 import Search from "./pages/Search.jsx";
-import SearchAniList from "./pages/SearchAniList.jsx";
 import SettingsPage from "./pages/Settings.jsx";
 import WelcomePage from './pages/WelcomePage.jsx';
 import AuthCallback from "./pages/AuthCallback.jsx";

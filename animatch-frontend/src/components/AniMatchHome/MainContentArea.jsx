@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { BookmarkSimpleIcon, HeartStraightIcon} from '@phosphor-icons/react'
-import { motion, AnimatePresence } from 'framer-motion'
 import AnimeModal from './AnimeModal'
 import { Tooltip } from 'flowbite-react'
 import { useNavigate } from 'react-router-dom'

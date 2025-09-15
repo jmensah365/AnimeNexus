@@ -13,7 +13,6 @@ function HomePage() {
     <div className='animate-fade-down animate-delay-200'>
     <HomeNavBar/>
       <div className='flex flex-col items-center justify-center bg-cover bg-center min-h-screen bg-[url(/afro_samurai.webp)] '>
-        {/* <audio src={backgroundMusic} autoPlay loop className='hidden' controls/> */}
           <div className='flex flex-col items-center justify-center'>
             <SplitText
               text="Discover Your Next Anime Adventure"
