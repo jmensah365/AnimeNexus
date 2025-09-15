@@ -39,8 +39,8 @@
 - [x] AI-powered recommendation
 - [x] Get anime from Kitsu API  
 - [x] Add anime trailers/previews
-- [ ] Add streaming links (Crunchyroll, Hulu, Netlix, etc.)  
-- [ ] Recommendation history, likes, watchlist  
+- [x] Add streaming links (Crunchyroll, Hulu, Netlix, etc.)  
+- [x] Recommendation history, likes, watchlist  
 - [ ] Mobile optimization  
 - [ ] Advanced search & filtering by year/genre/season/status  
  
