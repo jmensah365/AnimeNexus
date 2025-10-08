@@ -11,7 +11,7 @@ import reccommendationRoutes from './src/routes/reccommendationRoutes.js';
 
 const app = express();
 
-app.use(cors({origin: process.env.CORS_ORIGIN}));
+app.use(cors({origin: process.env.CORS_ORIGIN_PROD}));
 app.use(express.json());
 app.use(cookieParser());
 
