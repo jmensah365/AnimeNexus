@@ -1,6 +1,6 @@
 export const generateAndInsertAnimeMetadata = async (token) => {
     console.log('here');
-        const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/insert-metadata`, {
+        const response = await fetch(`${import.meta.env.VITE_PROD_URL}/api/anime/insert-metadata`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -13,7 +13,7 @@ export const generateAndInsertAnimeMetadata = async (token) => {
 }
 
 export const fetchKitsuApi = async () => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/status/upcoming`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/api/anime/status/upcoming`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
@@ -34,7 +34,7 @@ export const fetchKitsuApi = async () => {
 }
 
 export const fetchAnimeFromDB = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/get-anime`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/api/anime/get-anime`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const fetchAnimeFromDB = async (token) => {
 }
 
 export const fetchAiRecs = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/recommendations/`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/recommendations/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const fetchAiRecs = async (token) => {
 }
 
 export const getTrendingAnime = async () => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/api/anime/trending?perPage=20&page=1`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/api/anime/trending?perPage=20&page=1`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

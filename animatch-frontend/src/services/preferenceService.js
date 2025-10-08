@@ -1,5 +1,5 @@
 export const checkifFormIsCompleted = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/completed`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/completed`, {
         method: 'GET',
         headers: { 
             'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ export const checkifFormIsCompleted = async (token) => {
 }
 
 export const fetchPreferences = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const fetchPreferences = async (token) => {
 
 export const insertPreferences = async ({ genres, mood, moods, anime_era, episode_count},token) => {
     const finalMoods = mood ? [...moods, mood] : moods
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export const insertPreferences = async ({ genres, mood, moods, anime_era, episod
 
 export const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_counts, preferenceId }, token) => {
     if (mood !== '') moods.push(mood);
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/${preferenceId}`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/${preferenceId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export const updatePreferences = async ({ genres, mood, moods, anime_eras, episo
 };
 
 export const updatePreferenceFormCompletion = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

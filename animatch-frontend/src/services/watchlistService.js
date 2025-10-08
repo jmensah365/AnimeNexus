@@ -1,6 +1,6 @@
 
 export const fetchWatchlistWithInfo = async (token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/with-titles`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/watchlists/with-titles`, {
         method: 'GET',
         headers: { 
             'Content-Type': 'application/json',
@@ -13,7 +13,7 @@ export const fetchWatchlistWithInfo = async (token) => {
 
 
 export const createWatchlist = async ({ anime_id, status }, token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/watchlists/`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export const createWatchlist = async ({ anime_id, status }, token) => {
 }
 
 export const updateWatchlist = async ({ anime_id, status }, token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${anime_id}`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/watchlists/${anime_id}`, {
         method: 'PUT',
         headers: { 
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const updateWatchlist = async ({ anime_id, status }, token) => {
 }
 
 export const deleteWatchlist = async ({ watchlist_id }, token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/${watchlist_id}`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/watchlists/${watchlist_id}`, {
         method: 'DELETE',
         headers: { 
             'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const deleteWatchlist = async ({ watchlist_id }, token) => {
 }
 
 export const deleteWatchlistByAnimeId = async({anime_id}, token) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/watchlists/anime-id/${anime_id}`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/watchlists/anime-id/${anime_id}`, {
         method: 'DELETE',
         headers: { 
             'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ const useSignIn = () => {
 }
 
 // const checkifFormIsCompleted = async (token) => {
-//     const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/completed`, {
+//     const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/completed`, {
 //         method: 'GET',
 //         headers: { 
 //             'Content-Type': 'application/json',

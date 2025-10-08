@@ -32,7 +32,7 @@ const updatePassword = async (newPassword) => {
 
 const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_counts, preferenceId }, token) => {
     if (mood !== '') moods.push(mood);
-    const response = await fetch(`${import.meta.env.VITE_LOCAL_URL}/preferences/${preferenceId}`, {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/${preferenceId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
