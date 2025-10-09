@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignInPage from "./pages/Home/SignInPage.jsx";
 import SignUpPage from "./pages/Home/SignUpPage.jsx";
@@ -19,7 +19,16 @@ import { RequireAuth } from "./utils/Auth.jsx";
 
 export const queryClient = new QueryClient();
 
+
+
 function App() {
+
+    useEffect(() => {
+      console.log("=== Backend URL Check ===");
+      console.log("process.env.REACT_APP_BACKEND_URL:", process.env.VITE_PROD_URL);
+      console.log("Using fetch URL:", `${process.env.VITE_PROD_URL}/preferences/completed`);
+    }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
 
