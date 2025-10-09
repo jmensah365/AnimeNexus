@@ -1,4 +1,4 @@
-console.log(`${import.meta.env.VITE_PROD_URL}`);
+
 export const checkifFormIsCompleted = async (token) => {
     const response = await fetch(`${import.meta.env.VITE_PROD_URL}/preferences/completed`, {
         method: 'GET',

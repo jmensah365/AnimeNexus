@@ -23,11 +23,6 @@ export const queryClient = new QueryClient();
 
 function App() {
 
-    useEffect(() => {
-      console.log("=== Backend URL Check ===");
-      console.log("process.env.REACT_APP_BACKEND_URL:", process.env.VITE_PROD_URL);
-      console.log("Using fetch URL:", `${process.env.VITE_PROD_URL}/preferences/completed`);
-    }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
