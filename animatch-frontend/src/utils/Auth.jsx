@@ -42,7 +42,7 @@ export function useAuth() {
 }
 
 export function RequireAuth({redirectTo}) {
-    const {user, session, loading} = useAuth();
+    const {session, loading} = useAuth();
 
     if (loading) {
         return <WelcomePage/>;
