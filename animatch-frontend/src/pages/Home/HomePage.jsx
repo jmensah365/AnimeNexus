@@ -10,13 +10,13 @@ import SplitText from '../../styles/SplitText'
 function HomePage() {
   return (
     <>
-    <div className='animate-fade-down animate-delay-200'>
-    <HomeNavBar/>
-      <div className='flex flex-col items-center justify-center bg-cover bg-center min-h-screen bg-[url(/afro_samurai.webp)] '>
-          <div className='flex flex-col items-center justify-center'>
+      <div className='animate-fade-down animate-delay-200 bg-cover bg-center min-h-screen bg-[url(/afro_samurai.webp)]'>
+        <HomeNavBar/>
+        <div className='flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8'>
+          <div className='flex flex-col items-center justify-center max-w-4xl mx-auto'>
             <SplitText
               text="Discover Your Next Anime Adventure"
-              className="text-4xl font-semibold text-center mb-8 "
+              className=" text-2xl sm:text-4xl md:text-4xl lg:text-4xl font-semibold text-center mb-6 sm:mb-8 px-4"
               delay={70}
               duration={0.3}
               ease="power3.out"
@@ -31,15 +31,15 @@ function HomePage() {
           {/* Overview Section */}
           <AniMatchOverview />
           {/* Login/Signup Section */}
-          <div className='flex flex-row items-center justify-center gap-4 md:gap-10'>
+          <div className='flex flex-row items-center justify-center gap-3 sm:gap-4 md:gap-10 w-full px-4 max-w-md sm:max-w-none'>
             <LoginButton />
             <SignUpButton />
           </div>
-          </div>
+        </div>
 
-          {/* How It Works Section */}
-          <HowItWorks />
-          </div>
+        {/* How It Works Section */}
+        <HowItWorks />
+      </div>
     </>
   )
 }

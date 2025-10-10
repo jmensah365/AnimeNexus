@@ -1,10 +1,29 @@
 import React from 'react'
 import StyledButton from './Buttons/StyledButton'
+import { Button, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "flowbite-react";
 
 function HomeNavBar() {
     return (
         <>
-            <nav class="bg-transparent fixed w-full z-20 top-0 start-0 left-0">
+            <Navbar fluid className='!bg-transparent'>
+                <NavbarBrand className='rtl:space-x-reverse'>
+                    <a href='/' className='flex items-center space-x-1 h-10 md:h-15'>
+                        <img src={'/AniMatchLogo2.png'} class="h-14" alt="AniMatch Logo" />
+                        <span class="self-center text-2xl font-semibold whitespace-nowrap text-black">AniMatch</span>
+                    </a>
+                </NavbarBrand>
+                <div className='flex md:order-2'>
+                    <StyledButton Text='Get Started' />
+                    <NavbarToggle />
+                </div>
+                <NavbarCollapse>
+                    <NavbarLink href="/" className='text-lg !text-black hover:underline'>
+                        Home
+                    </NavbarLink>
+                    <NavbarLink href="/about" className='text-lg !text-black hover:underline'>About</NavbarLink>
+                </NavbarCollapse>
+            </Navbar >
+            {/* <nav class="bg-transparent fixed w-full z-20 top-0 start-0 left-0">
                 <div class="max-w-screen flex flex-wrap items-center justify-between mx-auto p-4 px-8">
                     <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
                         <img src={'/AniMatchLogo2.png'} class="h-14" alt="OncoTrials Logo"/>
@@ -30,7 +49,7 @@ function HomeNavBar() {
                         </ul>
                     </div>
                 </div>
-            </nav>
+            </nav> */}
         </>
     )
 }
