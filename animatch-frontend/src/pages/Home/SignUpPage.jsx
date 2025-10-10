@@ -81,9 +81,9 @@ function SignUpPage() {
 
     return (
         <>
-            <div className='animate-fade-down'>
+            <div className='animate-fade-down  min-h-screen bg-cover bg-center bg-[url(/samurai-champloo-1.jpg)]'>
                 <HomeNavBar />
-                <div className='flex items-center justify-center  min-h-screen bg-cover bg-center bg-[url(/samurai-champloo-1.jpg)]'>
+                <div className='flex items-center justify-center'>
                     <div className='flex flex-col items-center justify-center bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-8 w-[375px] mt-10'>
                         <h2 className='text-black text-3xl mb-5'>Welcome To Animatch!</h2>
                         <div className='space-y-2'>

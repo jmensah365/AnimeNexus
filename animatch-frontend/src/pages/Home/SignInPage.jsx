@@ -96,9 +96,9 @@ function SignInPage() {
     }
     return (
         <>
-            <div className='animate-fade-down'>
+            <div className='animate-fade-down min-h-screen bg-cover bg-center bg-[url(/samurai-champloo-2.jpg)]'>
                 <HomeNavbar />
-                <div className='flex justify-center items-center min-h-screen bg-cover bg-center bg-[url(/samurai-champloo-2.jpg)]'>
+                <div className='flex justify-center items-center mt-20'>
                     <div className='flex flex-col items-center justify-center bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-8 w-[350px]'>
                         <h2 className='text-black text-3xl mb-5'>
                             Welcome Back!
@@ -144,7 +144,6 @@ function SignInPage() {
                                 <hr className="flex-grow border-zinc-200 dark:border-zinc-700" />
                             </div>
                             <div className='flex flex-row gap-5 justify-center'>
-                                {/* <GoogleOAuth handleGoogleSignIn={handleGoogleSignIn} /> */}
                                 <GoogleButton onClick={handleGoogleSignUp}/>
                             </div>
                             <p className='text-black'>Haven't signed up? <a onClick={() => navigateTo('/register')} className='text-black hover:underline cursor-pointer'>Sign up!</a></p>
