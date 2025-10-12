@@ -31,7 +31,7 @@ function Sidebar() {
     }
 
     return (
-        <div className="w-64 bg-black border-r border-gray-800 p-3.5 hidden lg:block">
+        <div className="w-64 bg-black border-r border-gray-800 p-3.5">
             {/* Menu Section */}
             <div className="mb-8">
                 <div className='flex flex-row mb-8 items-center justify-start space-x-3'>

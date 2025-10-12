@@ -16,7 +16,7 @@ function HomePage() {
           <div className='flex flex-col items-center justify-center max-w-4xl mx-auto'>
             <SplitText
               text="Discover Your Next Anime Adventure"
-              className=" text-xl sm:text-4xl md:text-4xl lg:text-4xl font-semibold text-center mb-6 sm:mb-8 px-4"
+              className=" text-lg sm:text-4xl md:text-4xl lg:text-4xl font-semibold text-center mb-6 sm:mb-8 px-4"
               delay={70}
               duration={0.3}
               ease="power3.out"
