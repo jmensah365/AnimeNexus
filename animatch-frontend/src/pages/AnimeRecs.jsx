@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon, HeartStraightIcon } from '@phosphor-icons/react'
+import { SparkleIcon, CaretLeftIcon, CaretRightIcon, BookmarkSimpleIcon, HeartStraightIcon, ListIcon } from '@phosphor-icons/react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import AnimeModal from '../components/AniMatchHome/AnimeModal'
@@ -91,6 +91,7 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
 function AnimeRecs() {
     const { session } = useAuth();
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const deleteMutation = useDeleteWatchlistByAnimeId(session?.access_token);
     const createMutation = useCreateWatchlist(session?.access_token);
@@ -206,7 +207,24 @@ function AnimeRecs() {
     const animeFromDB = useFetchAnimeFromDB(session?.access_token);
 
     // Pagination
-    const animePerPage = 24;
+    // Dynamically set number of anime per page based on screen width
+    const getAnimePerPage = () => {
+        if (window.innerWidth < 640) return 6; // mobile (sm)
+        if (window.innerWidth < 1024) return 12; // tablet (md)
+        return 24; // desktop (lg+)
+    };
+
+    const [animePerPage, setAnimePerPage] = useState(getAnimePerPage());
+
+    // Update on window resize
+    useEffect(() => {
+        const handleResize = () => {
+            setAnimePerPage(getAnimePerPage());
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = Math.ceil(animeFromDB?.data?.anime_data.length / animePerPage);
     const start = (currentPage - 1) * animePerPage;
@@ -255,55 +273,83 @@ function AnimeRecs() {
 
     return (
         <>
-            <div className='flex min-h-screen bg-black'>
-                {/* Sidebar */}
-                <Sidebar />
-                <div className='flex flex-1 p-4 sm:p-6'>
-                    <div className='flex-1'>
-                        <h1 className='text-xl sm:text-3xl text-white font-bold p-6 inline-flex gap-1.5'>
-                            Anime Recommendations <SparkleIcon />
+            <div className='flex min-h-screen bg-black text-white relative overflow-hidden'>
+                <div
+                    className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
+                >
+                    <Sidebar mobile={true} />
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                {/* 🔹 Desktop Sidebar */}
+                <div className="hidden lg:block">
+                    <Sidebar />
+                </div>
+
+                <div className='flex-1 p-4 sm:p-6'>
+                    <div className='flex items-center justify-between mb-4 lg:hidden'>
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                            <ListIcon size={24} color="white" />
+                        </button>
+                        <h1 className="text-xl font-bold flex items-center gap-1">
+                            Anime Recs <SparkleIcon size={18} />
                         </h1>
-                        <div className='grid grid-cols-1 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-                            {isLoading && Array.from({ length: animePerPage }).map((_, i) => (
-                                <SkeletonCard key={i} />
-                            ))}
-                            {animeFromDB.isSuccess && slicedData.map((anime) => (
-                                <AnimeCard
-                                    key={anime.id}
-                                    anime={anime}
-                                    onClick={openModal}
-                                    onToggleWatchlist={toggleWatchlist}
-                                    isWatchlisted={watchlist.includes(anime.id)}
-                                    isFavorited={reactions.includes(anime.id)}
-                                    onToggleReaction={toggleReaction}
-                                />
-                            ))}
-                        </div>
-                        {/* Pagination */}
-                        {animeFromDB.isSuccess && (
-                            <div className="flex justify-between items-center mt-6 px-2">
-                                <button
-                                    onClick={handlePrevPage}
-                                    disabled={currentPage === 1}
-                                    className="p-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-pointer hover:scale-105 duration-300"
-                                    aria-label="Previous page"
-                                >
-                                    <CaretLeftIcon size={20} color='white' />
-                                </button>
-                                <span className="text-sm text-gray-400">
-                                    Page {currentPage} of {totalPages}
-                                </span>
-                                <button
-                                    onClick={handleNextPage}
-                                    disabled={currentPage === totalPages}
-                                    className="p-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-pointer hover:scale-105 duration-300"
-                                    aria-label="Next page"
-                                >
-                                    <CaretRightIcon size={20} color='white' />
-                                </button>
-                            </div>
-                        )}
                     </div>
+
+                    {/* Desktop Title */}
+                    <h1 className="hidden lg:inline-flex text-3xl text-white font-bold p-6 gap-2">
+                        Anime Recommendations <SparkleIcon size={24} />
+                    </h1>
+
+                    <div className='grid grid-cols-1 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+                        {isLoading && Array.from({ length: animePerPage }).map((_, i) => (
+                            <SkeletonCard key={i} />
+                        ))}
+                        {animeFromDB.isSuccess && slicedData.map((anime) => (
+                            <AnimeCard
+                                key={anime.id}
+                                anime={anime}
+                                onClick={openModal}
+                                onToggleWatchlist={toggleWatchlist}
+                                isWatchlisted={watchlist.includes(anime.id)}
+                                isFavorited={reactions.includes(anime.id)}
+                                onToggleReaction={toggleReaction}
+                            />
+                        ))}
+                    </div>
+                    {/* Pagination */}
+                    {animeFromDB.isSuccess && (
+                        <div className="flex justify-between items-center mt-6 px-2">
+                            <button
+                                onClick={handlePrevPage}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-pointer hover:scale-105 duration-300"
+                                aria-label="Previous page"
+                            >
+                                <CaretLeftIcon size={20} color='white' />
+                            </button>
+                            <span className="text-sm text-gray-400">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={handleNextPage}
+                                disabled={currentPage === totalPages}
+                                className="p-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black cursor-pointer hover:scale-105 duration-300"
+                                aria-label="Next page"
+                            >
+                                <CaretRightIcon size={20} color='white' />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
             {modalData && (
