@@ -241,9 +241,9 @@ function MainContentArea({ data, error, success }) {
                     See All
                 </button>
             </div>
-            <div className='flex items-center justify-center'>
+            {/* <div className='flex items-center justify-center'>
                 <h1>Spin-The-Wheel</h1>
-            </div>
+            </div> */}
             {modalData && createPortal(
                 <AnimeModal modalData={modalData} onClose={closeModal} />, document.body
             )}
