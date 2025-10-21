@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom';
 import Sidebar from '../components/Sidebar'
-import { PlusCircleIcon } from '@phosphor-icons/react';
+import { PlusCircleIcon, ListIcon } from '@phosphor-icons/react';
 import { useAuth } from '../utils/Auth'
 import { useCreateReaction, useDeleteReaction, useFetchReactionsWithInfo, useUpdateReaction } from '../hooks/useReactions';
 import { useFetchAnimeFromDB } from '../hooks/useAnime';
@@ -21,6 +21,7 @@ function Reactions() {
     const updateMutation = useUpdateReaction(token);
 
 
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [updateTarget, setUpdateTarget] = useState(null);
@@ -41,10 +42,33 @@ function Reactions() {
 
     return (
         <div className='flex animate-fade-down bg-black min-h-screen'>
-            <Sidebar />
+            {/* Mobile Sidebar */}
+            <div
+                className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
+            >
+                <Sidebar />
+                <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
+                >
+                    ✕
+                </button>
+            </div>
+
+            {/* Sidebar for Desktop */}
+            <div className="hidden lg:block">
+                <Sidebar />
+            </div>
             <div className='flex flex-1 p-4 sm:p-6'>
                 <div className='flex-1'>
                     <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6'>
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                            <ListIcon size={24} color="white" />
+                        </button>
                         <h1 className='text-white text-xl sm:text-3xl p-6 font-bold'>
                             My Reactions
                         </h1>

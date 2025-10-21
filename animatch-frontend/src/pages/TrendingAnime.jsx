@@ -93,7 +93,7 @@ function TrendingAnime() {
                 <div className='flex-1 space-y-2'>
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                         <ListIcon size={24} color="white" />
                     </button>
