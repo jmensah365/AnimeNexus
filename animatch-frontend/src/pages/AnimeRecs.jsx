@@ -284,7 +284,7 @@ function AnimeRecs() {
                     className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                         } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
                 >
-                    <Sidebar mobile={true} />
+                    <Sidebar  />
                     <button
                         onClick={() => setSidebarOpen(false)}
                         className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
@@ -293,7 +293,7 @@ function AnimeRecs() {
                     </button>
                 </div>
 
-                {/* 🔹 Desktop Sidebar */}
+                {/*  Desktop Sidebar */}
                 <div className="hidden lg:block">
                     <Sidebar />
                 </div>

@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar';
 import { useGetTrendingAnime } from '../hooks/useAnime';
+import { ListIcon } from '@phosphor-icons/react';
 
 
 const SkeletonCard = () => {
@@ -21,6 +22,7 @@ function timeAgo(date) {
 
 function TrendingAnime() {
     const getTrendingAnime = useGetTrendingAnime();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
 
@@ -58,7 +60,7 @@ function TrendingAnime() {
                         className='aspect-auto w-full h-96 rounded-sm object-cover transition-all duration-300  cursor-pointer'
                         loading='lazy' />
                 </div>
-    
+
                 <div className='absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6'>
                     <h2 className='text-red-400 font-medium text-2xl leading-tight'>{anime.title.english}</h2>
                     {/* <p className='text-white'>{anime.episode_count} Episodes</p> */}
@@ -70,10 +72,33 @@ function TrendingAnime() {
 
     return (
         <div className='flex animate-fade-down bg-black min-h-screen'>
-            <Sidebar />
+            <div
+                className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
+            >
+                <Sidebar />
+                <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
+                >
+                    ✕
+                </button>
+            </div>
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block">
+                <Sidebar />
+            </div>
+
             <div className='flex flex-1 p-4 sm:p-6'>
                 <div className='flex-1 space-y-2'>
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                        <ListIcon size={24} color="white" />
+                    </button>
                     <h1 className='text-white text-xl sm:text-3xl'>Trending Anime</h1>
+
                     <p className='text-sm text-white'>
                         Last updated {timeAgo(cachedAt)}. Next refresh is at {new Date(expiresAt).toLocaleString()}
                     </p>
@@ -82,12 +107,12 @@ function TrendingAnime() {
                             <SkeletonCard key={i} />
                         ))}
                         {getTrendingAnime.isSuccess && getTrendingAnime.data.map((anime) => (
-                                <AnimeCard
-                                    key={anime.id}
-                                    anime={anime}
-                                    // onClick={openModal}
-                                />
-                            ))}
+                            <AnimeCard
+                                key={anime.id}
+                                anime={anime}
+                            // onClick={openModal}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
