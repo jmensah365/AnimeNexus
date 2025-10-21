@@ -232,10 +232,16 @@ function AnimeRecs() {
     const slicedData = animeFromDB.data ? animeFromDB.data.anime_data.slice(start, end) : [];
 
     const handleNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
     }
     const handlePrevPage = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
     }
 
     const openModal = (anime) => { setModalData(anime); }
