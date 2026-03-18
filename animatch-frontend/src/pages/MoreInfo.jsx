@@ -74,22 +74,21 @@ export default function AnimePreferencesForm() {
     };
 
     return (
-        <div className="min-h-screen bg-[url(/the-climber-1.jpg)] bg-contain bg-center flex items-center justify-center py-10 animate-fade-up">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
-                <div className='flex flex-row items-center justify-center'>
-                    {/* <img src={AniMatchLogo}  className='h-12 w-12' alt='AniMatch Logo'/> */}
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Anime Preferences</h1>
-                </div>
+        <div className="min-h-screen bg-[url('/the-climber-1.jpg')] bg-cover bg-center flex items-center justify-center py-6 sm:py-10 px-4">
+            <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 w-full max-w-md sm:max-w-3xl animate-fade-up">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">
+                    Anime Preferences
+                </h1>
 
-                <form className="space-y-6" id='form' method='POST' onSubmit={handleSubmit}>
+                <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
                     {/* Genre Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Genres</label>
+                        <label className="block text-sm font-semibold text-gray-700">Genres</label>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {genres.map((genre) => (
                                 <span
                                     key={genre}
-                                    className="flex items-center rounded-full px-3 py-1 bg-red-500"
+                                    className="flex items-center rounded-full px-3 py-1 bg-red-500 text-white text-xs sm:text-sm"
                                 >
                                     {genre}
                                     <XIcon
@@ -99,9 +98,9 @@ export default function AnimePreferencesForm() {
                                 </span>
                             ))}
                         </div>
-                        <div className="relative mt-2">
+                        <div className="relative mt-3">
                             <select
-                                className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm"
+                                className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm sm:text-base py-2 px-3"
                                 onChange={(e) => {
                                     handleAddGenre(e.target.value);
                                     e.target.value = '';
@@ -117,38 +116,40 @@ export default function AnimePreferencesForm() {
                         </div>
                     </div>
 
-                    {/* Mood Input */}
+                    {/* Mood Selection */}
                     <div>
-                            <label className="block text-sm font-medium text-black">Mood</label>
-                            <div className="grid grid-cols-2 gap-2 mt-2">
-                                {Object.entries(moodMappings).map(([label, mood]) => (
-                                    <label key={mood} className="flex items-center space-x-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={moods.includes(mood)}
-                                            onChange={() => handleCheckboxChange(setMoods, mood)}
-                                            className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
-                                        />
-                                        <span className="text-sm text-black">{label}</span>
-                                    </label>
-                                ))}
-                            </div>
+                        <label className="block text-sm font-semibold text-gray-700">Mood</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                            {Object.entries(moodMappings).map(([label, mood]) => (
+                                <label key={mood} className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={moods.includes(mood)}
+                                        onChange={() => handleCheckboxChange(setMoods, mood)}
+                                        className="text-red-500 focus:ring-red-500 border-gray-300 rounded"
+                                    />
+                                    <span className="text-sm text-gray-700">{label}</span>
+                                </label>
+                            ))}
                         </div>
+                    </div>
+
+                    {/* Mood Text Input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Mood</label>
+                        <label className="block text-sm font-semibold text-gray-700">Describe your mood</label>
                         <input
                             type="text"
                             value={mood}
                             onChange={(e) => setMood(e.target.value)}
-                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm px-3 py-2"
-                            placeholder="Describe your mood... (optional)"
+                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm sm:text-base px-3 py-2"
+                            placeholder="Feeling chill? Hype? Thoughtful?"
                         />
                     </div>
 
                     {/* Anime Era Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Anime Era</label>
-                        <div className="grid grid-cols-2 gap-2 mt-2">
+                        <label className="block text-sm font-semibold text-gray-700">Anime Era</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                             {Object.entries(animeErasMapping).map(([label, era]) => (
                                 <label key={era} className="flex items-center space-x-2">
                                     <input
@@ -163,10 +164,10 @@ export default function AnimePreferencesForm() {
                         </div>
                     </div>
 
-                    {/* Episode Count Selection */}
+                    {/* Episode Count */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Episode Count</label>
-                        <div className="grid grid-cols-2 gap-2 mt-2">
+                        <label className="block text-sm font-semibold text-gray-700">Episode Count</label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
                             {episodeCounts.map((count) => (
                                 <label key={count} className="flex items-center space-x-2">
                                     <input
@@ -183,17 +184,18 @@ export default function AnimePreferencesForm() {
 
                     {/* Submit Button */}
                     <button
-                        id='submitBtn'
                         type="submit"
-                        className="w-full py-2 px-4 bg-gradient-to-br from-red-500 to-red-700 cursor-pointer hover:scale-102 transtion-all duration-500 text-white text-sm font-medium rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        className="w-full py-2.5 sm:py-3 px-4 bg-gradient-to-br from-red-500 to-red-700 hover:scale-[1.02] transition-all duration-300 text-white text-sm sm:text-base font-semibold rounded-md shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                         {insertPreferencesMutation.isPending ? 'Submitting Preferences...' : 'Submit Preferences'}
                     </button>
                 </form>
-                {insertPreferencesMutation.isError &&
-                    <Alert color='failure'>
+
+                {insertPreferencesMutation.isError && (
+                    <Alert color="failure" className="mt-4 text-sm">
                         {errorMessage}
-                    </Alert>}
+                    </Alert>
+                )}
             </div>
         </div>
     );
