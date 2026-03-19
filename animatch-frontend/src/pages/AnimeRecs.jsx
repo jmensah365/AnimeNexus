@@ -279,7 +279,7 @@ function AnimeRecs() {
 
     return (
         <>
-            <div className='flex min-h-screen bg-black text-white relative overflow-hidden'>
+            <div className='flex min-h-[100dvh] bg-black text-white relative overflow-hidden'>
                 <div
                     className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                         } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
