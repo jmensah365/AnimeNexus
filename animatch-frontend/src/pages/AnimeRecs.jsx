@@ -279,7 +279,7 @@ function AnimeRecs() {
 
     return (
         <>
-            <div className='flex min-h-[100dvh] bg-black text-white relative overflow-hidden'>
+            <div className='flex flex-col min-h-[100dvh] bg-black text-white relative overflow-hidden'>
                 <div
                     className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                         } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
@@ -298,7 +298,7 @@ function AnimeRecs() {
                     <Sidebar />
                 </div>
 
-                <div className='flex-1 p-4 sm:p-6'>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
                     <div className='flex items-center justify-between mb-4 lg:hidden'>
                         <button
                             onClick={() => setSidebarOpen(true)}
