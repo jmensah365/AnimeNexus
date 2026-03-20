@@ -6,6 +6,7 @@ import SignUpButton from '../../components/Buttons/SignUpButton'
 import '../../App.css'
 import HomeNavBar from '../../components/HomeNavBar'
 import SplitText from '../../styles/SplitText'
+import { Footer, FooterCopyright, FooterLink, FooterLinkGroup } from 'flowbite-react'
 
 function HomePage() {
   return (
@@ -40,6 +41,14 @@ function HomePage() {
         {/* How It Works Section */}
         <HowItWorks />
       </div>
+      <Footer container>
+      <FooterCopyright href="/home" by="Animatch™" year={2025} />
+      <FooterLinkGroup>
+        <FooterLink href="/about">About</FooterLink>
+        <FooterLink href="/privacy">Privacy Policy</FooterLink>
+        <FooterLink href="/terms">Terms & Conditions</FooterLink>
+      </FooterLinkGroup>
+    </Footer>
     </>
   )
 }

@@ -16,6 +16,8 @@ import AuthCallback from "./pages/AuthCallback.jsx";
 import TrendingAnime from "./pages/TrendingAnime.jsx";
 import Reactions from "./pages/Reactions.jsx";
 import { RequireAuth } from "./utils/Auth.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import TermsOfService from "./pages/TermsOfService.jsx";
 
 export const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ function App() {
           <Route path='/login' element={<SignInPage />} />
           <Route path='/register' element={<SignUpPage />} />
           <Route path='/about' element={<About />} />
+          <Route path='/privacy' element={<PrivacyPolicy/>} />
+          <Route path='/terms' element={<TermsOfService/>} />
           <Route path='/auth/callback' element={<AuthCallback />} />
 
           <Route element={<RequireAuth redirectTo={'/login'} />}>
