@@ -12,7 +12,7 @@ function HomePage() {
   return (
     <>
       <div className='animate-fade-down animate-delay-200 bg-cover bg-center min-h-screen bg-[url(/afro_samurai.webp)]'>
-        <HomeNavBar/>
+        <HomeNavBar />
         <div className='flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8'>
           <div className='flex flex-col items-center justify-center max-w-4xl mx-auto'>
             <SplitText
@@ -41,14 +41,14 @@ function HomePage() {
         {/* How It Works Section */}
         <HowItWorks />
       </div>
-      <Footer container>
-      <FooterCopyright href="/home" by="Animatch™" year={2025} />
-      <FooterLinkGroup>
-        <FooterLink href="/about">About</FooterLink>
-        <FooterLink href="/privacy">Privacy Policy</FooterLink>
-        <FooterLink href="/terms">Terms & Conditions</FooterLink>
-      </FooterLinkGroup>
-    </Footer>
+      <Footer container className='!bg-transparent'>
+        <FooterCopyright className='!text-black' href="/home" by="Animatch™" year={2025} />
+        <FooterLinkGroup className='!text-black'>
+          <FooterLink href="/about">About</FooterLink>
+          <FooterLink href="/privacy">Privacy Policy</FooterLink>
+          <FooterLink href="/terms">Terms & Conditions</FooterLink>
+        </FooterLinkGroup>
+      </Footer>
     </>
   )
 }
