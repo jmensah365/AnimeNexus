@@ -35,11 +35,11 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
                     loading="lazy"
                 />
 
-                {/* Gradient for readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Top gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent" />
 
-                {/* Title overlay */}
-                <h2 className="absolute bottom-3 left-3 right-3 text-white font-semibold text-lg leading-tight line-clamp-2">
+                {/* Title at top */}
+                <h2 className="absolute top-3 left-3 right-3 text-white font-semibold text-lg leading-tight line-clamp-2">
                     {anime.title}
                 </h2>
             </div>
