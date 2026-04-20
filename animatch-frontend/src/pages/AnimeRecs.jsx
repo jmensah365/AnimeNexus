@@ -27,6 +27,7 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
             onClick={() => onClick(anime)}
             className="relative p-2 group cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-red-600/70"
         >
+            <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
             <div className="overflow-hidden mb-3">
                 <img
                     src={anime.image_url}
@@ -35,7 +36,6 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
                     loading="lazy"
                 />
             </div>
-            <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
             <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6">
                 <p className="text-white">{anime.episode_count} Episodes</p>
                 <p className="text-white">{anime.synopsis.slice(0, 100)}...</p>
