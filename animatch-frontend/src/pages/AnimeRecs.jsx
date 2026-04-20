@@ -43,9 +43,9 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
                     {anime.title}
                 </h2>
             </div>
-            <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6">
+            <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col pt-16 px-4 pb-6">
                 <p className="text-white">{anime.episode_count} Episodes</p>
-                <p className="text-white">{anime.synopsis.slice(0, 100)}...</p>
+                <p className="text-white leading-snug line-clamp-4">{anime.synopsis.slice(0, 100)}...</p>
 
                 <div
                     className="absolute bottom-8 left-4 hover:scale-110 transition-all duration-300 z-50"
