@@ -88,20 +88,20 @@ function AniMatchHome() {
             {/* --- Main Content Area --- */}
             <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
                 {/* Carousel Section */}
-                <Carousel data={kitsuAPIQuery.data} autoSlide={true} autoSlideInterval={6000} />
+                <Carousel data={kitsuAPIQuery?.data} autoSlide={true} autoSlideInterval={6000} />
 
                 {/* AI Recommendations */}
                 <AIRecCards
-                    data={AIRecsQuery.data}
-                    error={AIRecsQuery.isError}
-                    success={AIRecsQuery.isSuccess}
+                    data={AIRecsQuery?.data}
+                    error={AIRecsQuery?.isError}
+                    success={AIRecsQuery?.isSuccess}
                 />
 
                 {/* Anime Cards based on preferences */}
                 <MainContentArea
-                    data={databaseAnimeQuery.data}
-                    error={databaseAnimeQuery.isError}
-                    success={databaseAnimeQuery.isSuccess}
+                    data={databaseAnimeQuery?.data}
+                    error={databaseAnimeQuery?.isError}
+                    success={databaseAnimeQuery?.isSuccess}
                 />
             </div>
 
