@@ -24,7 +24,7 @@ function WelcomePage() {
   return (
     <>
 
-      <div className="relative w-full h-screen">
+      <div className="relative w-full h-screen overflow-hidden">
         {/* Particles background */}
         <Particles
           particleColors={['#ffffff', '#ffffff']}
