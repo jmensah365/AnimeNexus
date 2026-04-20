@@ -106,7 +106,7 @@ export default function AnimePreferencesForm() {
                                     e.target.value = '';
                                 }}
                             >
-                                <option value="">Select a genre</option>
+                                <option value="">Select genre(s)</option>
                                 {genresList.map((genre) => (
                                     <option key={genre} value={genre}>
                                         {genre}
@@ -136,7 +136,7 @@ export default function AnimePreferencesForm() {
 
                     {/* Mood Text Input */}
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700">Describe your mood</label>
+                        <label className="block text-sm font-semibold text-gray-700">Describe your mood (optional)</label>
                         <input
                             type="text"
                             value={mood}
