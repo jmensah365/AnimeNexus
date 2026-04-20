@@ -111,7 +111,7 @@ function AnimeRecs() {
             const backendWatchlistAnimeIds = watchlistWithAnimeInfo?.result.map(item => item.kitsu_anime_data.id);
             setWatchlist(backendWatchlistAnimeIds);
             setIsWatchlistInitialized(true);
-            console.log('Watchlist initialized from backend:', backendWatchlistAnimeIds);
+            //console.log('Watchlist initialized from backend:', backendWatchlistAnimeIds);
         }
     }, [watchlistSuccess, watchlistWithAnimeInfo, isWatchlistInitialized]);
 
