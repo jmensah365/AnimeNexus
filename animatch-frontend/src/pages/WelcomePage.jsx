@@ -15,15 +15,19 @@ function WelcomePage() {
   const genAndInsertAnime = useGenAndInsertAnime(token);
   const genAndInsertAIRecs = useGenAndInsetAIRecs(token, navigate)
 
-  const handleClick = () => {
-    genAndInsertAnime.mutate(token)
-    genAndInsertAIRecs.mutate(token)
-  }
+  const handleClick = async () => {
+    try {
+      await genAndInsertAnime.mutateAsync(token);
+      await genAndInsertAIRecs.mutateAsync(token);
+    } catch (error) {
+      console.error('Error during setup:', error);
+    }
+  };
 
 
   return (
     <>
-
+    
       <div className="relative w-full h-screen overflow-scroll bg-black">
         {/* Particles background */}
         <Particles
@@ -47,6 +51,7 @@ function WelcomePage() {
           <p className='font-semibold'>Your adventure awaits...</p>
           <button
             onClick={() => handleClick()}
+            disabled={genAndInsertAnime.isPending || genAndInsertAIRecs.isPending}
             className={`relative border hover:border-red-600 duration-500 group cursor-pointer text-sky-50 overflow-hidden h-14 w-56 rounded-md bg-red-800 p-2 flex justify-center items-center font-extrabold mt-3 ${genAndInsertAIRecs.isPending ? 'animate-pulse' : 'animate-none'
               }`}
           >
@@ -55,7 +60,7 @@ function WelcomePage() {
             <div className="absolute z-0 w-32 h-32 rounded-full group-hover:scale-150 transition-all duration-500 ease-in-out bg-red-700 delay-150 group-hover:delay-150"></div>
             <div className="absolute z-0 w-24 h-24 rounded-full group-hover:scale-150 transition-all duration-500 ease-in-out bg-red-600 delay-150 group-hover:delay-200"></div>
             <div className="absolute z-0 w-16 h-16 rounded-full group-hover:scale-150 transition-all duration-500 ease-in-out bg-red-500 delay-150 group-hover:delay-300"></div>
-            <p className="z-10">{genAndInsertAIRecs.isPending ? 'Loading...' : 'Get Started'}</p>
+            <p className="z-10">{genAndInsertAIRecs.isPending || genAndInsertAIRecs.isPending ? 'Loading...' : 'Get Started'}</p>
           </button>
         </div>
       </div>
