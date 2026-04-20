@@ -45,6 +45,21 @@ const updatePreferences = async ({ genres, mood, moods, anime_eras, episode_coun
     return response.json();
 };
 
+const deleteAccount = async (token) => {
+    const response = await fetch(`${import.meta.env.VITE_PROD_URL}/auth/delete-account`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(await response.text());
+    }
+
+    return response.json();
+};
 
 
 // Data constants
@@ -113,6 +128,11 @@ function Settings() {
     const [insertAIError, setInsertAIError] = useState('');
     const [insertAnimeError, setInsertAnimeError] = useState('');
 
+    //Delete states
+    const [deleteConfirmText, setDeleteConfirmText] = useState('');
+    const [deleteSuccess, setDeleteSuccess] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+
 
     // Mutations
     const emailMutation = useMutation({
@@ -177,6 +197,25 @@ function Settings() {
         }
     });
 
+    const deleteAccountMutation = useMutation({
+        mutationFn: () => deleteAccount(token),
+        onSuccess: async (response) => {
+            setDeleteSuccess(response.message || 'Account deleted successfully.');
+            setDeleteError('');
+
+            await supabase.auth.signOut();
+            navigate('/');
+        },
+        onError: (error) => {
+            try {
+                setDeleteError(error.message);
+            } catch (e) {
+                setDeleteError('Failed to delete account. Please try again.');
+            }
+            setDeleteSuccess('');
+        }
+    });
+
     //Queries
     const preferences = useFetchPreferences(token);
     const preferenceId = preferences.data?.preference?.[0].id;
@@ -202,6 +241,17 @@ function Settings() {
         }
 
         passwordMutation.mutate(newPassword)
+    };
+
+    const handleDeleteAccount = (e) => {
+        e.preventDefault();
+
+        if (deleteConfirmText.trim() !== 'DELETE') {
+            setDeleteError('Please type DELETE exactly to confirm account deletion.');
+            return;
+        }
+
+        deleteAccountMutation.mutate();
     };
 
     const handlePreferencesSubmit = (e) => {
@@ -442,6 +492,8 @@ function Settings() {
                         </button>
                     </form>
 
+
+
                     {preferencesSuccess && (
                         <Alert color="success" onDismiss={() => setPreferencesSuccess("")}>
                             {preferencesSuccess}
@@ -452,6 +504,50 @@ function Settings() {
                             {preferencesError}
                         </Alert>
                     )}
+
+
+                </div>
+                {/* Delete Account Section */}
+                <div className="bg-gray-900 rounded-lg p-4 sm:p-6 mt-10 border border-red-900">
+                    <h2 className="text-lg font-semibold mb-2 text-red-400">Delete Account</h2>
+                    <p className="text-sm text-gray-300 mb-4">
+                        This action is permanent. Your account and associated data will be removed and cannot be recovered.
+                    </p>
+
+                    <form onSubmit={handleDeleteAccount} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Type <span className="font-bold text-red-400">DELETE</span> to confirm
+                            </label>
+                            <input
+                                type="text"
+                                value={deleteConfirmText}
+                                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-red-500 focus:border-red-500 text-sm"
+                                placeholder="Type DELETE"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={deleteAccountMutation.isPending}
+                            className="w-full bg-gradient-to-r from-red-500 to-red-700 cursor-pointer disabled:opacity-50 text-white px-4 py-2 rounded-md font-medium hover:bg-red-800 transition-colors duration-300"
+                        >
+                            {deleteAccountMutation.isPending ? 'Deleting Account...' : 'Delete Account'}
+                        </button>
+
+                        {deleteSuccess && (
+                            <Alert color="success" onDismiss={() => setDeleteSuccess('')}>
+                                {deleteSuccess}
+                            </Alert>
+                        )}
+
+                        {deleteError && (
+                            <Alert color="failure" onDismiss={() => setDeleteError('')}>
+                                {deleteError}
+                            </Alert>
+                        )}
+                    </form>
                 </div>
             </div>
         </div>
