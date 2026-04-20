@@ -19,7 +19,7 @@ const fetchAnime = async ({ pageParam = 0, queryKey }) => {
     return res.json();
 };
 
-const AnimeModal = ({ modalData, onClose }) => {
+const AnimeModal = ({modalData, onClose}) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -96,7 +96,7 @@ const AnimeModal = ({ modalData, onClose }) => {
                                         transition={{ delay: 0.2 }}
                                         className="text-4xl md:text-5xl font-bold text-white mb-2 text-center leading-tight"
                                     >
-                                        {modalData.attributes.canonicalTitle || modalData.attributes.titles.en}
+                                        {modalData.attributes.canonicalTitle || modalData.attributes.titles.en }
                                     </motion.h1>
                                 </div>
                             </div>
@@ -234,7 +234,6 @@ export default function Search() {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [selectedAnime, setSelectedAnime] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const limit = 12;
 
     // Debounce query input
@@ -305,23 +304,7 @@ export default function Search() {
 
     return (
         <div className="flex min-h-screen bg-black text-white animate-fade-down">
-            <div
-                className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
-            >
-                <Sidebar />
-                <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
-                >
-                    ✕
-                </button>
-            </div>
-
-            {/*  Desktop Sidebar */}
-            <div className="hidden lg:block">
-                <Sidebar />
-            </div>
+            <Sidebar />
             <main className="flex-grow max-w-7xl mx-auto p-6">
                 {/* Search Bar */}
                 <input
@@ -386,7 +369,7 @@ export default function Search() {
                 <div ref={loadMoreRef} className="h-12 flex justify-center items-center mt-8">
                     {!hasNextPage && debouncedQuery && (
                         <button type='button' className='text-gray-300 animate-bounce cursor-pointer' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                            <span className='inline-flex items-center justify-center gap-2'>Scroll back to the top <ArrowCircleUpIcon /></span>
+                            <span className='inline-flex items-center justify-center gap-2'>Scroll back to the top <ArrowCircleUpIcon/></span>
                         </button>
                     )}
                 </div>
