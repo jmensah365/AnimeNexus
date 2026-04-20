@@ -27,14 +27,21 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
             onClick={() => onClick(anime)}
             className="relative p-2 group cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-red-600/70"
         >
-            <div className="overflow-hidden mb-3">
-            <h2 className="text-red-400 font-medium text-xl">{anime.title}</h2>
+            <div className="relative overflow-hidden mb-3 rounded-sm">
                 <img
                     src={anime.image_url}
                     alt={anime.title}
-                    className="aspect-auto w-full h-96 rounded-sm object-fit transition-all duration-300"
+                    className="w-full h-96 object-cover transition-all duration-300"
                     loading="lazy"
                 />
+
+                {/* Gradient for readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                {/* Title overlay */}
+                <h2 className="absolute bottom-3 left-3 right-3 text-white font-semibold text-lg leading-tight line-clamp-2">
+                    {anime.title}
+                </h2>
             </div>
             <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6">
                 <p className="text-white">{anime.episode_count} Episodes</p>
@@ -233,13 +240,13 @@ function AnimeRecs() {
     const handleNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     }
     const handlePrevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     }
 
@@ -283,7 +290,7 @@ function AnimeRecs() {
                     className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                         } transition-transform duration-300 bg-black border-r border-gray-800 w-64 p-4 lg:hidden`}
                 >
-                    <Sidebar  />
+                    <Sidebar />
                     <button
                         onClick={() => setSidebarOpen(false)}
                         className="absolute top-4 right-4 text-white text-2xl focus:outline-none"
