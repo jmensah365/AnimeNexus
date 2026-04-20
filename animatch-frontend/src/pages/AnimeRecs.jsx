@@ -35,9 +35,8 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
                     loading="lazy"
                 />
             </div>
-
+            <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
             <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6">
-                <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
                 <p className="text-white">{anime.episode_count} Episodes</p>
                 <p className="text-white">{anime.synopsis.slice(0, 100)}...</p>
 
