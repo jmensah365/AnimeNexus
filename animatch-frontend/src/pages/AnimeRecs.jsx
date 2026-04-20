@@ -27,8 +27,8 @@ const AnimeCard = ({ anime, onClick, isWatchlisted, onToggleWatchlist, isFavorit
             onClick={() => onClick(anime)}
             className="relative p-2 group cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-red-600/70"
         >
-            <h2 className="text-red-400 font-medium text-2xl">{anime.title}</h2>
             <div className="overflow-hidden mb-3">
+            <h2 className="text-red-400 font-medium text-xl">{anime.title}</h2>
                 <img
                     src={anime.image_url}
                     alt={anime.title}
