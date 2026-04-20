@@ -3,7 +3,7 @@
 @source "../.flowbite-react/class-list.json";
 
 
-html, body, #root {
+html, body {
   margin: 0;
   padding: 0;
   background-color: black;

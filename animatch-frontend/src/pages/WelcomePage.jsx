@@ -24,7 +24,7 @@ function WelcomePage() {
   return (
     <>
 
-      <div className="relative w-full h-screen overflow-hidden bg-black">
+      <div className="relative w-full h-screen overflow-scroll bg-black">
         {/* Particles background */}
         <Particles
           particleColors={['#ffffff', '#ffffff']}
