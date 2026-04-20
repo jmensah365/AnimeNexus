@@ -40,7 +40,10 @@ function WelcomePage() {
 
         {/* Overlay content */}
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white animate-fade-down bg-black/40">
-          <img src={'/AniMatchLogo.png'} className="w-[600px] h-[600px]" />
+          <img
+            src="/AniMatchLogo.png"
+            className="w-full max-w-[600px] h-auto"
+          />
           <p className='font-semibold'>Your adventure awaits...</p>
           <button
             onClick={() => handleClick()}
