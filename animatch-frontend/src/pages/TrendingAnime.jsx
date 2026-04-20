@@ -66,10 +66,17 @@ function TrendingAnime() {
                         alt={anime.title.english}
                         className='aspect-auto w-full h-96 rounded-sm object-cover transition-all duration-300  cursor-pointer'
                         loading='lazy' />
+
+                    {/* Top gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent" />
+
+                    {/* Title at top */}
+                    <h2 className="absolute top-3 left-3 right-3 text-white font-semibold text-lg leading-tight line-clamp-2">
+                        {anime.title.english}
+                    </h2>
                 </div>
 
-                <div className='absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col p-6'>
-                    <h2 className='text-red-400 font-medium text-2xl leading-tight'>{anime.title.english}</h2>
+                <div className='absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex flex-col pt-16 px-4 pb-6"'>
                     {/* <p className='text-white'>{anime.episode_count} Episodes</p> */}
                     <p className=' text-white  leading-relaxed'>{stripHtml(anime.description).slice(0, 100)}...</p>
                 </div>
@@ -125,7 +132,7 @@ function TrendingAnime() {
                     </div>
                 </div>
             </div>
-            {modalData && <TrendingModal modalData={modalData} onClose={closeModal}/>}
+            {modalData && <TrendingModal modalData={modalData} onClose={closeModal} />}
         </>
     )
 }
