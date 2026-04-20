@@ -234,6 +234,7 @@ export default function Search() {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [selectedAnime, setSelectedAnime] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const limit = 12;
 
     // Debounce query input
